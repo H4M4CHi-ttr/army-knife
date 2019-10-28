@@ -1,19 +1,25 @@
 <template>
     <v-layout>
         <v-flex>
+            <h1>{{ title }}</h1>
+
+            <pre @click="$event.srcElement.select()">
+[Thu Jan 21 12:35:07 2016] [error] \xe6\x96\x87\xe5\xad\x97\xe5\x8c\x96\xe3\x81\x91\xe5\x8a\xa9\xe3\x81\x91\xe3\x81\xa6
+            </pre>
+
+            <p>
+                上の例のようにApacheのログなどで日本語がUTF-8の16進表記にエスケープされたものをデコードします。
+            </p>
             <v-card>
                 <v-card-text>
                     
                     <v-row>
-                        <v-markup>
-[Thu Jan 21 12:35:07 2016] [error] \xe6\x96\x87\xe5\xad\x97\xe5\x8c\x96\xe3\x81\x91\xe5\x8a\xa9\xe3\x81\x91\xe3\x81\xa6
-                        </v-markup>
 
                     </v-row>
 
                     <v-row>
                     
-                    <v-col md="6" sm="6" xs="12">
+                    <v-col cols="12" sm="6">
                     <v-textarea
                         label="デコードしたい文字列を入力"
                         v-model="target"
@@ -23,7 +29,7 @@
                     ></v-textarea>
                     </v-col>
 
-                    <v-col md="6" sm="6" xs="12">
+                    <v-col cols="12" sm="6">
                     <v-textarea
                         label="デコード結果"
                         v-model="decoded"
