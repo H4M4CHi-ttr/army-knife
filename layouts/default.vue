@@ -29,7 +29,7 @@
       fixed
       app
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="" />
       <v-toolbar-title v-text="title" />
       <v-spacer />
       <v-btn
@@ -75,7 +75,7 @@ export default {
   data () {
     return {
       clipped: false,
-      drawer: true,
+      drawer: false,
       fixed: false,
       items: [
         {
@@ -87,6 +87,11 @@ export default {
           icon: 'mdi-transfer-left',
           title: 'UTF-8 16進数デコード',
           to: '/decode/utf8-hex'
+        },
+        {
+          icon: 'mdi-database',
+          title: 'SQL VALUES 生成',
+          to: '/sql/values'
         },
       ],
       miniVariant: false,

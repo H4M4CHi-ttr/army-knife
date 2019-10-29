@@ -6,11 +6,13 @@
   "private": true,
   "scripts": {
     "dev": "nuxt",
+    "ddev": "HOST=0.0.0.0 PORT=3000 nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "d3": "^5.12.0",
     "nuxt": "^2.0.0"
   },
   "devDependencies": {
