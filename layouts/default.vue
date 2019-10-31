@@ -1,7 +1,7 @@
 <template>
   <v-app dark>
     <v-navigation-drawer
-      v-model="drawer"
+      v-model="drawer_final"
       :mini-variant="miniVariant"
       :clipped="clipped"
       fixed
@@ -29,7 +29,7 @@
       fixed
       app
     >
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="" />
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="d-lg-none" />
       <v-toolbar-title v-text="title" />
       <v-spacer />
       <v-btn
@@ -90,7 +90,7 @@ export default {
         },
         {
           icon: 'mdi-database',
-          title: 'SQL VALUES 生成',
+          title: 'SQL VALUES 生成 (β)',
           to: '/sql/values'
         },
       ],
@@ -99,6 +99,15 @@ export default {
       rightDrawer: false,
       title: 'Army Knife'
     }
+  },
+
+  computed: {
+    drawer_final () {
+      if (this.$vuetify.breakpoint.lgAndUp){
+        return true
+      }
+      return this.drawer;
+    },
   }
 }
 </script>

@@ -7,28 +7,40 @@
                 <v-card-text>
                     <v-textarea
                         v-model="target"
+						solo
                         ></v-textarea>
                     
-                    <v-row align="center">
-                        <v-radio-group v-model="delim_checked" row>
-                            <v-radio value="auto" label="自動"></v-radio>
-                            <v-radio v-for="item in delim_options" :value="item.value" :key="item.value">
-								<template v-slot:label>
-									{{ item.title }}
-									<code class="ml-1">{{ item.value }}</code>
-								</template>
-							</v-radio>
-                            <v-radio value="user" label="指定する"></v-radio>
-                        </v-radio-group>
-						<v-text-field
-							label="区切り文字"
-							hint="入力は1文字までです"
-							:disabled="delim_checked!='user'"
-							v-model="delim_user"
-							maxlength="1"
-							dense
-						></v-text-field>
-                    </v-row>
+					<v-card-actions>
+						<v-row align="center" dense>
+							<v-col cols="12" md="8">
+							<v-radio-group v-model="delim_checked" row>
+								<v-radio value="auto" label="自動"></v-radio>
+								<v-radio v-for="item in delim_options" :value="item.value" :key="item.value">
+									<template v-slot:label>
+										{{ item.title }}
+										<code class="ml-1">{{ item.value }}</code>
+									</template>
+								</v-radio>
+							</v-radio-group>
+							</v-col>
+
+							<v-col cols="12" md="4">
+								<v-row align="baseline">
+								<v-radio-group v-model="delim_checked" row>
+									<v-radio value="user" label="指定する"></v-radio>
+								<v-text-field
+									label="区切り文字"
+									hint="入力は1文字までです"
+									:disabled="delim_checked!='user'"
+									v-model="delim_user"
+									maxlength="1"
+									dense
+								></v-text-field>
+								</v-radio-group>
+								</v-row>
+							</v-col>
+						</v-row>
+					</v-card-actions>
 
                     <v-textarea
 						label="結果"
@@ -48,6 +60,7 @@ import * as d3 from "d3";
 export default {
     data () {
         return {
+			title: "SQL VALUES",
             target: "a,10\nb,20",
 		    rows: [],
 		
@@ -64,6 +77,12 @@ export default {
         }
     },
 
+    head () {
+        return {
+            title: this.title,
+        }
+    },
+
     computed: {
 		result () {
 			var dsv = d3.dsvFormat(this.delim);
@@ -74,6 +93,8 @@ export default {
 				res += "('" + this.rows[i].join("','") + "'),\n";
 			}
 			res = res.replace(/,\n$/,"");
+			
+			res = "VALUES\n" + res;
 			return res;
 		},
 		
