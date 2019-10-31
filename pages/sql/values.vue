@@ -90,7 +90,7 @@ export default {
 			this.rows = dsv.parseRows(this.target);
 			var res = "";
 			for (var i=0; i < this.rows.length; i++){
-				res += "('" + this.rows[i].join("','") + "'),\n";
+				res += "('" + this.rows[i].replace("'","''").join("','") + "'),\n";
 			}
 			res = res.replace(/,\n$/,"");
 			
