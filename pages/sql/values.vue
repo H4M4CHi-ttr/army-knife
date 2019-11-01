@@ -90,7 +90,9 @@ export default {
 			this.rows = dsv.parseRows(this.target);
 			var res = "";
 			for (var i=0; i < this.rows.length; i++){
-				res += "('" + this.rows[i].replace("'","''").join("','") + "'),\n";
+				// シングルクォートを連続シングルクォートに置き換え
+				var row = this.rows[i].map(e =>{ return e.replace("'", "''") })
+				res += "('" + this.rows[i].join("','") + "'),\n";
 			}
 			res = res.replace(/,\n$/,"");
 			
