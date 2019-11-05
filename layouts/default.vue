@@ -96,7 +96,7 @@ export default {
   },
 
   computed: {
-    drawer_final () {
+    drawer_final: {
       get () {
         if (this.$vuetify.breakpoint.lgAndUp){
           return true
