@@ -92,7 +92,7 @@ export default {
 			for (var i=0; i < this.rows.length; i++){
 				// シングルクォートを連続シングルクォートに置き換え
 				var row = this.rows[i].map(e =>{ return e.replace("'", "''") })
-				res += "('" + this.rows[i].join("','") + "'),\n";
+				res += "('" + row.join("','") + "'),\n";
 			}
 			res = res.replace(/,\n$/,"");
 			
