@@ -2,6 +2,9 @@ import colors from 'vuetify/es5/util/colors'
 
 export default {
   mode: 'universal',
+  router: {
+    base: "/army-knife"
+  },
   /*
   ** Headers of the page
   */
