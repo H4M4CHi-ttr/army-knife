@@ -32,12 +32,6 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" class="d-lg-none" />
       <v-toolbar-title v-text="title" />
       <v-spacer />
-      <v-btn
-        icon
-        @click.stop="rightDrawer = !rightDrawer"
-      >
-        <v-icon>mdi-menu</v-icon>
-      </v-btn>
     </v-app-bar>
     <v-content>
       <v-container>
@@ -103,10 +97,15 @@ export default {
 
   computed: {
     drawer_final () {
-      if (this.$vuetify.breakpoint.lgAndUp){
-        return true
+      get () {
+        if (this.$vuetify.breakpoint.lgAndUp){
+          return true
+        }
+        return this.drawer;
+      },
+      set (e) {
+        this.drawer = e;
       }
-      return this.drawer;
     },
   }
 }
