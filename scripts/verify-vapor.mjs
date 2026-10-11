@@ -56,7 +56,11 @@ const result = await build({
       name: "inspect-vapor-fixture",
       enforce: "post",
       transform(code, id) {
-        if (id.split("?")[0] === sourcePath("tests/fixtures/vapor/VaporProbe.vue")) {
+        // Vite normalizes module IDs to forward slashes, including on Windows.
+        if (
+          id.split("?")[0].replaceAll("\\", "/") ===
+          sourcePath("tests/fixtures/vapor/VaporProbe.vue").replaceAll("\\", "/")
+        ) {
           transformedProbe += `${code}\n`;
         }
       },

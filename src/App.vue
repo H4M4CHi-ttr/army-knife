@@ -47,6 +47,7 @@ const HarTool = defineAsyncComponent(() => import("@/components/tools/HarTool.vu
 const EnvTool = defineAsyncComponent(() => import("@/components/tools/EnvTool.vue"));
 const UrlTool = defineAsyncComponent(() => import("@/components/tools/UrlTool.vue"));
 const ExplainTool = defineAsyncComponent(() => import("@/components/tools/ExplainTool.vue"));
+const ShortcutTool = defineAsyncComponent(() => import("@/components/tools/ShortcutTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
@@ -490,6 +491,7 @@ onBeforeUnmount(() => {
           <EnvTool v-else-if="selectedTool.id === 'env'" key="env" />
           <UrlTool v-else-if="selectedTool.id === 'url'" key="url" />
           <ExplainTool v-else-if="selectedTool.id === 'explain'" key="explain" />
+          <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" key="shortcuts" />
         </template>
         <p v-if="!status.available" class="notice" role="status">
           {{ t("settings.storageError") }}

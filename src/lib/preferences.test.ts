@@ -104,7 +104,15 @@ describe("private browser preferences", () => {
       }),
       "en",
     );
-    expect(migrated.enabledTools).toEqual(["csv", "sets", "har", "env", "url", "explain"]);
+    expect(migrated.enabledTools).toEqual([
+      "csv",
+      "sets",
+      "shortcuts",
+      "har",
+      "env",
+      "url",
+      "explain",
+    ]);
     expect(migrated.enabledTools).not.toContain("cidr");
     expect(migrated.enabledTools).not.toContain("json-format");
     expect(migrated.enabledTools).not.toContain("contrast");

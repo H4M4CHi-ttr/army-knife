@@ -1,5 +1,11 @@
 # 第三者ソフトウェアとフォントの帰属
 
+## ショートカット調査の出典
+
+ショートカット辞書は、固定した公式一次資料に照合した82件です。出典ごとの権利表示を保持したこの82件版の公開はプロジェクト所有者が了承しています。提供者、対象版、UTC確認日、データライセンス、帰属、変更通知は `src/data/shortcuts.ts`、`src/data/shortcuts-firefox.ts` と結果画面に保持します。以前の560件アーカイブを実装の入力には使っていません。現行380件からの保留298件は現在の辞書・bundleに含めませんが、既存PR履歴の削除を意味しません。
+
+**アプリコードのMITは出典由来データを再許諾しません。** VS Code18件はCC BY 3.0 US、Terminal15件とGitHub18件はCC BY 4.0、Warp15件はDenver TechnologiesのMIT、Firefox16件とその翻案（機能名・条件説明・日本語訳を含む）はCC BY-SA 3.0です。Firefox由来部分のShareAlikeはファイル分割だけで解消されるものではありません。作者・著作権・原記事/帰属リンク、選択・正規化・翻訳の変更通知、免責、全ライセンス原文を [同梱の帰属ページ](public/licenses/shortcut-sources/notices.html) に保持します。各原文と [公開方針](docs/shortcuts.md) を確認してください。
+
 Army Knife の独自コードは [MIT License](LICENSE)、Copyright (c) 2026 H4M4CHi-ttr で提供します。第三者のコード、アイコン、フォントには、それぞれのライセンスが適用されます。本書によって第三者の権利表示やライセンスを変更することはありません。
 
 以下はロック済みの依存、同梱された原文、ソースの来歴に基づく案内です。完全な条件は各原文を参照してください。
@@ -8,15 +14,21 @@ Army Knife の独自コードは [MIT License](LICENSE)、Copyright (c) 2026 H4M
 
 production build は次のファイルを同じサイトから配信する構成です。ソースリポジトリでは生成物をコミットせず、依存のインストールとビルドから生成します。
 
-| 公開ディレクトリ内のパス              | 内容・生成元                                                                                                      |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `LICENSE.txt`                         | Army Knife の MIT 原文（ソースの `LICENSE` をコピー）                                                             |
-| `THIRD_PARTY_NOTICES.md`              | 本書                                                                                                              |
-| `licenses/shadcn-vue-MIT.txt`         | コピー・調整した shadcn-vue コンポーネントの MIT 原文                                                             |
-| `licenses/tailwindcss-MIT.txt`        | Tailwind CSS の MIT 原文                                                                                          |
-| `licenses/javascript-dependencies.md` | Vite+ のビルドが実際に bundle する JavaScript 依存のライセンス原文                                                |
-| `licenses/rust-dependencies.txt`      | Rust のロック済み依存情報と `LICENSE*` / `COPYING*` / `NOTICE*` / `UNLICENSE*` 原文を WASM ビルド時に集約したもの |
-| `fonts/licenses/`                     | Sarasa と Noto 5 系列、計 6 本の未変更の OFL 原文                                                                 |
+| 公開ディレクトリ内のパス                           | 内容・生成元                                                                                                      |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `LICENSE.txt`                                      | Army Knife の MIT 原文（ソースの `LICENSE` をコピー）                                                             |
+| `THIRD_PARTY_NOTICES.md`                           | 本書                                                                                                              |
+| `licenses/shadcn-vue-MIT.txt`                      | コピー・調整した shadcn-vue コンポーネントの MIT 原文                                                             |
+| `licenses/tailwindcss-MIT.txt`                     | Tailwind CSS の MIT 原文                                                                                          |
+| `licenses/javascript-dependencies.md`              | Vite+ のビルドが実際に bundle する JavaScript 依存のライセンス原文                                                |
+| `licenses/rust-dependencies.txt`                   | Rust のロック済み依存情報と `LICENSE*` / `COPYING*` / `NOTICE*` / `UNLICENSE*` 原文を WASM ビルド時に集約したもの |
+| `fonts/licenses/`                                  | Sarasa と Noto 5 系列、計 6 本の未変更の OFL 原文                                                                 |
+| `licenses/shortcut-sources/notices.html`           | 候補82件の出典・作者・著作権・変更通知・データ適用範囲                                                            |
+| `licenses/shortcut-sources/CC-BY-4.0.txt`          | CC BY 4.0 の全原文と免責                                                                                          |
+| `licenses/shortcut-sources/CC-BY-SA-3.0.txt`       | CC BY-SA 3.0 の全原文と免責                                                                                       |
+| `licenses/shortcut-sources/CC-BY-3.0-US.html`      | CC BY 3.0 US の全法的本文・CC通知（ナビゲーション・旗画像を除去）                                                 |
+| `licenses/shortcut-sources/vscode-docs-LICENSE.md` | VS Code文書の原著作権・文書/コードのライセンス区別・商標留保                                                      |
+| `licenses/shortcut-sources/warp-docs-MIT.txt`      | Warp文書の全著作権・許諾・免責原文                                                                                |
 
 JavaScript のバージョンと依存グラフは [package.json](package.json) と [pnpm-lock.yaml](pnpm-lock.yaml)、Rust は [Cargo.toml](crates/army-knife-core/Cargo.toml) と [Cargo.lock](crates/army-knife-core/Cargo.lock) で管理します。間接依存を含む原文は上記の生成ファイルで確認できます。ビルドやテストのためだけにインストールされるツールもあり、依存として列挙されているすべてのコードがブラウザへ配信されるわけではありません。
 

@@ -10,6 +10,7 @@ export type ToolId =
   | "har"
   | "env"
   | "url"
+  | "shortcuts"
   | "explain";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
@@ -22,6 +23,15 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "shortcuts",
+    category: "text",
+    wasm: false,
+    devtoys: false,
+    keywords:
+      "shortcut keyboard hotkey keybinding key chord sequence desktop web browser ショートカット キー キーボード 調査 快捷键 快捷鍵 단축키",
+    color: "blue",
+  },
   {
     id: "har",
     category: "network",

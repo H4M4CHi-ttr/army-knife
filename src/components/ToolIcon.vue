@@ -12,10 +12,12 @@ import {
   FileKey2,
   Link2,
   Workflow,
+  Keyboard,
 } from "@lucide/vue";
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  shortcuts: Keyboard,
   har: Activity,
   env: FileKey2,
   url: Link2,
