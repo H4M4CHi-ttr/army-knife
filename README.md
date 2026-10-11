@@ -172,7 +172,7 @@ GitHub Actions でも同じ品質ゲートを実行し、ブラウザ検査を�
 
 [ワークフロー](.github/workflows/ci.yml) は pull request・`main` への push・手動実行でテストします。**成功した `main` の production build だけを Pages に渡します。** PR や他のブランチからは公開しません。Pages が未設定の場合は設定を自動変更せず、デプロイ段階で失敗します。
 
-Pages 用のベースパスは `/army-knife/`、ツールのルーティングは `#/tool/cidr` のような hash 形式です。[GitHub の公式手順](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) と [CI の詳細](docs/testing.md#pages-deployment-and-permissions) を参照してください。
+Pages 用のベースパスは `/army-knife/` です。各ツールは `/army-knife/ja/tools/cidr/` のような通常 URL で直接開けます。5 言語それぞれの実 HTML に説明・使い方・例があり、同じページでツールを操作できます。旧 `#/tool/cidr` リンクも対応する通常ページへ移動します。無効にしたツールは説明だけ閲覧でき、操作には設定での有効化が必要です。[URL・静的生成の設計](docs/static-pages.md)、[GitHub の公式手順](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) と [CI の詳細](docs/testing.md#pages-deployment-and-permissions) を参照してください。
 
 ## ドキュメントとライセンス
 

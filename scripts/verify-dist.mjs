@@ -271,7 +271,7 @@ export function verifyDist(directory = join(PROJECT_ROOT, 'dist')) {
     });
     try {
       const document = new window.DOMParser().parseFromString(readFileSync(file, 'utf8'), extname(file) === '.svg' ? 'image/svg+xml' : 'text/html');
-      if (file === join(root, 'index.html')) validateCsp(document, file);
+      if (file === join(root, 'index.html') || document.getElementById('app')) validateCsp(document, file);
       for (const element of document.querySelectorAll('*')) {
         const tag = element.localName.toLowerCase();
         for (const attribute of element.attributes) {

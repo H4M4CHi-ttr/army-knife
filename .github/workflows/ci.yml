@@ -111,7 +111,10 @@ jobs:
         run: pnpm verify:vapor
 
       - name: Test production verification and license collection failure cases
-        run: node --test scripts/verify-dist.test.mjs scripts/build-rust-notices.test.mjs
+        run: node --test scripts/verify-dist.test.mjs scripts/build-rust-notices.test.mjs scripts/verify-static-pages.test.mjs
+
+      - name: Lint the application and static page generator
+        run: pnpm exec vp lint
 
       - name: Build the production GitHub Pages assets
         run: vp build

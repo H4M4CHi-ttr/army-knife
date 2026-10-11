@@ -1,8 +1,8 @@
 import { reactive, watch } from "vue";
 import { isToolId, tools, type ToolId } from "./catalog";
 
-export const LOCALES = ["ja", "en", "zh-CN", "zh-TW", "ko"] as const;
-export type Locale = (typeof LOCALES)[number];
+import { LOCALES, type Locale } from "./locales";
+export { LOCALES, type Locale } from "./locales";
 export type Theme = "system" | "light" | "dark";
 export const STORAGE_KEY = "army-knife:preferences:v1";
 export interface Preferences {

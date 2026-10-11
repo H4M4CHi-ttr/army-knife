@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { defineConfig } from "vite-plus";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
+import { writeStaticPages } from "./scripts/static-pages";
 
 export default defineConfig({
   base: "/army-knife/",
@@ -11,6 +12,13 @@ export default defineConfig({
     // components retain their VDOM runtime and cross via vaporInteropPlugin.
     vue({ features: { vapor: false } }),
     tailwindcss(),
+    {
+      name: "army-knife-static-tool-pages",
+      apply: "build",
+      closeBundle() {
+        writeStaticPages(fileURLToPath(new URL("./dist", import.meta.url)));
+      },
+    },
     {
       name: "army-knife-project-notices",
       apply: "build",

@@ -6,6 +6,7 @@ public/licenses/rust-dependencies.txt
 public/licenses/rust-dependencies.txt.tmp
 src/lib/wasm/pkg/
 .cache/
+.tools/
 .font-cache/
 target/
 crates/*/target/

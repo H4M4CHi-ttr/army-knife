@@ -44,7 +44,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm preview --host 127.0.0.1 --port 4173 --strictPort",
+    command: "node scripts/serve-dist.mjs --host 127.0.0.1 --port 4173",
     url: "http://127.0.0.1:4173/army-knife/",
     reuseExistingServer: false,
     timeout: 30_000,

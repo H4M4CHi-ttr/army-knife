@@ -23,7 +23,11 @@ async function staticAssets(directory: string, prefix = "/army-knife/"): Promise
 let allowedAssets: Promise<Set<string>> | undefined;
 function assetAllowlist(): Promise<Set<string>> {
   allowedAssets ??= staticAssets(resolve(process.cwd(), "dist")).then(
-    (paths) => new Set(["/army-knife/", ...paths]),
+    (paths) =>
+      new Set([
+        ...paths,
+        ...paths.filter((path) => path.endsWith("/index.html")).map((path) => path.slice(0, -10)),
+      ]),
   );
   return allowedAssets;
 }
@@ -88,7 +92,7 @@ const test = base.extend<{ shortcutAudit: Audit }>({
 });
 
 async function openTool(page: Page): Promise<void> {
-  await page.goto("./#/tool/shortcuts");
+  await page.goto("./en/tools/shortcuts/");
   await expect(page.getByTestId("shortcut-capture")).toBeVisible();
 }
 
@@ -292,13 +296,17 @@ test("all languages and themes react while results remain responsive", async ({
   await openTool(page);
   await page.getByTestId("shortcut-manual").fill("g then i");
   await page.getByTestId("shortcut-app").selectOption("github");
+  await expect(page.getByTestId("shortcut-result")).toHaveCount(1);
   const english = await page.getByTestId("shortcut-result-count").textContent();
   const englishCandidate = await page.getByTestId("shortcut-candidate-notice").textContent();
   for (const locale of ["ja", "zh-CN", "zh-TW", "ko", "en"]) {
     await page.getByTestId("settings-button").click();
     await page.getByTestId("locale-select").selectOption(locale);
-    await page.getByTestId("settings-close").click();
+    await expect(page).toHaveURL(new RegExp(`/army-knife/${locale}/tools/shortcuts/$`));
     await expect(page.locator("html")).toHaveAttribute("lang", locale);
+    await expect(page.getByTestId("shortcut-capture")).toHaveValue("");
+    await page.getByTestId("shortcut-manual").fill("g then i");
+    await page.getByTestId("shortcut-app").selectOption("github");
     await expect(page.getByTestId("shortcut-capture")).toHaveValue("G then I");
     await expect(page.getByTestId("shortcut-result")).toHaveCount(1);
     await expect(page.getByTestId("shortcut-result-count")).not.toContainText(

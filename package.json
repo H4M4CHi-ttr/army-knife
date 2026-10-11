@@ -14,7 +14,7 @@
     "build:fonts": "python3 scripts/build-fonts.py",
     "build:wasm": "node scripts/build-wasm.mjs",
     "test:wasm": "node scripts/test-wasm.mjs",
-    "verify:dist": "node scripts/verify-dist.mjs",
+    "verify:dist": "node scripts/verify-dist.mjs && node scripts/verify-static-pages.mjs",
     "verify:vapor": "node scripts/verify-vapor.mjs"
   },
   "dependencies": {

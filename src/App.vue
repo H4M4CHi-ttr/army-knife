@@ -34,9 +34,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import ToolIcon from "@/components/ToolIcon.vue";
 import SettingsDialog from "@/components/SettingsDialog.vue";
-import { getTool, isToolId, tools, type Category, type ToolId } from "@/lib/catalog";
+import { getTool, tools, type Category, type ToolId } from "@/lib/catalog";
 import { settings } from "@/lib/preferences";
 import { setFontLocale } from "@/lib/fonts";
+import { legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
 const JsonTool = defineAsyncComponent(() => import("@/components/tools/JsonTool.vue"));
@@ -56,7 +57,8 @@ const favoritesOnly = ref(false);
 const mobileOpen = ref(false);
 const settingsOpen = ref(false);
 const fontError = ref(false);
-const hash = ref(window.location.hash);
+const pageRoute = ref(resolvePageRoute(window.location.pathname, import.meta.env.BASE_URL));
+if (pageRoute.value.kind !== "unknown") preferences.locale = pageRoute.value.locale;
 const searchInput = ref<HTMLInputElement>();
 const heading = ref<HTMLElement>();
 const settingsButton = ref<InstanceType<typeof Button>>();
@@ -73,12 +75,53 @@ const languageNames = {
 const categoryIcons = { data: Database, text: TextCursorInput, network: Network, design: Palette };
 const categories: Category[] = ["data", "text", "network", "design"];
 const enabled = computed(() => tools.filter((tool) => preferences.enabledTools.includes(tool.id)));
-const requestedId = computed(() => hash.value.match(/^#\/tool\/([a-z-]+)$/)?.[1]);
+const requestedTool = computed(() =>
+  pageRoute.value.kind === "tool" ? getTool(pageRoute.value.toolId) : null,
+);
 const selectedTool = computed(() =>
-  isToolId(requestedId.value) && preferences.enabledTools.includes(requestedId.value)
-    ? getTool(requestedId.value)
+  requestedTool.value && preferences.enabledTools.includes(requestedTool.value.id)
+    ? requestedTool.value
     : null,
 );
+const homeHref = computed(() => localeHomePath(preferences.locale, import.meta.env.BASE_URL));
+const guideHasHeading = computed(() =>
+  requestedTool.value
+    ? document.getElementById("page-guide")?.dataset.tool === requestedTool.value.id
+    : document.getElementById("page-guide")?.dataset.page === "home",
+);
+const pageStates = {
+  ja: {
+    disabled: "このツールは設定で無効になっています",
+    disabledHint: "説明は引き続き読めます。操作するには設定でこのツールを有効にしてください。",
+    unknown: "ページが見つかりません",
+    unknownHint: "ツール一覧から利用したいツールを選んでください。",
+  },
+  en: {
+    disabled: "This tool is disabled in your settings",
+    disabledHint: "You can still read the guide. Enable this tool in Settings to use it.",
+    unknown: "Page not found",
+    unknownHint: "Choose a tool from the tool collection.",
+  },
+  "zh-CN": {
+    disabled: "此工具已在设置中停用",
+    disabledHint: "您仍可阅读说明。请在设置中启用此工具后使用。",
+    unknown: "找不到页面",
+    unknownHint: "请从工具列表中选择所需的工具。",
+  },
+  "zh-TW": {
+    disabled: "此工具已在設定中停用",
+    disabledHint: "您仍可閱讀說明。請在設定中啟用此工具後使用。",
+    unknown: "找不到頁面",
+    unknownHint: "請從工具清單中選擇所需的工具。",
+  },
+  ko: {
+    disabled: "설정에서 이 도구가 비활성화되어 있습니다",
+    disabledHint: "설명은 계속 읽을 수 있습니다. 사용하려면 설정에서 이 도구를 활성화하세요.",
+    unknown: "페이지를 찾을 수 없습니다",
+    unknownHint: "도구 목록에서 사용할 도구를 선택하세요.",
+  },
+};
+const pageState = computed(() => pageStates[preferences.locale]);
 const matches = computed(() =>
   enabled.value.filter((tool) => {
     const haystack =
@@ -109,15 +152,20 @@ const libraryHeading = computed(() =>
         : t("app.headline"),
 );
 
-function home(category: Category | "all" = "all", favorites = false) {
-  activeCategory.value = category;
-  favoritesOnly.value = favorites;
+function collectionHref(category: Category | "all" = "all", favorites = false) {
+  return `${homeHref.value}${favorites ? "#favorites" : category === "all" ? "" : `#category-${category}`}`;
+}
+function applyCollectionHash() {
+  if (pageRoute.value.kind !== "home") return;
+  const category = window.location.hash.replace(/^#category-/, "");
+  activeCategory.value = categories.includes(category as Category) ? (category as Category) : "all";
+  favoritesOnly.value = window.location.hash === "#favorites";
   query.value = "";
   mobileOpen.value = false;
-  window.location.hash = "/";
 }
+applyCollectionHash();
 function chooseTool(id: ToolId) {
-  window.location.hash = `/tool/${id}`;
+  window.location.assign(toolHref(id));
   query.value = "";
   mobileOpen.value = false;
 }
@@ -125,6 +173,9 @@ function favorite(id: ToolId) {
   preferences.favorites = preferences.favorites.includes(id)
     ? preferences.favorites.filter((value) => value !== id)
     : [...preferences.favorites, id];
+}
+function toolHref(id: ToolId) {
+  return toolPath(preferences.locale, id, import.meta.env.BASE_URL);
 }
 function openSettings(event?: Event) {
   settingsTrigger =
@@ -154,9 +205,20 @@ function toggleTheme() {
   preferences.theme = document.documentElement.classList.contains("dark") ? "light" : "dark";
 }
 function onHash() {
-  hash.value = window.location.hash;
+  const destination = legacyToolRedirect(
+    window.location.hash,
+    preferences.locale,
+    import.meta.env.BASE_URL,
+  );
+  if (destination) window.location.replace(destination);
+  else applyCollectionHash();
+}
+function onLocation() {
+  pageRoute.value = resolvePageRoute(window.location.pathname, import.meta.env.BASE_URL);
+  if (pageRoute.value.kind !== "unknown") preferences.locale = pageRoute.value.locale;
   query.value = "";
   mobileOpen.value = false;
+  applyCollectionHash();
 }
 function skipToContent() {
   document.getElementById("main-content")?.focus();
@@ -174,41 +236,42 @@ function onKey(event: KeyboardEvent) {
 watch(() => preferences.theme, applyTheme, { immediate: true });
 watch(
   () => preferences.locale,
-  (value) => {
+  (value, previous) => {
     locale.value = value;
     fontError.value = false;
     setFontLocale(value).catch(() => {
       if (preferences.locale === value) fontError.value = true;
     });
+    if (previous && previous !== value && pageRoute.value.kind !== "unknown") {
+      const destination =
+        pageRoute.value.kind === "tool" ? toolHref(pageRoute.value.toolId) : homeHref.value;
+      if (window.location.pathname !== destination) window.location.assign(destination);
+    }
   },
   { immediate: true },
 );
 watch(
-  [selectedTool, locale],
+  [requestedTool, locale],
   ([value]) => {
-    document.title = `${value ? t(`tool.${value.id}.name`) : "Army Knife"} — ${t("app.tagline")}`;
+    document.title = value
+      ? `${t(`tool.${value.id}.name`)} — Army Knife`
+      : `Army Knife — ${t("app.tagline")}`;
   },
   { immediate: true },
 );
-watch(selectedTool, async () => {
+watch(requestedTool, async () => {
   await nextTick();
   heading.value?.focus({ preventScroll: true });
 });
-watch(
-  () => preferences.enabledTools,
-  () => {
-    if (isToolId(requestedId.value) && !preferences.enabledTools.includes(requestedId.value))
-      window.location.hash = "/";
-  },
-  { deep: true },
-);
 onMounted(() => {
   window.addEventListener("hashchange", onHash);
+  window.addEventListener("popstate", onLocation);
   window.addEventListener("keydown", onKey);
   systemTheme.addEventListener("change", applyTheme);
 });
 onBeforeUnmount(() => {
   window.removeEventListener("hashchange", onHash);
+  window.removeEventListener("popstate", onLocation);
   window.removeEventListener("keydown", onKey);
   systemTheme.removeEventListener("change", applyTheme);
 });
@@ -224,7 +287,7 @@ onBeforeUnmount(() => {
       @click="mobileOpen = false"
     ></button>
     <aside :class="['sidebar', { 'sidebar-open': mobileOpen }]">
-      <a class="brand" href="#/" @click.prevent="home()"
+      <a class="brand" :href="homeHref"
         ><img :src="logo" alt="" width="37" height="37" />
         <div>
           <strong>army<span>knife</span><span class="brand-dot">.</span></strong
@@ -233,45 +296,45 @@ onBeforeUnmount(() => {
       >
       <nav :aria-label="t('nav.workspace')">
         <p class="nav-label">{{ t("nav.workspace") }}</p>
-        <button
+        <a
+          :href="homeHref"
           :class="[
             'nav-item',
-            { active: !selectedTool && !favoritesOnly && activeCategory === 'all' },
+            { active: pageRoute.kind === 'home' && !favoritesOnly && activeCategory === 'all' },
           ]"
-          @click="home()"
         >
           <LayoutGrid /><span>{{ t("nav.library") }}</span
           ><span class="nav-count">{{ enabled.length }}</span>
-        </button>
-        <button
-          :class="['nav-item', { active: !selectedTool && favoritesOnly }]"
-          @click="home('all', true)"
+        </a>
+        <a
+          :href="collectionHref('all', true)"
+          :class="['nav-item', { active: pageRoute.kind === 'home' && favoritesOnly }]"
         >
           <Heart /><span>{{ t("nav.favorites") }}</span
           ><span v-if="preferences.favorites.length" class="nav-count">{{
             enabled.filter((tool) => preferences.favorites.includes(tool.id)).length
           }}</span>
-        </button>
+        </a>
         <p class="nav-label category-label">{{ t("nav.categories") }}</p>
-        <button
+        <a
           v-for="category in categories"
           :key="category"
+          :href="collectionHref(category)"
           :class="[
             'nav-item category-item',
-            { active: !selectedTool && !favoritesOnly && activeCategory === category },
+            { active: pageRoute.kind === 'home' && !favoritesOnly && activeCategory === category },
           ]"
-          @click="home(category)"
         >
           <component :is="categoryIcons[category]" /><span>{{ t(`categories.${category}`) }}</span
           ><span class="category-count">{{
             enabled.filter((tool) => tool.category === category).length
           }}</span>
-        </button>
+        </a>
         <div class="sidebar-divider"></div>
         <a
           v-for="tool in enabled"
           :key="tool.id"
-          :href="`#/tool/${tool.id}`"
+          :href="toolHref(tool.id)"
           :class="['nav-tool', { selected: selectedTool?.id === tool.id }]"
           :aria-current="selectedTool?.id === tool.id ? 'page' : undefined"
           ><ToolIcon :id="tool.id" /><span>{{ t(`tool.${tool.id}.name`) }}</span
@@ -316,10 +379,10 @@ onBeforeUnmount(() => {
             autocomplete="off"
             spellcheck="false"
             :maxlength="150"
-            @keydown.enter="selectedTool && matches[0] && chooseTool(matches[0].id)"
+            @keydown.enter="pageRoute.kind === 'tool' && matches[0] && chooseTool(matches[0].id)"
           /><kbd>⌘ / Ctrl K</kbd>
-          <div v-if="query && selectedTool" class="search-results">
-            <a v-for="tool in matches" :key="tool.id" :href="`#/tool/${tool.id}`"
+          <div v-if="query && pageRoute.kind === 'tool'" class="search-results">
+            <a v-for="tool in matches" :key="tool.id" :href="toolHref(tool.id)"
               ><ToolIcon :id="tool.id" />{{ t(`tool.${tool.id}.name`) }}<ArrowUpRight
             /></a>
             <p v-if="!matches.length" class="hint">{{ t("states.noMatches") }}</p>
@@ -347,11 +410,13 @@ onBeforeUnmount(() => {
         </div>
       </header>
       <main id="main-content" class="workspace" tabindex="-1">
-        <template v-if="!selectedTool">
+        <template v-if="pageRoute.kind === 'home'">
           <section class="hero">
             <div class="hero-copy">
               <p class="eyebrow"><span></span>{{ t("app.eyebrow") }}</p>
-              <h1 ref="heading" tabindex="-1">{{ libraryHeading }}</h1>
+              <component :is="guideHasHeading ? 'h2' : 'h1'" ref="heading" tabindex="-1">{{
+                libraryHeading
+              }}</component>
               <p>{{ favoritesOnly ? t("app.favoritesLead") : t("app.lead") }}</p>
               <div class="hero-meta">
                 <span><ShieldCheck class="size-4" />{{ t("app.local") }}</span
@@ -391,7 +456,7 @@ onBeforeUnmount(() => {
           <div v-if="shown.length" class="tool-grid">
             <article v-for="tool in shown" :key="tool.id" class="tool-card">
               <a
-                :href="`#/tool/${tool.id}`"
+                :href="toolHref(tool.id)"
                 :data-testid="`tool-card-${tool.id}`"
                 class="tool-card-link"
                 ><div class="card-top">
@@ -438,61 +503,81 @@ onBeforeUnmount(() => {
             <p>{{ t("app.privacy") }}</p>
           </div>
         </template>
-        <template v-else>
-          <button class="back-link" @click="home()">
+        <template v-else-if="requestedTool">
+          <a class="back-link" :href="homeHref">
             <ArrowLeft class="size-3.5" />{{ t("actions.back") }}
-          </button>
+          </a>
           <div class="workbench-heading">
-            <span :class="['tool-icon', `icon-${selectedTool.color}`]"
-              ><ToolIcon :id="selectedTool.id"
+            <span :class="['tool-icon', `icon-${requestedTool.color}`]"
+              ><ToolIcon :id="requestedTool.id"
             /></span>
             <div>
               <div class="workbench-title">
-                <h1 ref="heading" tabindex="-1">{{ t(`tool.${selectedTool.id}.name`) }}</h1>
-                <Badge v-if="selectedTool.wasm" variant="secondary">Rust / WASM</Badge>
+                <component :is="guideHasHeading ? 'h2' : 'h1'" ref="heading" tabindex="-1">{{
+                  t(`tool.${requestedTool.id}.name`)
+                }}</component>
+                <Badge v-if="requestedTool.wasm" variant="secondary">Rust / WASM</Badge>
               </div>
-              <p>{{ t(`tool.${selectedTool.id}.description`) }}</p>
+              <p>{{ t(`tool.${requestedTool.id}.description`) }}</p>
             </div>
             <Button
               variant="ghost"
               size="icon"
               :aria-label="
                 t(
-                  preferences.favorites.includes(selectedTool.id)
+                  preferences.favorites.includes(requestedTool.id)
                     ? 'actions.unfavorite'
                     : 'actions.favorite',
                 )
               "
-              :aria-pressed="preferences.favorites.includes(selectedTool.id)"
-              @click="favorite(selectedTool.id)"
+              :aria-pressed="preferences.favorites.includes(requestedTool.id)"
+              @click="favorite(requestedTool.id)"
               ><Heart
                 :class="[
                   'size-4',
-                  { 'heart-filled': preferences.favorites.includes(selectedTool.id) },
+                  { 'heart-filled': preferences.favorites.includes(requestedTool.id) },
                 ]"
             /></Button>
           </div>
-          <WasmTool
-            v-if="
-              selectedTool.id === 'csv' || selectedTool.id === 'logs' || selectedTool.id === 'sets'
-            "
-            :id="selectedTool.id"
-            :key="selectedTool.id"
-          />
-          <JsonTool
-            v-else-if="selectedTool.id === 'json-diff' || selectedTool.id === 'json-format'"
-            :id="selectedTool.id"
-            :key="selectedTool.id"
-          />
-          <CidrTool v-else-if="selectedTool.id === 'cidr'" key="cidr" />
-          <UnicodeTool v-else-if="selectedTool.id === 'unicode'" key="unicode" />
-          <ContrastTool v-else-if="selectedTool.id === 'contrast'" key="contrast" />
-          <HarTool v-else-if="selectedTool.id === 'har'" key="har" />
-          <EnvTool v-else-if="selectedTool.id === 'env'" key="env" />
-          <UrlTool v-else-if="selectedTool.id === 'url'" key="url" />
-          <ExplainTool v-else-if="selectedTool.id === 'explain'" key="explain" />
-          <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" key="shortcuts" />
+          <section v-if="!selectedTool" class="library-empty" data-testid="tool-disabled">
+            <Box class="size-9" />
+            <h2>{{ pageState.disabled }}</h2>
+            <p>{{ pageState.disabledHint }}</p>
+            <Button variant="outline" data-testid="disabled-settings" @click="openSettings">{{
+              t("nav.settings")
+            }}</Button>
+          </section>
+          <template v-else>
+            <WasmTool
+              v-if="
+                selectedTool.id === 'csv' ||
+                selectedTool.id === 'logs' ||
+                selectedTool.id === 'sets'
+              "
+              :id="selectedTool.id"
+              :key="selectedTool.id"
+            />
+            <JsonTool
+              v-else-if="selectedTool.id === 'json-diff' || selectedTool.id === 'json-format'"
+              :id="selectedTool.id"
+              :key="selectedTool.id"
+            />
+            <CidrTool v-else-if="selectedTool.id === 'cidr'" key="cidr" />
+            <UnicodeTool v-else-if="selectedTool.id === 'unicode'" key="unicode" />
+            <ContrastTool v-else-if="selectedTool.id === 'contrast'" key="contrast" />
+            <HarTool v-else-if="selectedTool.id === 'har'" key="har" />
+            <EnvTool v-else-if="selectedTool.id === 'env'" key="env" />
+            <UrlTool v-else-if="selectedTool.id === 'url'" key="url" />
+            <ExplainTool v-else-if="selectedTool.id === 'explain'" key="explain" />
+            <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" key="shortcuts" />
+          </template>
         </template>
+        <section v-else class="library-empty" data-testid="page-not-found">
+          <Box class="size-9" />
+          <h1 ref="heading" tabindex="-1">{{ pageState.unknown }}</h1>
+          <p>{{ pageState.unknownHint }}</p>
+          <a class="back-link" :href="homeHref">{{ t("actions.back") }}</a>
+        </section>
         <p v-if="!status.available" class="notice" role="status">
           {{ t("settings.storageError") }}
         </p>

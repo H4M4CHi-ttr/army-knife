@@ -5,6 +5,7 @@ import App from "./App.vue";
 import { i18n } from "./i18n";
 import { setFontLocale } from "./lib/fonts";
 import { defaultPreferences, settings, STORAGE_KEY } from "./lib/preferences";
+import { legacyToolRedirect, localeHomePath, toolPath } from "./lib/routes";
 import * as engine from "./lib/wasm/client";
 
 // The real font loader owns network resources. Its behavior has separate unit
@@ -18,7 +19,8 @@ vi.mock("./lib/fonts", () => ({
 let app: VueWrapper | undefined;
 
 beforeEach(() => {
-  window.history.replaceState(null, "", "/army-knife/#/");
+  vi.stubEnv("BASE_URL", "/army-knife/");
+  window.history.replaceState(null, "", localeHomePath("en"));
   document.documentElement.classList.remove("dark");
   document.documentElement.lang = "en";
   document.body.replaceChildren();
@@ -38,10 +40,15 @@ afterEach(async () => {
   }
   await flushPromises();
   document.body.replaceChildren();
+  vi.unstubAllEnvs();
 });
 
 async function mountApp(hash = "#/"): Promise<VueWrapper> {
-  window.history.replaceState(null, "", `/army-knife/${hash}`);
+  return mountPage(legacyToolRedirect(hash, "en") ?? localeHomePath("en"));
+}
+
+async function mountPage(pathname: string): Promise<VueWrapper> {
+  window.history.replaceState(null, "", pathname);
   const host = document.createElement("div");
   document.body.append(host);
   app = mount(App, { attachTo: host, global: { plugins: [vaporInteropPlugin, i18n] } });
@@ -50,10 +57,15 @@ async function mountApp(hash = "#/"): Promise<VueWrapper> {
 }
 
 async function route(hash: string): Promise<void> {
-  // replaceState avoids an extra asynchronous emulator hashchange; the App
-  // still receives the same native event it handles for user navigation.
-  window.history.replaceState(null, "", `/army-knife/${hash}`);
-  window.dispatchEvent(new HashChangeEvent("hashchange"));
+  // Browser document links are verified in E2E. Popstate exercises the same
+  // page route resolution without replacing the unit-test document.
+  window.history.replaceState(
+    null,
+    "",
+    legacyToolRedirect(hash, settings.preferences.locale) ??
+      localeHomePath(settings.preferences.locale),
+  );
+  window.dispatchEvent(new PopStateEvent("popstate"));
   await flushPromises();
 }
 
@@ -85,6 +97,55 @@ async function openSettings(wrapper: VueWrapper): Promise<DOMWrapper<Element>> {
 }
 
 describe("App integration with real local tools", () => {
+  it("uses the public URL language ahead of saved preferences and preserves static guide content", async () => {
+    settings.preferences.locale = "ja";
+    const guide = document.createElement("article");
+    guide.id = "page-guide";
+    guide.dataset.tool = "url";
+    guide.innerHTML = "<h1>URL parser guide</h1><p>Static usage remains available.</p>";
+    document.body.append(guide);
+    const wrapper = await mountPage(toolPath("en", "url"));
+    await expectElement(wrapper, "#url-input");
+    expect(settings.preferences.locale).toBe("en");
+    expect(document.documentElement.lang).toBe("en");
+    expect(document.title).toBe(`${i18n.global.t("tool.url.name")} — Army Knife`);
+    expect(wrapper.get(".workbench-title h2").text()).toBe(i18n.global.t("tool.url.name"));
+    expect(wrapper.find(".workbench-title h1").exists()).toBe(false);
+    expect(document.getElementById("page-guide")).toBe(guide);
+    expect(guide.textContent).toContain("Static usage remains available.");
+  });
+
+  it("renders ordinary links with readable destinations and preserves modified click behavior", async () => {
+    const wrapper = await mountApp();
+    const link = wrapper.get('[data-testid="tool-card-cidr"]');
+    expect(link.attributes("href")).toBe(toolPath("en", "cidr"));
+    expect(wrapper.get("a.brand").attributes("href")).toBe(localeHomePath("en"));
+    const click = new MouseEvent("click", { bubbles: true, cancelable: true, ctrlKey: true });
+    link.element.dispatchEvent(click);
+    expect(click.defaultPrevented).toBe(false);
+  });
+
+  it("does not show the collection for an unknown pathname", async () => {
+    const wrapper = await mountPage("/army-knife/en/tools/not-a-tool/");
+    expect(wrapper.find('[data-testid="page-not-found"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid^="tool-card-"]').exists()).toBe(false);
+    expect(wrapper.find("textarea").exists()).toBe(false);
+  });
+
+  it("preserves homepage category and favorite navigation without adding input data to the URL", async () => {
+    settings.preferences.favorites = ["cidr"];
+    const wrapper = await mountPage(`${localeHomePath("en")}#category-network`);
+    expect(wrapper.find('[data-testid="tool-card-cidr"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="tool-card-csv"]').exists()).toBe(false);
+    const favorites = wrapper.get('a[href="/army-knife/en/#favorites"]');
+    expect(favorites.text()).toContain("Favorites");
+    window.history.replaceState(null, "", `${localeHomePath("en")}#favorites`);
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    await flushPromises();
+    expect(wrapper.findAll('[data-testid^="tool-card-"]')).toHaveLength(1);
+    expect(wrapper.find('[data-testid="tool-card-cidr"]').exists()).toBe(true);
+  });
+
   it("shows the complementary tools and keeps every DevToys overlap off by default", async () => {
     const wrapper = await mountApp();
     const cards = wrapper
@@ -108,11 +169,13 @@ describe("App integration with real local tools", () => {
   });
 
   it.each(["sets", "json-format", "contrast"])(
-    "does not instantiate the disabled %s tool from a direct hash URL",
+    "keeps the disabled %s tool URL and does not instantiate its component",
     async (id) => {
       const wrapper = await mountApp(`#/tool/${id}`);
       expect(wrapper.find(`[data-testid="tool-card-${id}"]`).exists()).toBe(false);
-      expect(wrapper.find('[data-testid="tool-card-csv"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="tool-disabled"]').exists()).toBe(true);
+      expect(wrapper.get('[data-testid="disabled-settings"]').text()).toBe("Settings");
+      expect(window.location.pathname).toBe(`/army-knife/en/tools/${id}/`);
       expect(wrapper.find(".tool-panel").exists()).toBe(false);
       expect(wrapper.find(".result-panel").exists()).toBe(false);
       expect(wrapper.find("textarea").exists()).toBe(false);
@@ -292,7 +355,7 @@ describe("App integration with real local tools", () => {
     expect(window.location.href).not.toContain(marker);
   });
 
-  it("applies settings through the actual dialog and removes a tool when it is disabled", async () => {
+  it("applies settings through the actual dialog and keeps the page when its tool is disabled", async () => {
     const wrapper = await mountApp();
     let dialog = await openSettings(wrapper);
     await dialog.get('[data-testid="theme-dark"]').trigger("click");
@@ -324,10 +387,10 @@ describe("App integration with real local tools", () => {
     await dialog.get('[data-testid="toggle-json-format"]').trigger("click");
     await dialog.get('[data-testid="settings-close"]').trigger("click");
     await vi.waitFor(() => {
-      expect(window.location.hash).toBe("#/");
+      expect(window.location.pathname).toBe(toolPath("ja", "json-format"));
       expect(wrapper.find("#json-left").exists()).toBe(false);
       expect(wrapper.find('[data-testid="tool-card-json-format"]').exists()).toBe(false);
-      expect(wrapper.find('[data-testid="tool-card-csv"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="tool-disabled"]').exists()).toBe(true);
     });
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).enabledTools).not.toContain(
       "json-format",
