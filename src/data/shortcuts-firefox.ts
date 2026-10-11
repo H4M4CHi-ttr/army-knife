@@ -15,7 +15,7 @@ export const firefoxShortcutSource: ShortcutSource = {
     state: "candidate",
     reviewedAt: "2026-10-11",
     reason:
-      "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Preparation candidate; merge/publication decision remains held.",
+      "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Selected for the owner-approved 82-record catalog. Other unresolved records remain excluded; source-specific license conditions still apply.",
   },
   license: {
     spdx: "CC-BY-SA-3.0",

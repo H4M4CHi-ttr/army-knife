@@ -1,5 +1,5 @@
 // Source-derived shortcut data: per-source licenses apply; application MIT does not relicense these records.
-// Candidate preparation only. See docs/shortcuts.md and the bundled source notices.
+// Selected source-reviewed catalog. See docs/shortcuts.md and the bundled source notices.
 import type { ShortcutRecord, ShortcutSource } from "@/lib/tools/shortcuts";
 import { firefoxShortcutRecords, firefoxShortcutSource } from "./shortcuts-firefox";
 
@@ -15,7 +15,7 @@ export const shortcutSources: readonly ShortcutSource[] = [
       state: "candidate",
       reviewedAt: "2026-10-11",
       reason:
-        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Preparation candidate; merge/publication decision remains held.",
+        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Selected for the owner-approved 82-record catalog. Other unresolved records remain excluded; source-specific license conditions still apply.",
     },
     license: {
       spdx: "CC-BY-3.0-US",
@@ -43,7 +43,7 @@ export const shortcutSources: readonly ShortcutSource[] = [
       state: "candidate",
       reviewedAt: "2026-10-11",
       reason:
-        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Preparation candidate; merge/publication decision remains held.",
+        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Selected for the owner-approved 82-record catalog. Other unresolved records remain excluded; source-specific license conditions still apply.",
     },
     license: {
       spdx: "MIT",
@@ -70,7 +70,7 @@ export const shortcutSources: readonly ShortcutSource[] = [
       state: "candidate",
       reviewedAt: "2026-10-11",
       reason:
-        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Preparation candidate; merge/publication decision remains held.",
+        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Selected for the owner-approved 82-record catalog. Other unresolved records remain excluded; source-specific license conditions still apply.",
     },
     license: {
       spdx: "CC-BY-4.0",
@@ -97,7 +97,7 @@ export const shortcutSources: readonly ShortcutSource[] = [
       state: "candidate",
       reviewedAt: "2026-10-11",
       reason:
-        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Preparation candidate; merge/publication decision remains held.",
+        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Selected for the owner-approved 82-record catalog. Other unresolved records remain excluded; source-specific license conditions still apply.",
     },
     license: {
       spdx: "CC-BY-4.0",
@@ -124,7 +124,7 @@ export const shortcutSources: readonly ShortcutSource[] = [
       state: "candidate",
       reviewedAt: "2026-10-11",
       reason:
-        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Preparation candidate; merge/publication decision remains held.",
+        "Existing assignments matched against this exact licensed primary-source route; attribution and complete license are bundled. Selected for the owner-approved 82-record catalog. Other unresolved records remain excluded; source-specific license conditions still apply.",
     },
     license: {
       spdx: "CC-BY-4.0",

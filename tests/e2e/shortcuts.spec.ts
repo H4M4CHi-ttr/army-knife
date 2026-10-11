@@ -176,7 +176,7 @@ test("ordered GitHub and VS Code chords expose setup, scope, and licensed eviden
     "MIT license does not relicense these records",
   );
   await expect(result.locator(".shortcut-card-source details")).toContainText(
-    "publication candidate",
+    "included record checked against its source",
   );
   await assertNoOverflow(page);
   await reviewScreenshot(page, testInfo, "shortcuts-licensed-evidence");

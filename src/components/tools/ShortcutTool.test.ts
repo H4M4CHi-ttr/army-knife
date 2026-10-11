@@ -190,7 +190,7 @@ describe("shortcut investigation through the real app", () => {
     const sourceNotes = rows[0]!.get(".shortcut-card-source details");
     expect(rows[0]!.get('[data-testid="shortcut-attribution"]').text()).toMatch(/GitHub|github/);
     expect(sourceNotes.text()).toContain("MIT license does not relicense these records");
-    expect(sourceNotes.text()).toContain("publication candidate");
+    expect(sourceNotes.text()).toContain("included record checked against its source");
 
     const marker = "PRIVATE_SHORTCUT_INPUT_4903";
     await wrapper.get('[data-testid="shortcut-text"]').setValue(marker);

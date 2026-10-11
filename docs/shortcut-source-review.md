@@ -1,6 +1,6 @@
 # Shortcut source review
 
-Review date: **2026-10-11 UTC**. This records source-route checks and preparation of a smaller publication candidate. **Merge and publication remain on hold; this is not a declaration that all rights checks are complete.** Document matching does not verify installed-app behavior or the current hosted deployment.
+Review date: **2026-10-11 UTC**. This records source-route checks and a selected 82-record catalog. **The project owner has approved this 82-record publication scope with the retained notices; the other 298 records remain held. This does not declare all remaining rights checks complete.** Document matching does not verify installed-app behavior or the current hosted deployment.
 
 ## Candidate and held scope
 

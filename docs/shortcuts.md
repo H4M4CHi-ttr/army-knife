@@ -2,7 +2,7 @@
 
 This tool looks up a curated dictionary of documented default bindings. It does not inspect running applications, register global hotkeys, or identify which process intercepted a key on the user's computer. Missing results mean the dictionary has no matching entry under the selected filters; they do not establish that a shortcut is unused or free of conflicts.
 
-The current **preparation candidate contains 82 records across 5 applications**, checked on **2026-10-11 UTC**, with **6 source references**. Alternatives and OS/context variants count separately. **Merge and site publication remain held pending review.** A candidate status is preparation metadata, not legal clearance.
+The current **selected catalog contains 82 records across 5 applications**, checked on **2026-10-11 UTC**, with **6 source references**. Alternatives and OS/context variants count separately. **The project owner has approved publication of this 82-record scope with the notices below.** The remaining 298 records stay excluded for separate review. The source registry retains candidate-review metadata; inclusion is not a declaration of clearance for other material.
 
 | Application        | Surface | Records | Source-derived data license     |
 | ------------------ | ------- | ------: | ------------------------------- |
