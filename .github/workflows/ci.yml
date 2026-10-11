@@ -119,6 +119,37 @@ jobs:
       - name: Verify the complete deployable asset graph
         run: pnpm verify:dist
 
+      # This expensive research task runs only on the designated experiment PR,
+      # not on main or regular pull requests.
+      - name: Export app search predictions and frozen benchmark training corpus
+        if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/multilingual-natural-search' }}
+        env:
+          SEARCH_COMPARE_OUTPUT: scripts/search-compare/.out
+        run: vp test src/lib/search/compare-benchmark.test.ts
+
+      - name: Install model comparison dependencies on benchmark PR only
+        if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/multilingual-natural-search' }}
+        run: python -m pip install --disable-pip-version-check "model2vec==0.10.0" "scikit-learn==1.7.2" "psutil==7.1.0"
+
+      - name: Benchmark trained classifier against pinned multilingual Model2Vec
+        if: ${{ github.event_name == 'pull_request' && github.head_ref == 'feat/multilingual-natural-search' }}
+        env:
+          HF_HUB_DOWNLOAD_TIMEOUT: "120"
+          TOKENIZERS_PARALLELISM: "false"
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+        run: python scripts/search-compare/run.py
+
+      - name: Preserve research scores and error examples
+        if: ${{ always() && github.event_name == 'pull_request' && github.head_ref == 'feat/multilingual-natural-search' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: multilingual-search-research
+          path: scripts/search-compare/.out
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Install Chromium, Firefox, and their system dependencies
         run: pnpm exec playwright install --with-deps chromium firefox
 
