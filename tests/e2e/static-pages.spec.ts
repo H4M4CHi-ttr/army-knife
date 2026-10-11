@@ -239,6 +239,9 @@ test("normal links support keyboard navigation, new tabs, reload, history and le
   await page.getByTestId("settings-button").click();
   await page.getByTestId("theme-light").click();
   await page.getByTestId("settings-close").click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByTestId("settings-button")).toBeFocused();
+  await page.evaluate(() => document.fonts.ready);
   const link = page.getByTestId("tool-card-cidr");
   await expect(link).toHaveAttribute("href", toolPath("en", "cidr"));
   const newTabEvent = context.waitForEvent("page");
