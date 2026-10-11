@@ -99,6 +99,7 @@ describe("App integration with real local tools", () => {
       "tool-card-har",
       "tool-card-json-diff",
       "tool-card-logs",
+      "tool-card-shortcuts",
       "tool-card-unicode",
       "tool-card-url",
     ]);
