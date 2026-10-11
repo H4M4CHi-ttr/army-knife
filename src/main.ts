@@ -51,6 +51,11 @@ if (destination) {
     application = undefined;
   });
   window.addEventListener("pageshow", (event) => {
-    if (event.persisted && !application) mountApplication();
+    if (event.persisted && !application) {
+      // Another document can change settings while this one is suspended.
+      // Honor those choices before deciding which tool is allowed to mount.
+      settings.refreshFromStorage();
+      mountApplication();
+    }
   });
 }

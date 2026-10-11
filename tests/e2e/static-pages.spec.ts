@@ -236,6 +236,9 @@ test("normal links support keyboard navigation, new tabs, reload, history and le
   context,
 }) => {
   await page.goto(localeHomePath("en"));
+  await page.getByTestId("settings-button").click();
+  await page.getByTestId("theme-light").click();
+  await page.getByTestId("settings-close").click();
   const link = page.getByTestId("tool-card-cidr");
   await expect(link).toHaveAttribute("href", toolPath("en", "cidr"));
   const newTabEvent = context.waitForEvent("page");
@@ -306,10 +309,13 @@ test("changing language opens the same generated tool page and preserves only pr
   expect(page.url()).not.toContain(PRIVATE_MARKER);
 });
 
-test("simulated retained-page lifecycle discards private inputs before the document is restored", async ({
+test("simulated retained-page lifecycle clears inputs and honors refreshed disabled preferences", async ({
   page,
 }) => {
   await page.goto(toolPath("en", "cidr"));
+  await page.getByTestId("settings-button").click();
+  await page.getByTestId("theme-light").click();
+  await page.getByTestId("settings-close").click();
   await page.locator("#cidr-input").fill(PRIVATE_MARKER);
   await page.evaluate(() => {
     window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
@@ -319,6 +325,23 @@ test("simulated retained-page lifecycle discards private inputs before the docum
   await page.evaluate(() => {
     window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
   });
+  await expect(page.locator("#cidr-input")).toHaveValue("");
+  await page.locator("#cidr-input").fill(PRIVATE_MARKER);
+  await page.evaluate((key) => {
+    window.dispatchEvent(new PageTransitionEvent("pagehide", { persisted: true }));
+    const saved = JSON.parse(localStorage.getItem(key) as string);
+    saved.enabledTools = saved.enabledTools.filter((id: string) => id !== "cidr");
+    saved.theme = "dark";
+    localStorage.setItem(key, JSON.stringify(saved));
+    window.dispatchEvent(new PageTransitionEvent("pageshow", { persisted: true }));
+  }, PREFERENCE_KEY);
+  await expect(page.getByTestId("tool-disabled")).toBeVisible();
+  await expect(page.locator("#cidr-input")).toHaveCount(0);
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(page.locator("#page-guide")).toBeVisible();
+  await page.getByTestId("disabled-settings").click();
+  await page.getByTestId("toggle-cidr").click();
+  await page.getByTestId("settings-close").click();
   await expect(page.locator("#cidr-input")).toHaveValue("");
   await expect(page).toHaveURL(new RegExp(`${toolPath("en", "cidr")}$`));
   const stored = await page.evaluate(() => ({
@@ -409,6 +432,7 @@ test("static explanations fit desktop and mobile viewports in both themes", asyn
     }));
     expect(geometry.content).toBeLessThanOrEqual(geometry.width + 1);
     await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
     const path = testInfo.outputPath(`static-guide-${theme}.png`);
     await page.screenshot({ path, fullPage: true, animations: "disabled" });
     await testInfo.attach(`static-guide-${theme}`, { path, contentType: "image/png" });

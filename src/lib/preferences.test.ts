@@ -169,6 +169,91 @@ describe("private browser preferences", () => {
     expect(controller.status.available).toBe(false);
   });
 
+  it("refreshes tool and appearance choices saved by another document without writing them back", () => {
+    let saved = JSON.stringify(defaultPreferences("en"));
+    const storage = {
+      getItem: vi.fn(() => saved),
+      setItem: vi.fn((_key: string, value: string) => {
+        saved = value;
+      }),
+    };
+    const suspended = createPreferences(storage, ["en-US"]);
+    const active = createPreferences(storage, ["en-US"]);
+    stops.push(suspended.stop, active.stop);
+    active.preferences.enabledTools = active.preferences.enabledTools.filter((id) => id !== "cidr");
+    active.preferences.theme = "dark";
+    active.preferences.autoApply = false;
+    expect(suspended.preferences.enabledTools).toContain("cidr");
+    expect(suspended.preferences.theme).toBe("system");
+    storage.setItem.mockClear();
+    expect(suspended.refreshFromStorage()).toBe(true);
+    expect(suspended.preferences).toEqual(active.preferences);
+    expect(suspended.preferences.enabledTools).not.toContain("cidr");
+    expect(suspended.preferences.theme).toBe("dark");
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("preserves a stored all-off choice on refresh and restores only allowed fields", () => {
+    let saved = JSON.stringify(defaultPreferences("en"));
+    const storage = { getItem: vi.fn(() => saved), setItem: vi.fn() };
+    const controller = createPreferences(storage, ["en-US"]);
+    stops.push(controller.stop);
+    saved = JSON.stringify({
+      version: 1,
+      locale: "zh-CN",
+      theme: "dark",
+      enabledTools: [],
+      favorites: ["cidr", "unknown", "cidr"],
+      autoApply: false,
+      privateInput: "DO_NOT_RESTORE_THIS_INPUT",
+    });
+    expect(controller.refreshFromStorage()).toBe(true);
+    expect(controller.preferences).toEqual({
+      ...defaultPreferences("zh-CN"),
+      theme: "dark",
+      enabledTools: [],
+      favorites: ["cidr"],
+      autoApply: false,
+    });
+    expect(Object.hasOwn(controller.preferences, "privateInput")).toBe(false);
+    expect(controller.status.available).toBe(true);
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("keeps in-memory choices if a refresh read becomes blocked", () => {
+    const storage = { getItem: vi.fn(() => null), setItem: vi.fn() };
+    const controller = createPreferences(storage, ["ko-KR"]);
+    stops.push(controller.stop);
+    controller.preferences.theme = "dark";
+    controller.preferences.enabledTools = [];
+    controller.preferences.favorites = ["cidr"];
+    const before = JSON.parse(JSON.stringify(controller.preferences));
+    storage.getItem.mockImplementation(() => {
+      throw new Error("blocked after suspension");
+    });
+    storage.setItem.mockClear();
+    expect(controller.refreshFromStorage()).toBe(false);
+    expect(controller.preferences).toEqual(before);
+    expect(controller.status.available).toBe(false);
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("keeps in-memory choices when refresh has no stored record or no Storage object", () => {
+    const storage = { getItem: vi.fn(() => null), setItem: vi.fn() };
+    for (const source of [storage, undefined]) {
+      const controller = createPreferences(source, ["ja-JP"]);
+      stops.push(controller.stop);
+      controller.preferences.theme = "dark";
+      controller.preferences.enabledTools = [];
+      const before = JSON.parse(JSON.stringify(controller.preferences));
+      storage.setItem.mockClear();
+      expect(controller.refreshFromStorage()).toBe(false);
+      expect(controller.preferences).toEqual(before);
+      expect(controller.status.available).toBe(Boolean(source));
+      expect(storage.setItem).not.toHaveBeenCalled();
+    }
+  });
+
   it("also works without a Storage object and restores defaults on reset", () => {
     const controller = createPreferences(undefined, ["ko-KR"]);
     stops.push(controller.stop);
