@@ -47,13 +47,18 @@ const test = base.extend<{ shortcutAudit: Audit }>({
         });
       };
       context.on("request", record);
-      page.on("websocket", (socket) => audit.sockets.push(socket.url()));
-      page.on("pageerror", (error) => audit.errors.push(error.message));
-      page.on("console", (message) => {
-        if (message.type() === "error") audit.errors.push(message.text());
-      });
+      const observePage = (currentPage: Page): void => {
+        currentPage.on("websocket", (socket) => audit.sockets.push(socket.url()));
+        currentPage.on("pageerror", (error) => audit.errors.push(error.message));
+        currentPage.on("console", (message) => {
+          if (message.type() === "error") audit.errors.push(message.text());
+        });
+      };
+      observePage(page);
+      context.on("page", observePage);
       await use(audit);
       context.off("request", record);
+      context.off("page", observePage);
       const origin = new URL(baseURL as string).origin;
       const allowlist = await assetAllowlist();
       for (const request of audit.requests) {
@@ -131,9 +136,9 @@ test("focused key capture owns Ctrl+K and lets users leave with Tab or Escape", 
   await expect(capture).toHaveValue("Ctrl+K");
 });
 
-test("ordered Gmail and VS Code chords expose setup, scope, and official evidence", async ({
+test("ordered GitHub and VS Code chords expose setup, scope, and licensed evidence", async ({
   page,
-}) => {
+}, testInfo) => {
   await openTool(page);
   const capture = page.getByTestId("shortcut-capture");
   await page.getByTestId("shortcut-sequential").check();
@@ -143,16 +148,16 @@ test("ordered Gmail and VS Code chords expose setup, scope, and official evidenc
   await page.keyboard.press("Control+c");
   await expect(capture).toHaveValue("Ctrl+K then Ctrl+C");
   const result = page.getByTestId("shortcut-result");
-  await expect(result.filter({ hasText: "VS Code" })).toHaveCount(1);
+  await expect(result.filter({ hasText: "Visual Studio Code" })).toHaveCount(1);
   await expect(result.first()).toContainText("Ctrl+K then Ctrl+C");
   await expect(result.first().getByTestId("shortcut-source")).toHaveAttribute(
     "href",
-    /^https:\/\/code\.visualstudio\.com\//,
+    /^https:\/\/github\.com\/microsoft\/vscode-docs\/blob\/[a-f0-9]{40}\/docs\/customization\/keyboard-shortcuts-windows\.docx$/,
   );
   await expect(result.first().getByTestId("shortcut-checked")).toContainText(/2026-10-\d{2}/);
 
   await page.getByTestId("shortcut-clear").click();
-  await page.getByTestId("shortcut-app").selectOption("gmail");
+  await page.getByTestId("shortcut-app").selectOption("github");
   await page.getByTestId("shortcut-surface").selectOption("web");
   await capture.focus();
   await page.keyboard.press("g");
@@ -162,9 +167,48 @@ test("ordered Gmail and VS Code chords expose setup, scope, and official evidenc
   await expect(result).toContainText(/enable|turn.*on|settings/i);
   await expect(result.getByTestId("shortcut-source")).toHaveAttribute(
     "href",
-    /^https:\/\/support\.google\.com\//,
+    /^https:\/\/github\.com\/github\/docs\/blob\/[a-f0-9]{40}\/content\/get-started\/accessibility\/keyboard-shortcuts\.md$/,
   );
   await expect(result.getByTestId("shortcut-source")).toHaveAttribute("rel", /noopener/);
+  await result.locator(".shortcut-card-source details summary").click();
+  await expect(result.getByTestId("shortcut-attribution")).toContainText(/GitHub|github/);
+  await expect(result.locator(".shortcut-card-source details")).toContainText(
+    "MIT license does not relicense these records",
+  );
+  await expect(result.locator(".shortcut-card-source details")).toContainText(
+    "publication candidate",
+  );
+  await assertNoOverflow(page);
+  await reviewScreenshot(page, testInfo, "shortcuts-licensed-evidence");
+  const license = result.getByTestId("shortcut-license");
+  await expect(license).toHaveText("CC-BY-4.0");
+  await expect(license).toHaveAttribute(
+    "href",
+    "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+  );
+  await expect(license).toHaveAttribute("rel", /noopener/);
+  const notice = result.getByTestId("shortcut-notice");
+  const licenseText = result.getByTestId("shortcut-license-text");
+  await expect(notice).toHaveAttribute(
+    "href",
+    "/army-knife/licenses/shortcut-sources/notices.html",
+  );
+  await expect(licenseText).toHaveAttribute(
+    "href",
+    "/army-knife/licenses/shortcut-sources/CC-BY-4.0.txt",
+  );
+  await expect(notice).toHaveAttribute("rel", /noopener/);
+  await expect(licenseText).toHaveAttribute("rel", /noopener/);
+  const noticePopup = page.waitForEvent("popup");
+  await notice.click();
+  const noticePage = await noticePopup;
+  await expect(noticePage.locator("body")).toContainText(/GitHub|attribution/i);
+  await noticePage.close();
+  const textPopup = page.waitForEvent("popup");
+  await licenseText.click();
+  const licensePage = await textPopup;
+  await expect(licensePage.locator("body")).toContainText(/Attribution 4\.0 International/i);
+  await licensePage.close();
   await page.getByTestId("shortcut-sequential").uncheck();
   await capture.focus();
   await page.keyboard.press("g");
@@ -183,22 +227,27 @@ test("screen controls reach reserved chords and narrow app, OS, surface, and tex
     "aria-pressed",
     "true",
   );
-  await page.getByTestId("shortcut-builder-key").selectOption("L");
+  await page.getByTestId("shortcut-builder-key").selectOption("F");
   await page.getByTestId("shortcut-builder-add").click();
-  await expect(page.getByTestId("shortcut-capture")).toHaveValue("Ctrl+L");
+  await expect(page.getByTestId("shortcut-capture")).toHaveValue("Ctrl+F");
   await page.getByTestId("shortcut-platform").selectOption("windows");
   await page.getByTestId("shortcut-surface").selectOption("browser");
-  await page.getByTestId("shortcut-app").selectOption("chrome");
+  await page.getByTestId("shortcut-app").selectOption("firefox");
   const result = page.getByTestId("shortcut-result");
   await expect(result).toHaveCount(1);
-  await expect(result).toContainText("Chrome");
-  await page.getByTestId("shortcut-text").fill("address");
+  await expect(result).toContainText("Firefox");
+  await page.getByTestId("shortcut-text").fill("page");
   await expect(result).toHaveCount(1);
   await assertNoOverflow(page);
   await reviewScreenshot(page, testInfo, "shortcuts-reserved-light");
   await page.getByTestId("shortcut-platform").selectOption("macos");
   await expect(result).toHaveCount(0);
   await expect(page.getByTestId("shortcut-no-matches")).toContainText(/does not|unknown|unlisted/i);
+  await page.getByTestId("shortcut-manual").fill("Meta+F");
+  await expect(page.getByTestId("shortcut-capture")).toHaveValue("Meta+F");
+  await expect(result).toHaveCount(1);
+  await expect(result).toContainText("Firefox");
+  await page.getByTestId("shortcut-manual").fill("Ctrl+F");
   await page.getByTestId("shortcut-platform").selectOption("windows");
   await page.getByTestId("shortcut-text").fill(PRIVATE_MARKER);
   await expect(result).toHaveCount(0);
@@ -242,8 +291,9 @@ test("all languages and themes react while results remain responsive", async ({
 }, testInfo) => {
   await openTool(page);
   await page.getByTestId("shortcut-manual").fill("g then i");
-  await page.getByTestId("shortcut-app").selectOption("gmail");
+  await page.getByTestId("shortcut-app").selectOption("github");
   const english = await page.getByTestId("shortcut-result-count").textContent();
+  const englishCandidate = await page.getByTestId("shortcut-candidate-notice").textContent();
   for (const locale of ["ja", "zh-CN", "zh-TW", "ko", "en"]) {
     await page.getByTestId("settings-button").click();
     await page.getByTestId("locale-select").selectOption(locale);
@@ -254,9 +304,16 @@ test("all languages and themes react while results remain responsive", async ({
     await expect(page.getByTestId("shortcut-result-count")).not.toContainText(
       /shortcuts\.|shortcut\./,
     );
-    if (locale === "en")
+    await expect(page.getByTestId("shortcut-candidate-notice")).not.toContainText(
+      /shortcuts\.|shortcut\./,
+    );
+    if (locale === "en") {
       await expect(page.getByTestId("shortcut-result-count")).toHaveText(english!);
-    else await expect(page.getByTestId("shortcut-result-count")).not.toHaveText(english!);
+      await expect(page.getByTestId("shortcut-candidate-notice")).toHaveText(englishCandidate!);
+    } else {
+      await expect(page.getByTestId("shortcut-result-count")).not.toHaveText(english!);
+      await expect(page.getByTestId("shortcut-candidate-notice")).not.toHaveText(englishCandidate!);
+    }
     await assertNoOverflow(page);
   }
   await reviewScreenshot(page, testInfo, "shortcuts-sequence-light");

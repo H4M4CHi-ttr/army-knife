@@ -10,12 +10,43 @@ export interface ShortcutStroke {
   code?: string;
 }
 
+export type ShortcutDataLicenseId =
+  | "CC-BY-4.0"
+  | "CC-BY-3.0-US"
+  | "CC-BY-SA-3.0"
+  | "MIT"
+  | "Apache-2.0";
+
+export interface ShortcutPublication {
+  /** Candidate means prepared for review, not a legal clearance or permission verdict. */
+  state: "candidate" | "held";
+  reviewedAt: string;
+  reason: string;
+}
+
+export interface ShortcutDataLicense {
+  spdx: ShortcutDataLicenseId;
+  url: string;
+  attribution: string;
+  /** Exact upstream material to which this notice applies, including revision when available. */
+  upstreamUrl: string;
+  changes: string;
+  /** Applies to all record contributions bearing this sourceId, not to the app's code. */
+  scope: "source-derived-records";
+  shareAlike: boolean;
+  /** Relative published asset paths; the build must separately verify their existence. */
+  offlinePath: string;
+  licenseTextPath: string;
+}
+
 export interface ShortcutSource {
   id: string;
   title: string;
   url: string;
   checkedAt: string;
   rights: string;
+  publication?: ShortcutPublication;
+  license?: ShortcutDataLicense;
 }
 
 export interface ShortcutRecord {
@@ -42,6 +73,105 @@ export interface ShortcutSearchOptions {
   matchMode?: "exact" | "contains";
   /** Physical matching requires explicit codes in both the query and the source record. */
   keyMode?: "logical" | "physical";
+}
+
+const supportedDataLicenses: readonly ShortcutDataLicenseId[] = [
+  "CC-BY-4.0",
+  "CC-BY-3.0-US",
+  "CC-BY-SA-3.0",
+  "MIT",
+  "Apache-2.0",
+];
+
+function nonempty(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function httpsUrl(value: unknown): boolean {
+  if (!nonempty(value)) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && Boolean(url.hostname) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+function localAssetPath(value: unknown): boolean {
+  if (!nonempty(value) || !/^(?:[A-Za-z0-9_.-]+\/)*[A-Za-z0-9_.-]+$/.test(value)) return false;
+  return value.split("/").every((part) => part !== "." && part !== "..");
+}
+
+function calendarDate(value: unknown): boolean {
+  if (!nonempty(value) || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+/**
+ * Audit a prepared public candidate catalog. This checks metadata consistency,
+ * not legal permission, upstream license coverage, or files on disk. Pending
+ * records must be excluded before importing/building the public catalog; this
+ * validator is not a runtime filter that makes bundled private material safe.
+ */
+export function validateShortcutPublication(
+  records: readonly ShortcutRecord[],
+  sources: readonly ShortcutSource[],
+): string[] {
+  const issues: string[] = [];
+  const sourceById = new Map<string, ShortcutSource>();
+  const usedSources = new Set<string>();
+  const recordIds = new Set<string>();
+  for (const source of sources) {
+    const prefix = `Source ${source.id || "<missing id>"}`;
+    if (!nonempty(source.id)) issues.push(`${prefix}: id is required`);
+    if (sourceById.has(source.id)) issues.push(`${prefix}: duplicate source id`);
+    sourceById.set(source.id, source);
+    const publication = source.publication;
+    if (publication?.state !== "candidate")
+      issues.push(`${prefix}: publication.state must be candidate`);
+    if (!calendarDate(publication?.reviewedAt))
+      issues.push(`${prefix}: publication.reviewedAt must be a calendar date`);
+    if (!nonempty(publication?.reason)) issues.push(`${prefix}: publication.reason is required`);
+    const license = source.license;
+    if (!license) {
+      issues.push(`${prefix}: license metadata is required`);
+      continue;
+    }
+    if (!supportedDataLicenses.includes(license.spdx))
+      issues.push(`${prefix}: license.spdx is unsupported`);
+    if (!httpsUrl(license.url)) issues.push(`${prefix}: license.url must be an HTTPS URL`);
+    if (!httpsUrl(license.upstreamUrl))
+      issues.push(`${prefix}: license.upstreamUrl must be an HTTPS URL`);
+    if (!nonempty(license.attribution)) issues.push(`${prefix}: license.attribution is required`);
+    if (!nonempty(license.changes)) issues.push(`${prefix}: license.changes is required`);
+    if (license.scope !== "source-derived-records")
+      issues.push(`${prefix}: license.scope must be source-derived-records`);
+    if (
+      typeof license.shareAlike !== "boolean" ||
+      license.shareAlike !== (license.spdx === "CC-BY-SA-3.0")
+    ) {
+      issues.push(`${prefix}: license.shareAlike must match the supported data license`);
+    }
+    if (!localAssetPath(license.offlinePath))
+      issues.push(`${prefix}: license.offlinePath must be a relative local asset path`);
+    if (!localAssetPath(license.licenseTextPath))
+      issues.push(`${prefix}: license.licenseTextPath must be a relative local asset path`);
+  }
+  for (const record of records) {
+    const prefix = `Record ${record.id || "<missing id>"}`;
+    if (!nonempty(record.id)) issues.push(`${prefix}: id is required`);
+    if (recordIds.has(record.id)) issues.push(`${prefix}: duplicate record id`);
+    recordIds.add(record.id);
+    if (!sourceById.has(record.sourceId))
+      issues.push(`${prefix}: unknown sourceId ${record.sourceId}`);
+    usedSources.add(record.sourceId);
+  }
+  for (const source of sources) {
+    if (!usedSources.has(source.id))
+      issues.push(`Source ${source.id}: source has no candidate records`);
+  }
+  return issues;
 }
 
 const modifierOrder: Modifier[] = ["Ctrl", "Alt", "Shift", "Meta"];

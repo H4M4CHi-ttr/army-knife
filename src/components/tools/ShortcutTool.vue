@@ -131,7 +131,9 @@ const results = computed(() =>
 );
 const pages = computed(() => Math.max(1, Math.ceil(results.value.length / pageSize)));
 const visibleResults = computed(() =>
-  results.value.slice((page.value - 1) * pageSize, page.value * pageSize),
+  results.value
+    .slice((page.value - 1) * pageSize, page.value * pageSize)
+    .map((record) => ({ ...record, source: sourceById.get(record.sourceId) })),
 );
 const canAdd = computed(() => Boolean(builderKey.value || builderModifiers.value.length));
 watch([sequence, platform, surface, appId, text, matchMode, keyMode], () => {
@@ -202,6 +204,9 @@ function action(record: ShortcutRecord) {
 }
 function context(record: ShortcutRecord) {
   return locale.value === "ja" && record.contextJa ? record.contextJa : record.context;
+}
+function localSourceHref(path: string) {
+  return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`;
 }
 </script>
 
@@ -447,6 +452,9 @@ function context(record: ShortcutRecord) {
     <p class="hint shortcut-coverage">
       {{ t("shortcuts.coverage", { records: shortcutRecords.length, apps: apps.length }) }}
     </p>
+    <p class="hint shortcut-coverage" data-testid="shortcut-candidate-notice">
+      {{ t("shortcuts.candidateNotice") }}
+    </p>
     <p
       v-if="!visibleResults.length && !invalidShortcut"
       class="notice"
@@ -498,20 +506,94 @@ function context(record: ShortcutRecord) {
             </dd>
           </div>
         </dl>
-        <div v-if="sourceById.get(record.sourceId)" class="shortcut-card-source">
+        <div v-if="record.source" class="shortcut-card-source">
           <a
-            :href="sourceById.get(record.sourceId)!.url"
+            :href="record.source.url"
             target="_blank"
             rel="noopener noreferrer"
             data-testid="shortcut-source"
-            >{{ sourceById.get(record.sourceId)!.title }} ↗</a
+            >{{ record.source.title }} ↗</a
           >
           <p class="hint" data-testid="shortcut-checked">
-            {{ t("shortcuts.checked", { date: sourceById.get(record.sourceId)!.checkedAt }) }}
+            {{ t("shortcuts.checked", { date: record.source.checkedAt }) }}
+          </p>
+          <p v-if="record.source.license" class="hint shortcut-license-line">
+            {{ t("shortcuts.dataLicense") }}
+            <a
+              v-if="record.source.license.url"
+              :href="record.source.license.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-testid="shortcut-license"
+              >{{ record.source.license.spdx }}</a
+            >
+            <span v-else>{{ record.source.license.spdx }}</span>
           </p>
           <details>
             <summary>{{ t("shortcuts.rights") }}</summary>
-            <p class="hint">{{ sourceById.get(record.sourceId)!.rights }}</p>
+            <p class="hint">{{ record.source.rights }}</p>
+            <template v-if="record.source.license">
+              <dl class="shortcut-card-metadata shortcut-license-metadata">
+                <div v-if="record.source.license.attribution">
+                  <dt>{{ t("shortcuts.attributionLabel") }}</dt>
+                  <dd data-testid="shortcut-attribution">
+                    {{ record.source.license.attribution }}
+                  </dd>
+                </div>
+                <div v-if="record.source.license.changes">
+                  <dt>{{ t("shortcuts.changesLabel") }}</dt>
+                  <dd>{{ record.source.license.changes }}</dd>
+                </div>
+              </dl>
+              <p class="hint">{{ t("shortcuts.licenseScope") }}</p>
+              <p v-if="record.source.license.shareAlike" class="hint">
+                {{ t("shortcuts.shareAlike") }}
+              </p>
+              <div class="shortcut-license-links">
+                <a
+                  v-if="record.source.license.upstreamUrl"
+                  :href="record.source.license.upstreamUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >{{ t("shortcuts.upstream") }} ↗</a
+                >
+                <a
+                  v-if="record.source.license.offlinePath"
+                  :href="localSourceHref(record.source.license.offlinePath)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="shortcut-notice"
+                  >{{ t("shortcuts.offlineNotice") }} ↗</a
+                >
+                <a
+                  v-if="record.source.license.licenseTextPath"
+                  :href="localSourceHref(record.source.license.licenseTextPath)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid="shortcut-license-text"
+                  >{{ t("shortcuts.licenseText") }} ↗</a
+                >
+              </div>
+            </template>
+            <template v-if="record.source.publication">
+              <p class="hint">
+                {{
+                  t(
+                    record.source.publication.state === "candidate"
+                      ? "shortcuts.publicationCandidate"
+                      : "shortcuts.publicationHeld",
+                  )
+                }}
+              </p>
+              <p v-if="record.source.publication.reviewedAt" class="hint">
+                {{
+                  t("shortcuts.publicationReviewed", { date: record.source.publication.reviewedAt })
+                }}
+              </p>
+              <p v-if="record.source.publication.reason" class="hint">
+                {{ record.source.publication.reason }}
+              </p>
+            </template>
           </details>
         </div>
       </article>
@@ -776,6 +858,18 @@ function context(record: ShortcutRecord) {
 .shortcut-card-source details p {
   margin-top: 0.4rem;
   overflow-wrap: anywhere;
+}
+.shortcut-license-line {
+  margin-top: 0.3rem;
+}
+.shortcut-license-metadata {
+  margin-top: 0.65rem;
+}
+.shortcut-license-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 0.65rem;
 }
 .shortcut-pagination {
   justify-content: flex-end;

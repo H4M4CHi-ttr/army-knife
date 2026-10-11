@@ -111,7 +111,7 @@ describe("shortcut investigation through the real app", () => {
     await press(input, "k", { code: "KeyK", ctrlKey: true });
     await press(input, "c", { code: "KeyC", ctrlKey: true });
     expect(input.value).toBe("Ctrl+K then Ctrl+C");
-    expect(results(wrapper).some((row) => row.text().includes("VS Code"))).toBe(true);
+    expect(results(wrapper).some((row) => row.text().includes("Visual Studio Code"))).toBe(true);
     expect(results(wrapper).every((row) => row.text().includes("Ctrl+K then Ctrl+C"))).toBe(true);
 
     const tab = await press(input, "Tab", { code: "Tab" });
@@ -126,25 +126,31 @@ describe("shortcut investigation through the real app", () => {
   it("lets users configure browser-reserved chords and filter OS, surface, app, and text", async () => {
     const wrapper = await mountTool();
     await wrapper.get('[data-testid="shortcut-builder-modifier-Ctrl"]').trigger("click");
-    await wrapper.get('[data-testid="shortcut-builder-key"]').setValue("L");
+    await wrapper.get('[data-testid="shortcut-builder-key"]').setValue("F");
     await wrapper.get('[data-testid="shortcut-builder-add"]').trigger("click");
-    expect(capture(wrapper).value).toBe("Ctrl+L");
+    expect(capture(wrapper).value).toBe("Ctrl+F");
     await wrapper.get('[data-testid="shortcut-platform"]').setValue("windows");
     await wrapper.get('[data-testid="shortcut-surface"]').setValue("browser");
-    await wrapper.get('[data-testid="shortcut-app"]').setValue("chrome");
+    await wrapper.get('[data-testid="shortcut-app"]').setValue("firefox");
     expect(results(wrapper).length).toBeGreaterThan(0);
-    expect(results(wrapper).every((row) => row.text().includes("Chrome"))).toBe(true);
-    expect(results(wrapper).every((row) => !row.text().includes("Gmail"))).toBe(true);
+    expect(results(wrapper).every((row) => row.text().includes("Firefox"))).toBe(true);
+    expect(results(wrapper).every((row) => !row.text().includes("GitHub"))).toBe(true);
+    expect(results(wrapper)[0]!.get('[data-testid="shortcut-license"]').text()).toBe(
+      "CC-BY-SA-3.0",
+    );
+    expect(results(wrapper)[0]!.get(".shortcut-card-source details").text()).toContain(
+      "ShareAlike applies to adaptations",
+    );
     await wrapper.get('[data-testid="shortcut-platform"]').setValue("macos");
     expect(results(wrapper)).toHaveLength(0);
     const input = capture(wrapper);
     input.focus();
-    await press(input, "l", { code: "KeyL", metaKey: true });
-    expect(input.value).toBe("Meta+L");
+    await press(input, "f", { code: "KeyF", metaKey: true });
+    expect(input.value).toBe("Meta+F");
     expect(results(wrapper).length).toBeGreaterThan(0);
-    await wrapper.get('[data-testid="shortcut-manual"]').setValue("Ctrl+L");
+    await wrapper.get('[data-testid="shortcut-manual"]').setValue("Ctrl+F");
     await wrapper.get('[data-testid="shortcut-platform"]').setValue("windows");
-    await wrapper.get('[data-testid="shortcut-text"]').setValue("address");
+    await wrapper.get('[data-testid="shortcut-text"]').setValue("page");
     expect(results(wrapper).length).toBeGreaterThan(0);
     await wrapper.get('[data-testid="shortcut-text"]').setValue("PRIVATE_SHORTCUT_INPUT_4903");
     expect(results(wrapper)).toHaveLength(0);
@@ -156,17 +162,35 @@ describe("shortcut investigation through the real app", () => {
   it("shows setup conditions, official provenance, and preserves private input only in memory", async () => {
     const wrapper = await mountTool();
     await wrapper.get('[data-testid="shortcut-manual"]').setValue("g then i");
-    await wrapper.get('[data-testid="shortcut-app"]').setValue("gmail");
+    await wrapper.get('[data-testid="shortcut-app"]').setValue("github");
     expect(capture(wrapper).value).toBe("G then I");
     const rows = results(wrapper);
     expect(rows.length).toBeGreaterThan(0);
     expect(rows[0]!.text()).toMatch(/enable|turn.*on|settings/i);
     const source = rows[0]!.get('[data-testid="shortcut-source"]');
-    expect(source.attributes("href")).toMatch(/^https:\/\/support\.google\.com\//);
+    expect(source.attributes("href")).toMatch(
+      /^https:\/\/github\.com\/github\/docs\/blob\/[a-f0-9]{40}\/content\/get-started\/accessibility\/keyboard-shortcuts\.md$/,
+    );
     expect(source.attributes("target")).toBe("_blank");
     expect(source.attributes("rel")).toContain("noopener");
     expect(rows[0]!.get('[data-testid="shortcut-checked"]').text()).toMatch(/2026-10-\d{2}/);
     expect(rows[0]!.text()).toMatch(/version|current|2026|rolling/i);
+    const license = rows[0]!.get('[data-testid="shortcut-license"]');
+    expect(license.text()).toBe("CC-BY-4.0");
+    expect(license.attributes("href")).toBe(
+      "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+    );
+    expect(license.attributes("rel")).toContain("noopener");
+    const notice = rows[0]!.get('[data-testid="shortcut-notice"]');
+    const licenseText = rows[0]!.get('[data-testid="shortcut-license-text"]');
+    expect(notice.attributes("href")).toBe("/licenses/shortcut-sources/notices.html");
+    expect(licenseText.attributes("href")).toBe("/licenses/shortcut-sources/CC-BY-4.0.txt");
+    expect(notice.attributes("rel")).toContain("noopener");
+    expect(licenseText.attributes("rel")).toContain("noopener");
+    const sourceNotes = rows[0]!.get(".shortcut-card-source details");
+    expect(rows[0]!.get('[data-testid="shortcut-attribution"]').text()).toMatch(/GitHub|github/);
+    expect(sourceNotes.text()).toContain("MIT license does not relicense these records");
+    expect(sourceNotes.text()).toContain("publication candidate");
 
     const marker = "PRIVATE_SHORTCUT_INPUT_4903";
     await wrapper.get('[data-testid="shortcut-text"]').setValue(marker);
@@ -190,8 +214,9 @@ describe("shortcut investigation through the real app", () => {
   it("reacts to all five UI languages without resetting the selected sequence", async () => {
     const wrapper = await mountTool();
     await wrapper.get('[data-testid="shortcut-manual"]').setValue("g then i");
-    await wrapper.get('[data-testid="shortcut-app"]').setValue("gmail");
+    await wrapper.get('[data-testid="shortcut-app"]').setValue("github");
     const english = wrapper.get('[data-testid="shortcut-result-count"]').text();
+    const englishCandidate = wrapper.get('[data-testid="shortcut-candidate-notice"]').text();
     for (const locale of ["ja", "zh-CN", "zh-TW", "ko", "en"] as const) {
       settings.preferences.locale = locale;
       await nextTick();
@@ -199,9 +224,16 @@ describe("shortcut investigation through the real app", () => {
       expect(capture(wrapper).value).toBe("G then I");
       expect(results(wrapper).length).toBeGreaterThan(0);
       const count = wrapper.get('[data-testid="shortcut-result-count"]').text();
+      const candidate = wrapper.get('[data-testid="shortcut-candidate-notice"]').text();
       expect(count).not.toMatch(/shortcuts\.|shortcut\./);
-      if (locale === "en") expect(count).toBe(english);
-      else expect(count).not.toBe(english);
+      expect(candidate).not.toMatch(/shortcuts\.|shortcut\./);
+      if (locale === "en") {
+        expect(count).toBe(english);
+        expect(candidate).toBe(englishCandidate);
+      } else {
+        expect(count).not.toBe(english);
+        expect(candidate).not.toBe(englishCandidate);
+      }
     }
   });
 
@@ -218,8 +250,8 @@ describe("shortcut investigation through the real app", () => {
     expect(input.value).toBe("NumpadAdd");
     expect(wrapper.get('[data-testid="shortcut-observed"]').text()).toContain("NumpadAdd");
     expect(wrapper.get('[data-testid="shortcut-observed"]').text()).toMatch(/3/);
-    await wrapper.get('[data-testid="shortcut-manual"]').setValue("Ctrl+L");
-    await wrapper.get('[data-testid="shortcut-app"]').setValue("chrome");
+    await wrapper.get('[data-testid="shortcut-manual"]').setValue("Ctrl+F");
+    await wrapper.get('[data-testid="shortcut-app"]').setValue("firefox");
     expect(results(wrapper).length).toBeGreaterThan(0);
     await wrapper.get('[data-testid="shortcut-key-mode"]').setValue("physical");
     expect(results(wrapper)).toHaveLength(0);
@@ -240,12 +272,11 @@ describe("shortcut investigation through the real app", () => {
     expect(results(wrapper).some((row) => row.text().includes("Ctrl+K then Ctrl+C"))).toBe(false);
   });
 
-  it("builds modifier-only Excel web prefixes and keeps the macOS mapping distinct", async () => {
+  it("builds modifier-only prefixes even when the app's bindings are absent from the catalog", async () => {
     const wrapper = await mountTool();
     await wrapper.get('[data-testid="shortcut-sequential"]').setValue(true);
     await wrapper.get('[data-testid="shortcut-platform"]').setValue("windows");
     await wrapper.get('[data-testid="shortcut-surface"]').setValue("web");
-    await wrapper.get('[data-testid="shortcut-app"]').setValue("excel");
     await wrapper.get('[data-testid="shortcut-builder-modifier-Alt"]').trigger("click");
     await wrapper.get('[data-testid="shortcut-builder-modifier-Meta"]').trigger("click");
     await wrapper.get('[data-testid="shortcut-builder-key"]').setValue("");
@@ -256,13 +287,14 @@ describe("shortcut investigation through the real app", () => {
     await wrapper.get('[data-testid="shortcut-builder-key"]').setValue("H");
     await wrapper.get('[data-testid="shortcut-builder-add"]').trigger("click");
     expect(capture(wrapper).value).toBe("Alt+Meta then H");
-    expect(results(wrapper)).toHaveLength(1);
-    expect(results(wrapper)[0]!.attributes("data-record-id")).toBe("web-excel-home-pc");
+    expect(results(wrapper)).toHaveLength(0);
+    expect(wrapper.get('[data-testid="shortcut-no-matches"]').text()).toContain("does not mean");
     await wrapper.get('[data-testid="shortcut-platform"]').setValue("macos");
     expect(results(wrapper)).toHaveLength(0);
     await wrapper.get('[data-testid="shortcut-manual"]').setValue("Ctrl+Alt then H");
-    expect(results(wrapper)).toHaveLength(1);
-    expect(results(wrapper)[0]!.attributes("data-record-id")).toBe("web-excel-home-mac");
+    expect(capture(wrapper).value).toBe("Ctrl+Alt then H");
+    expect(results(wrapper)).toHaveLength(0);
+    expect(wrapper.get('[data-testid="shortcut-no-matches"]').text()).toContain("does not mean");
   });
 
   it("bounds ordered capture, supports undo, and resets paginated results when searching", async () => {
@@ -283,7 +315,7 @@ describe("shortcut investigation through the real app", () => {
     expect(input.value).toBe("A then B then C");
     expect(wrapper.find('[data-testid="shortcut-sequence-limit"]').exists()).toBe(false);
     await wrapper.get('[data-testid="shortcut-manual"]').setValue("g then i");
-    await wrapper.get('[data-testid="shortcut-app"]').setValue("gmail");
+    await wrapper.get('[data-testid="shortcut-app"]').setValue("github");
     expect(results(wrapper)).toHaveLength(1);
     expect(wrapper.find('[data-testid="shortcut-next"]').exists()).toBe(false);
     await wrapper.get('[data-testid="shortcut-manual"]').setValue("Ctrl+");

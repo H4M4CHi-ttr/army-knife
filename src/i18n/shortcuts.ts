@@ -73,7 +73,9 @@ const en = {
     "Physical matches require an explicit code in both the query and the record. A missing documented code cannot be inferred from a letter or keyboard layout.",
   "shortcuts.resultCount": "{count} known bindings",
   "shortcuts.coverage":
-    "Catalog: {records} bindings across {apps} apps / categories. Coverage is selective; filters describe documented applicability, not the detected device.",
+    "Current candidate catalog: {records} bindings across {apps} apps / categories. Coverage is selective; filters describe documented applicability, not the detected device.",
+  "shortcuts.candidateNotice":
+    "This dictionary contains a selected set of publication candidates. Check each source's scope and reuse notes.",
   "shortcuts.noMatches":
     "No catalog entries match. This does not mean the shortcut is unused or free of conflicts. Try other filters or consult the app's current shortcut settings.",
   "shortcuts.chordBinding": "One stroke: hold the listed modifiers together with the key.",
@@ -84,6 +86,18 @@ const en = {
   "shortcuts.recordCode": "Documented codes",
   "shortcuts.checked": "Source checked: {date}",
   "shortcuts.rights": "Source and reuse notes",
+  "shortcuts.dataLicense": "Record source license:",
+  "shortcuts.attributionLabel": "Attribution",
+  "shortcuts.changesLabel": "Changes",
+  "shortcuts.upstream": "Upstream licensing statement",
+  "shortcuts.offlineNotice": "Bundled attribution and scope notice",
+  "shortcuts.licenseText": "Bundled full license text",
+  "shortcuts.licenseScope":
+    "The source-derived records use the license above. The application's MIT license does not relicense these records.",
+  "shortcuts.shareAlike": "ShareAlike applies to adaptations of these source-derived records.",
+  "shortcuts.publicationCandidate": "Status: publication candidate with source-specific notes.",
+  "shortcuts.publicationHeld": "Status: withheld from publication.",
+  "shortcuts.publicationReviewed": "Publication notes reviewed: {date}",
   "shortcuts.verification":
     "Bindings were checked against the linked documentation. They have not all been tested in the apps. Custom bindings, versions, browser reservations, focus and keyboard layouts can change behavior. Input stays in this page's memory.",
   "shortcuts.pagination": "Shortcut result pages",
@@ -169,7 +183,9 @@ const ja: ShortcutMessages = {
     "物理位置の一致には、検索キーと掲載データの両方に code の明示が必要です。資料にない code を英字やキーボード配列から推定することはありません。",
   "shortcuts.resultCount": "既知の割り当て {count} 件",
   "shortcuts.coverage":
-    "掲載範囲：{apps} アプリ・カテゴリ、{records} 件。網羅的な一覧ではありません。絞り込みは資料上の適用条件であり、現在の端末の検出結果ではありません。",
+    "現在の候補辞書：{apps} アプリ・カテゴリ、{records} 件。網羅的な一覧ではありません。絞り込みは資料上の適用条件であり、現在の端末の検出結果ではありません。",
+  "shortcuts.candidateNotice":
+    "掲載確認用に選んだ候補データを収録しています。各出典の対象範囲と再利用の注記を確認してください。",
   "shortcuts.noMatches":
     "一致する掲載データがありません。未使用・競合なしという意味ではありません。絞り込みを変更するか、アプリの現在のキー設定を確認してください。",
   "shortcuts.chordBinding": "単一操作：記載の修飾キーとキーを同時に保持します。",
@@ -179,6 +195,19 @@ const ja: ShortcutMessages = {
   "shortcuts.recordCode": "資料にある code",
   "shortcuts.checked": "出典確認日：{date}",
   "shortcuts.rights": "出典・再利用の注記",
+  "shortcuts.dataLicense": "記録の出典ライセンス：",
+  "shortcuts.attributionLabel": "帰属表示",
+  "shortcuts.changesLabel": "変更内容",
+  "shortcuts.upstream": "出典側のライセンス表記",
+  "shortcuts.offlineNotice": "同梱の帰属・対象範囲の注記",
+  "shortcuts.licenseText": "同梱のライセンス全文",
+  "shortcuts.licenseScope":
+    "この出典に由来する記録には上記のライセンスが適用されます。アプリ本体の MIT ライセンスによって、この記録のライセンスが変わることはありません。",
+  "shortcuts.shareAlike":
+    "この出典に由来する記録の翻案には、継承（ShareAlike）条件が適用されます。",
+  "shortcuts.publicationCandidate": "状態：出典ごとの注記を伴う掲載候補。",
+  "shortcuts.publicationHeld": "状態：公開を保留。",
+  "shortcuts.publicationReviewed": "掲載に関する注記の確認日：{date}",
   "shortcuts.verification":
     "リンク先の資料で確認した割り当てです。すべてをアプリで実機検証したものではありません。独自設定・版・ブラウザの予約キー・フォーカス・配列により挙動が変わります。入力内容はこのページのメモリ内だけで扱います。",
   "shortcuts.pagination": "ショートカット検索結果のページ",
@@ -258,7 +287,9 @@ const zhCN: ShortcutMessages = {
     "物理匹配要求查询和记录都明确包含 code。不能从字母或键盘布局推断文档中未提供的 code。",
   "shortcuts.resultCount": "{count} 条已知绑定",
   "shortcuts.coverage":
-    "词典范围：{apps} 个应用 / 类别，{records} 条绑定。内容并不完整；筛选表示文档中的适用范围，并非设备检测结果。",
+    "当前候选词典：{apps} 个应用 / 类别，{records} 条绑定。内容并不完整；筛选表示文档中的适用范围，并非设备检测结果。",
+  "shortcuts.candidateNotice":
+    "本词典收录为发布审查挑选的候选数据。请查看各来源的适用范围及再利用说明。",
   "shortcuts.noMatches":
     "词典中没有匹配记录。这不代表快捷键未被使用或没有冲突。请调整筛选，或检查应用当前的快捷键设置。",
   "shortcuts.chordBinding": "单次操作：同时按住所列修饰键和按键。",
@@ -268,6 +299,18 @@ const zhCN: ShortcutMessages = {
   "shortcuts.recordCode": "文档中的 code",
   "shortcuts.checked": "来源核查日期：{date}",
   "shortcuts.rights": "来源及再利用说明",
+  "shortcuts.dataLicense": "记录来源许可证：",
+  "shortcuts.attributionLabel": "署名",
+  "shortcuts.changesLabel": "修改内容",
+  "shortcuts.upstream": "来源方的许可声明",
+  "shortcuts.offlineNotice": "随附署名及适用范围说明",
+  "shortcuts.licenseText": "随附许可证全文",
+  "shortcuts.licenseScope":
+    "源自此来源的记录适用上方许可证。应用本身的 MIT 许可证不会更改这些记录的许可证。",
+  "shortcuts.shareAlike": "对这些源自来源的记录进行改编时，适用相同方式共享（ShareAlike）条款。",
+  "shortcuts.publicationCandidate": "状态：带来源专属说明的发布候选。",
+  "shortcuts.publicationHeld": "状态：暂缓发布。",
+  "shortcuts.publicationReviewed": "发布说明核查日期：{date}",
   "shortcuts.verification":
     "绑定依据链接文档核查，尚未全部在应用中实测。自定义绑定、版本、浏览器保留键、焦点及键盘布局都可能改变行为。输入仅保留在本页面内存中。",
   "shortcuts.pagination": "快捷键结果分页",
@@ -348,7 +391,9 @@ const zhTW: ShortcutMessages = {
     "實體比對要求查詢及記錄都明確包含 code。不能從字母或鍵盤配置推斷文件中未提供的 code。",
   "shortcuts.resultCount": "{count} 筆已知綁定",
   "shortcuts.coverage":
-    "字典範圍：{apps} 個應用程式 / 類別、{records} 筆綁定。內容並不完整；篩選表示文件中的適用範圍，並非裝置偵測結果。",
+    "目前候選字典：{apps} 個應用程式 / 類別、{records} 筆綁定。內容並不完整；篩選表示文件中的適用範圍，並非裝置偵測結果。",
+  "shortcuts.candidateNotice":
+    "本字典收錄為發布審查挑選的候選資料。請查看各來源的適用範圍及再利用說明。",
   "shortcuts.noMatches":
     "字典中沒有相符記錄。這不代表快捷鍵未被使用或沒有衝突。請調整篩選，或檢查應用程式目前的快捷鍵設定。",
   "shortcuts.chordBinding": "單次操作：同時按住所列修飾鍵及按鍵。",
@@ -358,6 +403,18 @@ const zhTW: ShortcutMessages = {
   "shortcuts.recordCode": "文件中的 code",
   "shortcuts.checked": "來源核查日期：{date}",
   "shortcuts.rights": "來源及再利用說明",
+  "shortcuts.dataLicense": "記錄來源授權：",
+  "shortcuts.attributionLabel": "姓名標示",
+  "shortcuts.changesLabel": "修改內容",
+  "shortcuts.upstream": "來源方的授權聲明",
+  "shortcuts.offlineNotice": "隨附姓名標示及適用範圍說明",
+  "shortcuts.licenseText": "隨附授權條款全文",
+  "shortcuts.licenseScope":
+    "源自此來源的記錄適用上方授權。應用程式本身的 MIT 授權不會更改這些記錄的授權。",
+  "shortcuts.shareAlike": "改作這些源自來源的記錄時，適用相同方式分享（ShareAlike）條款。",
+  "shortcuts.publicationCandidate": "狀態：附來源專屬說明的發布候選。",
+  "shortcuts.publicationHeld": "狀態：暫緩發布。",
+  "shortcuts.publicationReviewed": "發布說明核查日期：{date}",
   "shortcuts.verification":
     "綁定依連結文件核查，尚未全部在應用程式中實測。自訂綁定、版本、瀏覽器保留鍵、焦點及鍵盤配置都可能改變行為。輸入僅保留於本頁面記憶體。",
   "shortcuts.pagination": "快捷鍵結果分頁",
@@ -439,7 +496,9 @@ const ko: ShortcutMessages = {
     "물리 일치는 검색과 기록 양쪽에 명시적인 code가 필요합니다. 문서에 없는 code를 문자나 키보드 배열에서 추정하지 않습니다.",
   "shortcuts.resultCount": "알려진 단축키 {count}개",
   "shortcuts.coverage":
-    "사전 범위: {apps}개 앱 / 분류의 단축키 {records}개. 전체 목록은 아닙니다. 필터는 문서의 적용 조건이며 현재 기기의 감지 결과가 아닙니다.",
+    "현재 후보 사전: {apps}개 앱 / 분류의 단축키 {records}개. 전체 목록은 아닙니다. 필터는 문서의 적용 조건이며 현재 기기의 감지 결과가 아닙니다.",
+  "shortcuts.candidateNotice":
+    "이 사전에는 공개 검토를 위해 선정한 후보 데이터가 포함됩니다. 각 출처의 범위와 재사용 안내를 확인하세요.",
   "shortcuts.noMatches":
     "일치하는 사전 항목이 없습니다. 사용하지 않는 키이거나 충돌이 없다는 뜻은 아닙니다. 필터를 변경하거나 앱의 현재 단축키 설정을 확인하세요.",
   "shortcuts.chordBinding": "단일 동작: 표시된 보조 키와 키를 함께 누릅니다.",
@@ -449,6 +508,19 @@ const ko: ShortcutMessages = {
   "shortcuts.recordCode": "문서의 code",
   "shortcuts.checked": "출처 확인일: {date}",
   "shortcuts.rights": "출처 및 재사용 안내",
+  "shortcuts.dataLicense": "기록 출처 라이선스:",
+  "shortcuts.attributionLabel": "저작자 표시",
+  "shortcuts.changesLabel": "변경 내용",
+  "shortcuts.upstream": "출처의 라이선스 명시",
+  "shortcuts.offlineNotice": "포함된 저작자 표시 및 범위 안내",
+  "shortcuts.licenseText": "포함된 라이선스 전문",
+  "shortcuts.licenseScope":
+    "이 출처에서 파생된 기록에는 위 라이선스가 적용됩니다. 앱 자체의 MIT 라이선스가 이 기록의 라이선스를 변경하지는 않습니다.",
+  "shortcuts.shareAlike":
+    "이 출처에서 파생된 기록을 각색할 때 동일조건변경허락(ShareAlike) 조건이 적용됩니다.",
+  "shortcuts.publicationCandidate": "상태: 출처별 안내를 포함한 공개 후보.",
+  "shortcuts.publicationHeld": "상태: 공개 보류.",
+  "shortcuts.publicationReviewed": "공개 안내 확인일: {date}",
   "shortcuts.verification":
     "링크된 문서를 기준으로 확인한 단축키이며 모든 앱에서 직접 시험한 것은 아닙니다. 사용자 설정, 버전, 브라우저 예약 키, 초점, 키보드 배열에 따라 동작이 달라질 수 있습니다. 입력은 이 페이지의 메모리에만 남습니다.",
   "shortcuts.pagination": "단축키 결과 페이지",

@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vite-plus/test";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { shortcutRecords, shortcutSources } from "./shortcuts";
-import { formatShortcut, parseShortcut, searchShortcuts } from "@/lib/tools/shortcuts";
+import {
+  formatShortcut,
+  parseShortcut,
+  searchShortcuts,
+  validateShortcutPublication,
+} from "@/lib/tools/shortcuts";
 
-describe("published shortcut dictionary", () => {
+describe("shortcut publication candidate", () => {
   it("preserves unique identities and complete official provenance", () => {
     expect(new Set(shortcutRecords.map((record) => record.id)).size).toBe(shortcutRecords.length);
     const sourceIds = new Set(shortcutSources.map((source) => source.id));
@@ -40,42 +47,32 @@ describe("published shortcut dictionary", () => {
     }
   });
 
-  it("covers real Web applications separately from browser and desktop shortcuts", () => {
-    const web = shortcutRecords.filter((record) => record.surface === "web");
-    for (const name of [
-      "Gmail",
-      "Google Docs",
-      "Google Sheets",
-      "GitHub",
-      "Notion",
-      "Slack",
-      "Discord",
-    ]) {
-      expect(
-        web.some((record) => record.app.includes(name)),
-        name,
-      ).toBe(true);
+  it("contains only the individually matched licensed candidate scope", () => {
+    expect(shortcutRecords).toHaveLength(82);
+    expect(shortcutSources).toHaveLength(6);
+    expect(validateShortcutPublication(shortcutRecords, shortcutSources)).toEqual([]);
+    expect(new Set(shortcutRecords.map((record) => record.appId))).toEqual(
+      new Set(["vscode", "warp", "windows-terminal", "firefox", "github"]),
+    );
+    const licenses = new Map(shortcutSources.map((source) => [source.id, source.license!.spdx]));
+    const counts: Record<string, number> = {};
+    for (const record of shortcutRecords) {
+      const license = licenses.get(record.sourceId)!;
+      counts[license] = (counts[license] ?? 0) + 1;
     }
-    expect(web.some((record) => record.app.includes("Excel"))).toBe(true);
-    for (const name of ["Chrome", "Edge", "Firefox"]) {
-      expect(
-        shortcutRecords.some((record) => record.app.includes(name) && record.surface === "browser"),
-        name,
-      ).toBe(true);
-      expect(
-        web.some((record) => record.app === name),
-        name,
-      ).toBe(false);
-    }
-    for (const name of ["Slack", "Discord", "Excel"]) {
-      expect(
-        shortcutRecords.some((record) => record.app.includes(name) && record.surface === "desktop"),
-        name,
-      ).toBe(true);
-    }
+    expect(counts).toEqual({ "CC-BY-3.0-US": 18, MIT: 15, "CC-BY-4.0": 33, "CC-BY-SA-3.0": 16 });
   });
 
-  it("retains OS-specific mappings, sequences, and explicit keypad positions", () => {
+  it("distinguishes actual Web applications from browser shortcuts", () => {
+    const web = shortcutRecords.filter((record) => record.surface === "web");
+    expect(web).toHaveLength(18);
+    expect(web.every((record) => record.app.includes("GitHub"))).toBe(true);
+    expect(shortcutRecords.filter((record) => record.surface === "browser")).toHaveLength(16);
+    expect(web.some((record) => record.app.includes("Firefox"))).toBe(false);
+    expect(shortcutRecords.filter((record) => record.surface === "desktop")).toHaveLength(48);
+  });
+
+  it("retains OS-specific and ordered mappings without inventing physical positions", () => {
     expect(
       shortcutRecords.some(
         (record) =>
@@ -87,17 +84,43 @@ describe("published shortcut dictionary", () => {
       shortcutRecords.some((record) => record.sequence.length > 1 && record.appId === "vscode"),
     ).toBe(true);
     expect(
-      shortcutRecords.some((record) =>
-        record.sequence.some((stroke) => stroke.code?.startsWith("Numpad")),
-      ),
+      shortcutRecords.some((record) => record.sequence.length > 1 && record.surface === "web"),
     ).toBe(true);
-    expect(
-      shortcutRecords.some(
-        (record) =>
-          record.surface === "web" &&
-          record.app.includes("Excel") &&
-          record.sequence[0]?.key === "",
-      ),
-    ).toBe(true);
+    expect(shortcutRecords.every((record) => record.sequence.every((stroke) => !stroke.code))).toBe(
+      true,
+    );
+  });
+
+  it("bundles complete same-site licenses and source-specific attribution for every candidate", () => {
+    const readPublic = (relative: string) => readFileSync(resolve("public", relative), "utf8");
+    for (const source of shortcutSources) {
+      const license = source.license!;
+      const notice = readPublic(license.offlinePath);
+      expect(notice, source.id).toContain(source.id);
+      expect(notice, source.id).toContain(license.attribution.replaceAll("&", "&amp;"));
+      expect(notice, source.id).toContain(license.spdx);
+      expect(notice, source.id).toContain(source.url.replaceAll("&", "&amp;"));
+      expect(notice, source.id).toContain(license.changes);
+      const fullLicense = readPublic(license.licenseTextPath);
+      expect(fullLicense.length, source.id).toBeGreaterThan(1000);
+      for (const record of shortcutRecords.filter((record) => record.sourceId === source.id)) {
+        expect(notice, record.id).toContain(record.id);
+      }
+    }
+    expect(readPublic("licenses/shortcut-sources/CC-BY-4.0.txt")).toContain(
+      "Section 8 -- Interpretation.",
+    );
+    expect(readPublic("licenses/shortcut-sources/CC-BY-SA-3.0.txt")).toContain("8. Miscellaneous");
+    expect(readPublic("licenses/shortcut-sources/CC-BY-3.0-US.html")).toContain("8. Miscellaneous");
+    expect(readPublic("licenses/shortcut-sources/warp-docs-MIT.txt")).toContain(
+      "Copyright (C) 2020-2026 Denver Technologies, Inc.",
+    );
+    const notice = readPublic("licenses/shortcut-sources/notices.html");
+    expect(notice).toContain("individual mozilla.org contributors");
+    expect(notice).toContain("AliceWyman");
+    expect(notice).toContain("Flavius Floare");
+    expect(notice).toContain("Merely separating a file is not a determination");
+    expect(notice).toContain("MIT license does not relicense the source-derived records");
+    expect(notice).not.toMatch(/<(script|img|iframe)\b/i);
   });
 });
