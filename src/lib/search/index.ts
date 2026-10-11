@@ -30,22 +30,24 @@ const COMMON_ENGLISH = new Set([
   "on", "or", "please", "show", "the", "to", "tool", "tools", "want",
   "what", "which", "with", "would",
 ]);
-const WORDS = /[\p{Script=Latin}\p{N}]+|[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]+/gu;
-const ASIAN = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
+// Latin words stay whole; scripts that commonly join text without spaces use
+// short character n-grams. The Unicode fallback keeps future scripts searchable.
+const WORDS = /[\p{Script=Latin}\p{N}]+|[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]+|[\p{L}\p{M}\p{N}]+/gu;
+const NON_LATIN = /[^\p{Script=Latin}\p{N}]/u;
 
 function normalize(text: string): string {
-  return text.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  return text.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{M}\p{N}]+/gu, " ").trim();
 }
 
 function terms(text: string): Set<string> {
   const result = new Set<string>();
   for (const match of normalize(text).matchAll(WORDS)) {
     const word = match[0];
-    if (!ASIAN.test(word)) {
+    if (!NON_LATIN.test(word)) {
       if (!COMMON_ENGLISH.has(word)) result.add(word);
       continue;
     }
-    // CJK n-grams also work in browsers without Intl.Segmenter dictionaries.
+    // Unicode n-grams also work without Intl.Segmenter language dictionaries.
     // Keep single-character words only when the entire word has length one.
     const chars = [...word];
     if (chars.length === 1) result.add(word);
