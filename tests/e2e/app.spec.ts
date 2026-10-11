@@ -620,3 +620,42 @@ test("Vapor output reacts to language and color changes while VDOM settings stay
   await assertNoOverflow(page);
   await screenshot(page, testInfo, "contrast-vapor-ja");
 });
+
+
+test("intent search works across five languages, and respects privacy and enabled tools", async ({
+  page,
+}) => {
+  await dashboard(page);
+  const input = page.locator(".global-search");
+  for (const [query, id] of [
+    ["ブラウザの通信が遅い", "har"],
+    ["missing environment variables", "env"],
+    ["修改网址的查询参数", "url"],
+    ["查看PostgreSQL執行計畫", "explain"],
+    ["누락된 환경 변수를", "env"],
+  ] as const) {
+    await input.fill(query);
+    await expect(page.getByTestId("tool-card-" + id)).toBeVisible();
+  }
+
+  await input.fill(PRIVATE_MARKER);
+  await expect(page.locator(".tool-card")).toHaveCount(0);
+  expect(await page.evaluate(() => JSON.stringify({ ...localStorage })))
+    .not.toContain(PRIVATE_MARKER);
+
+  // The default opt-out of DevToys-overlapping tools remains effective.
+  await input.fill("pretty print JSON");
+  await expect(page.getByTestId("tool-card-json-format")).toHaveCount(0);
+  await input.fill("");
+
+  await settings(page);
+  await page.getByTestId("locale-select").selectOption("ko");
+  await page.getByTestId("settings-close").click();
+
+  // Search in Japanese while the UI is Korean.
+  await input.fill("ブラウザの通信が遅い");
+  await expect(page.getByTestId("tool-card-har")).toBeVisible();
+  await input.press("Enter");
+  await expect(page).toHaveURL(/#\/tool\/har$/);
+  await assertNoOverflow(page);
+});
