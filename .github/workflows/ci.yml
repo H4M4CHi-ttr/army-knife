@@ -1,0 +1,169 @@
+name: Test and deploy Pages
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  quality:
+    name: Test, build, and inspect the static app
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      CI: "true"
+      RUSTUP_TOOLCHAIN: "1.99.0"
+      CARGO_TERM_COLOR: always
+    steps:
+      - name: Check out the tested revision
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Vite+, Node, and the pinned package manager
+        uses: voidzero-dev/setup-vp@v1.21.2
+        with:
+          version: "1.1.0"
+          node-version: "24.19.0"
+          run-install: false
+          cache: true
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install the exact JavaScript dependency graph
+        run: vp install --frozen-lockfile
+
+      - name: Set up the font build's Python runtime
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.12.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-fonts.txt
+
+      - name: Install pinned font build dependencies
+        run: python -m pip install --requirement scripts/requirements-fonts.txt
+
+      - name: Restore checksum-pinned font sources and generated subsets
+        uses: actions/cache@v6.1.0
+        with:
+          path: |
+            .cache/fonts
+            public/fonts
+          key: ${{ runner.os }}-${{ runner.arch }}-fonts-python3.12.12-${{ hashFiles('scripts/build-fonts.py', 'scripts/font-sources.lock.json', 'scripts/requirements-fonts.txt', 'third-party/fonts/*.txt') }}
+
+      - name: Generate the self-hosted fonts
+        run: pnpm build:fonts
+
+      - name: Verify font manifests, checksums, naming, and licenses
+        run: python scripts/build-fonts.py --check
+
+      - name: Install the pinned Rust toolchain and WebAssembly target
+        run: rustup toolchain install 1.99.0 --profile minimal --component clippy --target wasm32-unknown-unknown
+
+      - name: Restore Rust dependencies and compiled crate outputs
+        uses: actions/cache@v6.1.0
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/registry/src
+            ~/.cargo/git/db
+            crates/army-knife-core/target
+          key: ${{ runner.os }}-${{ runner.arch }}-rust1.99.0-${{ hashFiles('crates/army-knife-core/Cargo.lock') }}
+
+      - name: Restore the matching wasm-bindgen executable
+        id: wasm-bindgen-cache
+        uses: actions/cache@v6.1.0
+        with:
+          path: ~/.cargo/bin/wasm-bindgen
+          key: ${{ runner.os }}-${{ runner.arch }}-rust1.99.0-wasm-bindgen0.2.129
+
+      - name: Install the exact wasm-bindgen CLI
+        if: steps.wasm-bindgen-cache.outputs.cache-hit != 'true'
+        run: cargo install wasm-bindgen-cli --version 0.2.129 --locked
+
+      - name: Test the Rust analysis engine
+        run: cargo test --manifest-path crates/army-knife-core/Cargo.toml --locked
+
+      - name: Lint all Rust targets
+        run: cargo clippy --manifest-path crates/army-knife-core/Cargo.toml --all-targets --locked -- -D warnings
+
+      - name: Compile Rust to WebAssembly and generate browser bindings
+        run: pnpm build:wasm
+
+      - name: Exercise the actual compiled WebAssembly module
+        run: pnpm test:wasm
+
+      - name: Type-check Vue and TypeScript
+        run: pnpm typecheck
+
+      - name: Run the Vite+ unit tests
+        run: vp test
+
+      - name: Test production verification and license collection failure cases
+        run: node --test scripts/verify-dist.test.mjs scripts/build-rust-notices.test.mjs
+
+      - name: Build the production GitHub Pages assets
+        run: vp build
+
+      - name: Verify the complete deployable asset graph
+        run: pnpm verify:dist
+
+      - name: Install Chromium, Firefox, and their system dependencies
+        run: pnpm exec playwright install --with-deps chromium firefox
+
+      - name: Test the production app in both browsers and both viewport sizes
+        id: browser-tests
+        run: pnpm test:e2e
+
+      - name: Preserve the browser report, screenshots, and failure traces
+        if: ${{ !cancelled() && (steps.browser-tests.outcome == 'success' || steps.browser-tests.outcome == 'failure') }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: browser-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload the tested production build for GitHub Pages
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4.0.0
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy the verified build to GitHub Pages
+    needs: quality
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: github-pages
+      cancel-in-progress: false
+    steps:
+      - name: Read the repository's GitHub Pages configuration
+        uses: actions/configure-pages@v5.0.0
+        with:
+          enablement: false
+
+      - name: Deploy the artifact produced by the passing quality job
+        id: deployment
+        uses: actions/deploy-pages@v4.0.5
+        with:
+          timeout: "240000"

@@ -1,0 +1,46 @@
+{
+  "name": "army-knife",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vp dev --host 0.0.0.0",
+    "build": "vp build",
+    "preview": "vp preview --host 0.0.0.0",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "test": "vp test",
+    "test:e2e": "playwright test",
+    "build:fonts": "python3 scripts/build-fonts.py",
+    "build:wasm": "node scripts/build-wasm.mjs",
+    "test:wasm": "node scripts/test-wasm.mjs",
+    "verify:dist": "node scripts/verify-dist.mjs"
+  },
+  "dependencies": {
+    "@lucide/vue": "1.55.0",
+    "@vueuse/core": "15.0.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "reka-ui": "2.11.0",
+    "tailwind-merge": "3.7.0",
+    "vue": "3.5.43",
+    "vue-i18n": "11.4.14"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "24.19.2",
+    "@vitejs/plugin-vue": "6.0.10",
+    "@vue/test-utils": "2.5.1",
+    "happy-dom": "20.14.6",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3",
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.1.0",
+    "vite-plus": "1.1.0",
+    "vue-tsc": "3.3.12"
+  },
+  "engines": {
+    "node": "^24.19.0 || >=26.0.0"
+  },
+  "packageManager": "pnpm@11.25.0"
+}

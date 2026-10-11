@@ -1,0 +1,57 @@
+/* Family selection remains available even if a local font asset fails to load.
+ * Actual @font-face rules are built into public/fonts/{locale}.css.
+ * Sarasa-derived subsets use new internal names; original OFL notices ship at
+ * fonts/licenses/. No Google Fonts or other third-party font service is used.
+ */
+:root,
+:root[lang="ja"] {
+  --font-sans:
+    "Noto Sans JP Variable", "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo,
+    system-ui, sans-serif;
+  --font-mono:
+    "Army Knife Mono J", "Sarasa Mono J", "Noto Sans Mono CJK JP", "BIZ UDGothic", "Cascadia Code",
+    Consolas, "Liberation Mono", ui-monospace, monospace;
+  --font-ui: var(--font-sans);
+  --font-code: var(--font-mono);
+}
+
+:root[lang="en"] {
+  --font-sans: "Noto Sans Variable", "Noto Sans", system-ui, "Segoe UI", sans-serif;
+  --font-mono:
+    "Army Knife Mono J", "Sarasa Mono J", "Noto Sans Mono", "Cascadia Code", Consolas,
+    "Liberation Mono", ui-monospace, monospace;
+}
+
+:root[lang="zh-CN"] {
+  --font-sans:
+    "Noto Sans SC Variable", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono:
+    "Army Knife Mono SC", "Sarasa Mono SC", "Noto Sans Mono CJK SC", "Cascadia Code", Consolas,
+    "Liberation Mono", ui-monospace, monospace;
+}
+
+:root[lang="zh-TW"] {
+  --font-sans:
+    "Noto Sans TC Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui,
+    sans-serif;
+  --font-mono:
+    "Army Knife Mono TC", "Sarasa Mono TC", "Noto Sans Mono CJK TC", "Cascadia Code", Consolas,
+    "Liberation Mono", ui-monospace, monospace;
+}
+
+:root[lang="ko"] {
+  --font-sans:
+    "Noto Sans KR Variable", "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui,
+    sans-serif;
+  --font-mono:
+    "Army Knife Mono K", "Sarasa Mono K", "Noto Sans Mono CJK KR", "D2Coding", "Cascadia Code",
+    Consolas, "Liberation Mono", ui-monospace, monospace;
+}
+
+code,
+pre,
+kbd,
+samp,
+.font-mono {
+  font-family: var(--font-mono);
+}

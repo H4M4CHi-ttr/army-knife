@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "sarasa": {
+    "version": "1.0.42",
+    "project": "https://github.com/be5invis/Sarasa-Gothic",
+    "url": "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.42/SarasaMono-TTF-1.0.42.7z",
+    "sha256": "51bd943a0a8ad598f969a8c6c0ad143f9c46453a9276ea7683d25300bb62a0e7",
+    "archive": "SarasaMono-TTF-1.0.42.7z",
+    "license": "Sarasa-Gothic-OFL.txt",
+    "licenseSha256": "32c932e0dbae4f6e6386964bbc2d04178707665a05ca65cf636241af13d50a53",
+    "licenseSource": "https://github.com/be5invis/Sarasa-Gothic/blob/v1.0.42/LICENSE"
+  },
+  "noto": {
+    "noto-sans": {
+      "package": "@fontsource-variable/noto-sans",
+      "version": "5.3.0",
+      "url": "https://registry.npmjs.org/@fontsource-variable/noto-sans/-/noto-sans-5.3.0.tgz",
+      "archive": "noto-sans-5.3.0.tgz",
+      "sha256": "2cd97f3573b6e8ceaaa54ddf5df3f8e64d89a5bb31954013700d36a7ec01dcd6",
+      "integrity": "sha512-e3ZuxzY9AL2psXPZlhwhnYrHUHv6PMoyK9MQ7croF0CUgURLqu9EMjW7q2FgVLwij1tjLsIHQrnwQ8aUcg4BiA==",
+      "family": "Noto Sans Variable",
+      "license": "noto-sans-OFL.txt",
+      "licenseSha256": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
+      "project": "https://github.com/google/fonts"
+    },
+    "noto-sans-jp": {
+      "package": "@fontsource-variable/noto-sans-jp",
+      "version": "5.3.1",
+      "url": "https://registry.npmjs.org/@fontsource-variable/noto-sans-jp/-/noto-sans-jp-5.3.1.tgz",
+      "archive": "noto-sans-jp-5.3.1.tgz",
+      "sha256": "0a8f7d31c6c091e31977c801313b18e692312c37d9fe9a6d779b876e8046dbfc",
+      "integrity": "sha512-/anGvJFc5y36f8DJ+3TSh2+KAvaRLA9PaLUMvneeY5s4j8m+8X4F3lE/sjTuG9YI5BX4sykvCk4TuJMG7ecMRQ==",
+      "family": "Noto Sans JP Variable",
+      "license": "noto-sans-jp-OFL.txt",
+      "licenseSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+      "project": "https://github.com/google/fonts"
+    },
+    "noto-sans-sc": {
+      "package": "@fontsource-variable/noto-sans-sc",
+      "version": "5.3.1",
+      "url": "https://registry.npmjs.org/@fontsource-variable/noto-sans-sc/-/noto-sans-sc-5.3.1.tgz",
+      "archive": "noto-sans-sc-5.3.1.tgz",
+      "sha256": "95a11c5bbacd9995d94fc8cf964ee687307aacf20957ca6a4a16077519388163",
+      "integrity": "sha512-UB96JJ17HyD5ehEU7Em0hDdh7fvTMB4B4Hzmq5c4QaNwwSLqTrdM2S+coySeBqCkXwh0DxqXT0b0wMrmzorFpQ==",
+      "family": "Noto Sans SC Variable",
+      "license": "noto-sans-sc-OFL.txt",
+      "licenseSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+      "project": "https://github.com/google/fonts"
+    },
+    "noto-sans-tc": {
+      "package": "@fontsource-variable/noto-sans-tc",
+      "version": "5.3.1",
+      "url": "https://registry.npmjs.org/@fontsource-variable/noto-sans-tc/-/noto-sans-tc-5.3.1.tgz",
+      "archive": "noto-sans-tc-5.3.1.tgz",
+      "sha256": "8b71fb2cedb863e26379ee441c9d3ee56bbbbb4b4d2d508df23f54ab164dbf6d",
+      "integrity": "sha512-gueh+AySNkihE+HvizXLHltxt5/xVFSvw6ISnKTlpb/lG5QQm6u/KwuempTJ/jDYMST3xwiERYTTyseoJ/Kxew==",
+      "family": "Noto Sans TC Variable",
+      "license": "noto-sans-tc-OFL.txt",
+      "licenseSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+      "project": "https://github.com/google/fonts"
+    },
+    "noto-sans-kr": {
+      "package": "@fontsource-variable/noto-sans-kr",
+      "version": "5.3.1",
+      "url": "https://registry.npmjs.org/@fontsource-variable/noto-sans-kr/-/noto-sans-kr-5.3.1.tgz",
+      "archive": "noto-sans-kr-5.3.1.tgz",
+      "sha256": "9bbb1134818e567b21024f0bf842b53a9419de67608febbf18b23072385c8bfa",
+      "integrity": "sha512-f5aty6Qgk2LVU5TjCtXHxiYHqUWYW8f75ll0Chn8ucCqoOlIomcACUwf1V47yUt6wTdWZiGr3dcbQk+zlOspMA==",
+      "family": "Noto Sans KR Variable",
+      "license": "noto-sans-kr-OFL.txt",
+      "licenseSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+      "project": "https://github.com/google/fonts"
+    }
+  },
+  "locales": {
+    "en": {
+      "ui": "noto-sans",
+      "mono": "J"
+    },
+    "ja": {
+      "ui": "noto-sans-jp",
+      "mono": "J"
+    },
+    "zh-CN": {
+      "ui": "noto-sans-sc",
+      "mono": "SC"
+    },
+    "zh-TW": {
+      "ui": "noto-sans-tc",
+      "mono": "TC"
+    },
+    "ko": {
+      "ui": "noto-sans-kr",
+      "mono": "K"
+    }
+  }
+}

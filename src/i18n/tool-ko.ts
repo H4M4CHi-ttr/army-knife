@@ -1,0 +1,66 @@
+import type { toolMessagesEn } from "../lib/tools/ui-messages";
+
+export const toolKo: Record<keyof typeof toolMessagesEn, string> = {
+  "cidr.input": "IP 주소 / 프리픽스",
+  "cidr.ipv6Example": "IPv6 예제",
+  "cidr.addressCount": "범위 내 주소 수",
+  "cidr.family": "IP 버전",
+  "cidr.prefix": "프리픽스 길이",
+  "cidr.usableHosts": "IPv4 호스트 수",
+  "cidr.canonical": "정규화된 네트워크 주소",
+  "cidr.address": "입력 주소",
+  "cidr.network": "첫 번째 주소",
+  "cidr.lastAddress": "마지막 주소",
+  "cidr.subnetMask": "서브넷 마스크",
+  "cidr.wildcardMask": "와일드카드 마스크",
+  "cidr.broadcast": "지정 브로드캐스트",
+  "cidr.firstHost": "첫 번째 호스트",
+  "cidr.lastHost": "마지막 호스트",
+  "cidr.normalized":
+    "입력에 호스트 비트가 포함되어 있어, 위의 정규화된 네트워크 주소에서는 해당 비트를 0으로 바꾸었습니다.",
+  "cidr.pointToPoint":
+    "/31에서는 포인트 투 포인트 링크의 두 주소를 모두 호스트로 계산합니다(RFC 3021).",
+  "cidr.ipv6Note":
+    "IPv6에는 브로드캐스트 주소가 없습니다. 주소 수는 양 끝을 포함한 범위의 전체 주소 수이며, 할당 가능한 호스트 수를 의미하지 않습니다.",
+  "cidr.hostNote":
+    "호스트 수는 일반적인 서브넷 규칙에 따라 계산합니다. 예약된 주소나 특수 용도 주소는 할당하거나 라우팅할 수 없을 수 있습니다.",
+  "unicode.includeWhitespace": "탭과 일반 줄바꿈도 표시",
+  "unicode.codePoints": "코드 포인트 수",
+  "unicode.bytes": "UTF-8 바이트 수",
+  "unicode.findings": "확인할 문자",
+  "unicode.location": "위치",
+  "unicode.codePoint": "코드 포인트",
+  "unicode.name": "유니코드 이름",
+  "unicode.lineColumn": "{line}행 {column}열",
+  "unicode.offset": "UTF-16 오프셋 {offset}",
+  "unicode.normalization": "정규화됨",
+  "unicode.none": "보이지 않는 문자나 특수 문자를 찾지 못했습니다.",
+  "unicode.resultCap": "문자 {count}개를 찾았습니다. 결과에는 처음 1,000개가 포함됩니다.",
+  "unicode.previewCap": "미리보기는 20,000자까지만 표시합니다.",
+  "unicode.positions":
+    "위치는 보이는 글자 수가 아닌 코드 포인트 단위로 표시합니다. UTF-16 오프셋은 0부터 시작합니다.",
+  "unicode.previous": "이전",
+  "unicode.next": "다음",
+  "unicode.page": "전체 {total}페이지 중 {current}페이지",
+  "unicode.kind.bidi": "방향 제어",
+  "unicode.kind.joiner": "연결 문자",
+  "unicode.kind.variation": "변형 선택자",
+  "unicode.kind.tag": "태그 문자",
+  "unicode.kind.space": "특수 공백",
+  "unicode.kind.control": "제어 문자",
+  "unicode.kind.format": "보이지 않는 문자 / 서식 제어",
+  "unicode.kind.invalid": "짝이 없는 서로게이트",
+  "errors.IP_INVALID":
+    "완전한 IPv4 또는 IPv6 주소를 입력하세요. IPv4의 불필요한 선행 0, URL용 대괄호, 영역 식별자는 지원하지 않습니다.",
+  "errors.CIDR_INVALID":
+    "192.168.1.0/24 또는 2001:db8::/64처럼 IP 주소 뒤에 슬래시와 프리픽스 길이를 입력하세요.",
+  "errors.CIDR_PREFIX_INVALID": "프리픽스 길이는 IPv4에서 0~32, IPv6에서 0~128이어야 합니다.",
+  "errors.JSON_INVALID": "유효하지 않은 JSON입니다. 따옴표, 쉼표, 괄호를 확인하세요.",
+  "errors.JSON_DEPTH_LIMIT": "JSON 중첩 깊이가 한도인 64를 초과했습니다.",
+  "errors.JSON_NODE_LIMIT": "JSON 값의 수가 한도인 50,000개를 초과했습니다.",
+  "errors.JSON_DUPLICATE_KEY": "객체 키가 중복되면 값이 손실됩니다. 먼저 중복 키를 제거하세요.",
+  "errors.JSON_NUMBER_PRECISION":
+    "정밀도를 유지할 수 없는 숫자가 있습니다. 큰 정수나 높은 정밀도가 필요한 값은 따옴표로 감싼 문자열을 사용하세요.",
+  "errors.JSON_INDENT_INVALID": "들여쓰기는 0~8 사이의 값을 선택하세요.",
+  "errors.COLOR_INVALID": "#RGB 또는 #RRGGBB 형식의 불투명한 색상을 입력하세요.",
+};

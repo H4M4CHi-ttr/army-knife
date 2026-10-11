@@ -1,0 +1,12 @@
+# Build-only font tooling. No Python code runs in the browser.
+fonttools==4.66.1
+brotli==1.2.0
+py7zr==1.1.3
+backports.zstd==1.8.0
+inflate64==1.0.4
+multivolumefile==0.2.3
+psutil==7.2.2
+pybcj==1.0.8
+pycryptodomex==3.24.0
+pyppmd==1.3.1
+texttable==1.7.0

@@ -2,6 +2,8 @@ node_modules/
 dist/
 public/fonts/
 public/wasm/
+public/licenses/rust-dependencies.txt
+public/licenses/rust-dependencies.txt.tmp
 src/lib/wasm/pkg/
 .cache/
 .font-cache/

@@ -1,0 +1,12 @@
+packages:
+  - '.'
+overrides:
+  'vite@*': 'npm:@voidzero-dev/vite-plus-core@1.1.0'
+# Vite+ reports its own version while providing the Vite 8 API to these plugins.
+peerDependencyRules:
+  allowedVersions:
+    vite: '1.1.0'
+onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
+  - 'esbuild'
+  - 'vue-demi'
