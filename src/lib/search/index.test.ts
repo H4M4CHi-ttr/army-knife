@@ -110,6 +110,16 @@ describe("local multilingual intent search", () => {
     }]);
     expect(spanish("buscar peticiones HTTP lentas")[0]?.id).toBe("har");
     expect(spanish("")).toEqual(tools);
+    const russian = createToolSearch(tools, [{
+      language: "ru",
+      labels: {},
+      intents: {
+        har: ["найти медленные сетевые запросы"],
+        env: ["сравнить переменные окружения"],
+      },
+    }]);
+    expect(russian("сетевые запросы")[0]?.id).toBe("har");
+    expect(russian("переменные окружения")[0]?.id).toBe("env");
     expect(searchTools("ブラウザの通信が遅い")[0]?.id).toBe("har");
   });
 
