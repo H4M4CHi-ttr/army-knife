@@ -37,7 +37,7 @@ JavaScript のバージョンと依存グラフは [package.json](package.json) 
 
 | プロジェクト / パッケージ                                        | バージョン         | ライセンス                                        |
 | ---------------------------------------------------------------- | ------------------ | ------------------------------------------------- |
-| [Vue](https://github.com/vuejs/core)                             | 3.5.43             | MIT                                               |
+| [Vue](https://github.com/vuejs/core)                             | 3.6.0-rc.11        | MIT                                               |
 | [Vue I18n](https://github.com/intlify/vue-i18n)                  | 11.4.14            | MIT                                               |
 | [VueUse](https://github.com/vueuse/vueuse) / `@vueuse/core`      | 15.0.0（直接依存） | MIT                                               |
 | [Reka UI](https://github.com/unovue/reka-ui)                     | 2.11.0             | MIT                                               |
@@ -89,6 +89,7 @@ SOFTWARE.
 | [regex](https://github.com/rust-lang/regex)                  | 1.13.1     | MIT OR Apache-2.0    |
 | [serde](https://github.com/serde-rs/serde)                   | 1.0.229    | MIT OR Apache-2.0    |
 | [serde_json](https://github.com/serde-rs/json)               | 1.0.152    | MIT OR Apache-2.0    |
+| [url](https://github.com/servo/rust-url)                     | 2.5.8      | MIT OR Apache-2.0    |
 | [wasm-bindgen](https://github.com/wasm-bindgen/wasm-bindgen) | 0.2.129    | MIT OR Apache-2.0    |
 
 間接依存には追加の条件があるものもあります。例えば `unicode-ident` 1.0.26 の表記は **(MIT OR Apache-2.0) AND Unicode-3.0**、`ryu` 1.0.23 は **Apache-2.0 OR BSL-1.0** です。集約処理はこれらのライセンス原文も保持します。

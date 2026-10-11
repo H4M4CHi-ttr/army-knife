@@ -8,10 +8,18 @@ import {
   GitCompareArrows,
   Braces,
   Contrast,
+  Activity,
+  FileKey2,
+  Link2,
+  Workflow,
 } from "@lucide/vue";
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  har: Activity,
+  env: FileKey2,
+  url: Link2,
+  explain: Workflow,
   csv: TableProperties,
   logs: Logs,
   sets: Combine,

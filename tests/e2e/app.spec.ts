@@ -86,7 +86,14 @@ async function dashboard(page: Page): Promise<void> {
 
 async function tool(page: Page, id: string): Promise<void> {
   await page.goto(`./#/tool/${id}`);
-  await expect(page.getByRole("button", { name: "Run", exact: true })).toBeVisible();
+  const inputId = id.startsWith("json-")
+    ? "json-left"
+    : id === "sets"
+      ? "sets-left"
+      : id === "env"
+        ? "env-left"
+        : `${id}-input`;
+  await expect(page.locator(`#${inputId}`)).toBeVisible();
 }
 
 async function settings(page: Page): Promise<void> {
@@ -167,7 +174,6 @@ test("CSV and log tools execute the real WASM module and retain exact string val
     .fill(
       `id,name,amount\n9007199254740993,${PRIVATE_MARKER},10\n2,"quoted, cell",\n3,${literalHtml},20`,
     );
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   const csv = JSON.parse(await downloadResult(page));
   expect(csv.operation).toBe("csv");
   expect(csv.rows).toBe(3);
@@ -186,7 +192,6 @@ test("CSV and log tools execute the real WASM module and retain exact string val
   await page
     .locator("#logs-input")
     .fill(`INFO ${PRIVATE_MARKER}\nERROR repeated\nWARN caution\nERROR repeated`);
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   const logs = JSON.parse(await downloadResult(page));
   expect(logs.operation).toBe("logs");
   expect(logs.totalLines).toBe(4);
@@ -202,7 +207,6 @@ test("list operations require opting in and return complete local results", asyn
   await tool(page, "sets");
   await page.locator("#sets-left").fill(`alpha\nbeta\nbeta\n${PRIVATE_MARKER}`);
   await page.locator("#sets-right").fill(`beta\ngamma\n${PRIVATE_MARKER}`);
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   expect(await downloadResult(page)).toBe(`beta\n${PRIVATE_MARKER}`);
 });
 
@@ -211,21 +215,18 @@ test("CIDR and Unicode report meaningful boundaries and discard stale results", 
 }, testInfo) => {
   await tool(page, "cidr");
   await page.locator("#cidr-input").fill("::/0");
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   const ipv6 = JSON.parse(await downloadResult(page));
   expect(ipv6.addressCount).toBe("340282366920938463463374607431768211456");
   expect(ipv6.broadcast).toBeNull();
   await assertNoOverflow(page);
   await screenshot(page, testInfo, "subnet-ipv6");
   await page.locator("#cidr-input").fill("192.0.2.10/31");
-  await expect(page.getByRole("button", { name: "Download", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Run", exact: true }).click();
+  await expect(page.locator(".cidr-network code")).toHaveText("192.0.2.10/31");
   const pointToPoint = JSON.parse(await downloadResult(page));
   expect(pointToPoint.usableHostCount).toBe("2");
 
   await tool(page, "unicode");
   await page.locator("#unicode-input").fill(`A😀\r\nB\u200b${PRIVATE_MARKER}\u202e`);
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   const unicode = JSON.parse(await downloadResult(page));
   expect(unicode.totalFindings).toBe(2);
   expect(unicode.findings[0]).toMatchObject({ codePoint: "U+200B", line: 2, column: 2 });
@@ -240,12 +241,10 @@ test("JSON diff respects structure, escapes pointers, and rejects lossy numbers"
   await tool(page, "json-diff");
   await page.locator("#json-left").fill(`{"a/b":{"~value":1},"marker":"${PRIVATE_MARKER}"}`);
   await page.locator("#json-right").fill(`{"marker":"${PRIVATE_MARKER}","a/b":{"~value":2}}`);
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   const result = JSON.parse(await downloadResult(page));
   expect(result.changes).toEqual([{ kind: "replace", path: "/a~1b/~0value", before: 1, after: 2 }]);
   await page.locator("#json-left").fill('{"id":9007199254740993}');
   await expect(page.getByRole("button", { name: "Download", exact: true })).toHaveCount(0);
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText(/precision|preserved safely/i);
 });
 
@@ -256,7 +255,6 @@ test("only preferences persist; input text never enters storage or location", as
   await page.getByTestId("settings-close").click();
   await tool(page, "unicode");
   await page.locator("#unicode-input").fill(`secret = "${PRIVATE_MARKER}";\u200b`);
-  await page.getByRole("button", { name: "Run", exact: true }).click();
   await expect(page.getByRole("button", { name: "Download", exact: true })).toBeVisible();
   const storage = await page.evaluate(() => ({
     local: { ...localStorage },
@@ -265,8 +263,10 @@ test("only preferences persist; input text never enters storage or location", as
   }));
   expect(Object.keys(storage.local)).toEqual([PREFERENCE_KEY]);
   expect(Object.keys(JSON.parse(storage.local[PREFERENCE_KEY] as string)).sort()).toEqual([
+    "autoApply",
     "enabledTools",
     "favorites",
+    "knownTools",
     "locale",
     "theme",
     "version",
@@ -363,4 +363,249 @@ test("light and dark workbenches fit the viewport and produce review screenshots
   await expect(page.locator("html")).toHaveClass(/dark/);
   await assertNoOverflow(page);
   await screenshot(page, testInfo, "dashboard-dark");
+});
+
+test("delayed apply counts down, restarts on edits, and applies the latest input automatically", async ({
+  page,
+}, testInfo) => {
+  await page.clock.install({ time: new Date("2026-10-11T12:00:00Z") });
+  await tool(page, "json-diff");
+  await page.clock.pauseAt(new Date("2026-10-11T12:10:00Z"));
+  const longValue = "x".repeat(9_000);
+  await page.locator("#json-left").fill(JSON.stringify({ value: longValue, revision: 1 }));
+  await page.locator("#json-right").fill(JSON.stringify({ value: longValue, revision: 2 }));
+  const control = page.getByTestId("apply-control");
+  const apply = page.getByTestId("apply-now");
+  await expect(control).toHaveAttribute("data-mode", "deferred");
+  await expect(control).toHaveAttribute("data-status", "pending");
+  await expect(apply).toContainText("0.8s");
+  await page.clock.runFor(400);
+  await expect(apply).toContainText("0.4s");
+  await expect(page.locator(".apply-progress")).toHaveAttribute("style", /scaleX\(0\.5\)/);
+  await assertNoOverflow(page);
+  await screenshot(page, testInfo, "auto-apply-countdown");
+  await page.locator("#json-right").fill(JSON.stringify({ value: longValue, revision: 3 }));
+  await expect(apply).toContainText("0.8s");
+  await page.clock.runFor(799);
+  await expect(page.locator(".result-panel")).toHaveCount(0);
+  await page.clock.runFor(1);
+  await expect(control).toHaveAttribute("data-status", "applied");
+  const result = JSON.parse(await downloadResult(page));
+  expect(result.changes).toEqual([{ kind: "replace", path: "/revision", before: 1, after: 3 }]);
+});
+
+test("manual mode persists, a manual apply bypasses waiting, and stale results cannot be downloaded", async ({
+  page,
+}) => {
+  await page.clock.install({ time: new Date("2026-10-11T12:00:00Z") });
+  await tool(page, "logs");
+  await page.clock.pauseAt(new Date("2026-10-11T12:10:00Z"));
+  await page.getByTestId("auto-apply-toggle").uncheck();
+  await page.locator("#logs-input").fill(`INFO ${PRIVATE_MARKER}\nERROR first`);
+  await page.clock.runFor(2_000);
+  await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "manual");
+  await expect(page.getByRole("button", { name: "Download", exact: true })).toHaveCount(0);
+  await page.getByTestId("apply-now").click();
+  const first = JSON.parse(await downloadResult(page));
+  expect(first.totalLines).toBe(2);
+  await page.locator("#logs-input").fill("WARN replacement");
+  await expect(page.getByRole("button", { name: "Download", exact: true })).toHaveCount(0);
+  await page.getByTestId("auto-apply-toggle").check();
+  await page.clock.runFor(320);
+  await expect(page.getByTestId("apply-now")).toContainText("0.5s");
+  await page.getByTestId("apply-now").click();
+  const latest = JSON.parse(await downloadResult(page));
+  expect(latest.totalLines).toBe(1);
+  expect(latest.levels.warn).toBe(1);
+  await page.clock.runFor(2_000);
+  await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "applied");
+  await page.getByTestId("auto-apply-toggle").uncheck();
+  expect(
+    await page.evaluate((key) => JSON.parse(localStorage.getItem(key)!).autoApply, PREFERENCE_KEY),
+  ).toBe(false);
+  await page.clock.resume();
+  await page.reload();
+  await expect(page.getByTestId("auto-apply-toggle")).not.toBeChecked();
+  await expect(page.locator("#logs-input")).toHaveValue("");
+});
+
+test("HAR analysis runs in real WASM and treats unknown sizes as unknown", async ({
+  page,
+}, testInfo) => {
+  await tool(page, "har");
+  await page.locator("#har-input").fill(
+    JSON.stringify({
+      log: {
+        version: "1.2",
+        entries: [
+          {
+            request: {
+              method: "GET",
+              url: `https://example.invalid/page?secret=${PRIVATE_MARKER}`,
+            },
+            response: {
+              status: 200,
+              headersSize: 100,
+              bodySize: 900,
+              content: { mimeType: "text/html" },
+            },
+            time: 120,
+          },
+          {
+            request: { method: "POST", url: "https://api.example.invalid/upload" },
+            response: {
+              status: 503,
+              headersSize: 80,
+              bodySize: 0,
+              content: { mimeType: "application/json" },
+            },
+            time: 800,
+          },
+          {
+            request: { method: "GET", url: "https://example.invalid/cached" },
+            response: {
+              status: 304,
+              headersSize: -1,
+              bodySize: 0,
+              content: { mimeType: "text/html" },
+            },
+            time: 2,
+          },
+        ],
+      },
+    }),
+  );
+  const result = JSON.parse(await downloadResult(page));
+  expect(result.operation).toBe("har");
+  expect(result.requests).toBe(3);
+  expect(result.httpErrors).toBe(1);
+  expect(result.responseTransfer).toEqual({
+    knownBytes: "1080",
+    knownEntries: 2,
+    unknownEntries: 1,
+  });
+  expect(result.hosts[0].key).toBe("example.invalid");
+  expect(result.slowest[0]).toMatchObject({ method: "POST", timeMs: 800, status: 503 });
+  await expect(page.getByTestId("har-result")).toContainText("Partial size total");
+  await assertNoOverflow(page);
+  await screenshot(page, testInfo, "har-analysis");
+});
+
+test("dotenv comparison shows missing keys and duplicates and keeps values hidden until requested", async ({
+  page,
+}, testInfo) => {
+  await tool(page, "env");
+  await page
+    .locator("#env-left")
+    .fill(`A=1\nDB_HOST=old\nDB_HOST=local\nSECRET=${PRIVATE_MARKER}\nONLY_LEFT=yes`);
+  await page
+    .locator("#env-right")
+    .fill(`A=1\nDB_HOST=remote\nSECRET=${PRIVATE_MARKER}\nONLY_RIGHT=on`);
+  await expect(page.getByTestId("apply-control")).toHaveAttribute("data-mode", "instant");
+  const result = JSON.parse(await downloadResult(page));
+  expect(result.complete).toBe(true);
+  expect(result.summary).toEqual({ "left-only": 1, "right-only": 1, changed: 1, equal: 2 });
+  expect(result.left.duplicateKeys).toBe(1);
+  expect(result.changes.find((entry: { key: string }) => entry.key === "DB_HOST").left.value).toBe(
+    "local",
+  );
+  await expect(page.locator(".env-table")).not.toContainText('"local"');
+  await page.getByTestId("env-reveal-values").check();
+  await expect(page.locator(".env-table")).toContainText('"local"');
+  await page.getByTestId("env-include-equal").check();
+  await expect(page.locator(".env-table")).toContainText(PRIVATE_MARKER);
+  await assertNoOverflow(page);
+  await screenshot(page, testInfo, "env-comparison");
+  await page.locator("#env-left").fill("VALID=1\nnot an assignment");
+  expect(JSON.parse(await downloadResult(page)).complete).toBe(false);
+});
+
+test("URL query edits update immediately and preserve repeated keys, order, and bare flags", async ({
+  page,
+}, testInfo) => {
+  await tool(page, "url");
+  await page
+    .locator("#url-input")
+    .fill("https://example.invalid:8443/a?tag=one&tag=two&q=hello+world&flag#frag");
+  await expect(page.getByTestId("query-value-2")).toHaveValue("hello world");
+  await page.getByTestId("query-value-1").fill("three & four");
+  await expect(page.getByTestId("url-output")).toContainText("tag=one&tag=three+%26+four");
+  await page.getByTestId("query-add").click();
+  await page.getByTestId("query-key-4").fill("marker");
+  await page.getByTestId("query-value-4").fill(PRIVATE_MARKER);
+  await page.getByTestId("query-remove-0").click();
+  const result = await downloadResult(page);
+  const url = new URL(result);
+  expect(url.searchParams.getAll("tag")).toEqual(["three & four"]);
+  expect(url.searchParams.get("marker")).toBe(PRIVATE_MARKER);
+  expect(url.hash).toBe("#frag");
+  expect(result).toContain("&flag&marker=");
+  await assertNoOverflow(page);
+  await screenshot(page, testInfo, "url-query-editor");
+});
+
+test("EXPLAIN JSON preserves per-loop metrics and ignores unrelated large integers without rounding", async ({
+  page,
+}, testInfo) => {
+  await tool(page, "explain");
+  const input = JSON.stringify([
+    {
+      Plan: {
+        "Node Type": "Sort",
+        "Plan Rows": 10,
+        "Actual Rows": 100,
+        "Actual Loops": 3,
+        "Actual Total Time": 12,
+        "Total Cost": 20,
+        Plans: [
+          {
+            "Node Type": "Seq Scan",
+            "Relation Name": PRIVATE_MARKER,
+            "Plan Rows": 10,
+            "Actual Rows": 100,
+            "Actual Loops": 3,
+            "Actual Total Time": 10,
+            "Total Cost": 18,
+          },
+        ],
+      },
+      "Planning Time": 1,
+      "Execution Time": 13,
+      "Query Identifier": "large-query-id",
+    },
+  ]).replace('"large-query-id"', "9007199254740993");
+  await page.locator("#explain-input").fill(input);
+  const result = JSON.parse(await downloadResult(page));
+  expect(result.nodes).toHaveLength(2);
+  expect(result.nodes[1]).toMatchObject({
+    actualRows: 100,
+    actualLoops: 3,
+    rowRatio: 10,
+    actualTotalTimeMs: 10,
+  });
+  expect(result.statements[0]).toMatchObject({ planningTimeMs: 1, executionTimeMs: 13 });
+  await page.locator("#explain-filter").fill("Seq Scan");
+  await expect(page.locator(".explain-nodes tbody tr")).toHaveCount(1);
+  await page.locator("#explain-filter").fill("");
+  await assertNoOverflow(page);
+  await screenshot(page, testInfo, "postgres-explain");
+});
+
+test("Vapor output reacts to language and color changes while VDOM settings stay accessible", async ({
+  page,
+}) => {
+  await dashboard(page);
+  await enableTool(page, "contrast");
+  await page.goto("./#/tool/contrast");
+  await expect(page.locator(".color-controls")).toBeVisible();
+  await page.getByRole("textbox").first().fill("#000000");
+  await page.getByRole("textbox").last().fill("#FFFFFF");
+  expect(JSON.parse(await downloadResult(page)).ratio).toBe(21);
+  await settings(page);
+  await page.getByTestId("locale-select").selectOption("ja");
+  await page.getByTestId("settings-close").click();
+  await expect(page.getByTestId("instant-updates")).toContainText("入力を即時反映");
+  await expect(page.getByRole("button", { name: "コピー", exact: true })).toBeVisible();
+  await expect(page.locator(".contrast-ratio strong")).toContainText("21.00");
+  await assertNoOverflow(page);
 });

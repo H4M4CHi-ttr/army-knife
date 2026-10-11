@@ -43,6 +43,10 @@ const JsonTool = defineAsyncComponent(() => import("@/components/tools/JsonTool.
 const CidrTool = defineAsyncComponent(() => import("@/components/tools/CidrTool.vue"));
 const UnicodeTool = defineAsyncComponent(() => import("@/components/tools/UnicodeTool.vue"));
 const ContrastTool = defineAsyncComponent(() => import("@/components/tools/ContrastTool.vue"));
+const HarTool = defineAsyncComponent(() => import("@/components/tools/HarTool.vue"));
+const EnvTool = defineAsyncComponent(() => import("@/components/tools/EnvTool.vue"));
+const UrlTool = defineAsyncComponent(() => import("@/components/tools/UrlTool.vue"));
+const ExplainTool = defineAsyncComponent(() => import("@/components/tools/ExplainTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
@@ -482,13 +486,17 @@ onBeforeUnmount(() => {
           <CidrTool v-else-if="selectedTool.id === 'cidr'" key="cidr" />
           <UnicodeTool v-else-if="selectedTool.id === 'unicode'" key="unicode" />
           <ContrastTool v-else-if="selectedTool.id === 'contrast'" key="contrast" />
+          <HarTool v-else-if="selectedTool.id === 'har'" key="har" />
+          <EnvTool v-else-if="selectedTool.id === 'env'" key="env" />
+          <UrlTool v-else-if="selectedTool.id === 'url'" key="url" />
+          <ExplainTool v-else-if="selectedTool.id === 'explain'" key="explain" />
         </template>
         <p v-if="!status.available" class="notice" role="status">
           {{ t("settings.storageError") }}
         </p>
         <footer class="page-footer">
           <span>{{ t("app.footer") }}</span
-          ><span class="font-mono">army-knife / v0.1.0</span>
+          ><span class="font-mono">army-knife / v0.2.0</span>
         </footer>
       </main>
     </div>

@@ -1,23 +1,39 @@
-<script setup lang="ts">
+<script setup vapor lang="ts">
 import { computed, ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
+import { useAppI18n } from "@/i18n/useAppI18n";
 import CodeInput from "@/components/CodeInput.vue";
 import { Button } from "@/components/ui/button";
 import { copyText, downloadText } from "@/lib/io";
-import { inspectUnicode, ToolError, UNICODE_LIMITS, type UnicodeReport } from "@/lib/tools";
+import { inspectUnicode, UNICODE_LIMITS, type UnicodeReport } from "@/lib/tools";
+import ApplyControl from "@/components/ApplyControl.vue";
+import { useToolExecution } from "@/composables/useToolExecution";
 
-const { t, locale } = useI18n();
+const { t, locale } = useAppI18n();
 const input = ref("");
 const includeWhitespace = ref(false);
-const result = ref<UnicodeReport | null>(null);
-const error = ref("");
+const {
+  result,
+  error: executionError,
+  control,
+  apply,
+  cancel,
+  setAuto,
+} = useToolExecution<UnicodeReport>({
+  source: () => [input.value, includeWhitespace.value],
+  canRun: () => Boolean(input.value),
+  mode: () => (input.value.length <= 8192 ? "instant" : "deferred"),
+  execute: () => inspectUnicode(input.value, includeWhitespace.value),
+});
+const copyError = ref("");
+const error = computed(
+  () => copyError.value || (executionError.value ? `errors.${executionError.value}` : ""),
+);
 const copied = ref(false);
 const page = ref(1);
 const pageSize = 100;
 
 watch([input, includeWhitespace], () => {
-  result.value = null;
-  error.value = "";
+  copyError.value = "";
   copied.value = false;
   page.value = 1;
 });
@@ -35,26 +51,14 @@ function sample(): void {
     'const user\u200bName = "hamachi";\nconst space = "hello\u00a0world";\nconst emoji = "👩\u200d💻";\n// direction: \u202eabc\u202c';
 }
 
-function run(): void {
-  error.value = "";
-  copied.value = false;
-  page.value = 1;
-  try {
-    result.value = inspectUnicode(input.value, includeWhitespace.value);
-  } catch (caught) {
-    result.value = null;
-    error.value = caught instanceof ToolError ? `errors.${caught.code}` : "states.unknownError";
-  }
-}
-
 async function copy(): Promise<void> {
   if (!result.value) return;
   try {
     await copyText(JSON.stringify(result.value, null, 2));
     copied.value = true;
-    error.value = "";
+    copyError.value = "";
   } catch {
-    error.value = "errors.CLIPBOARD_UNAVAILABLE";
+    copyError.value = "errors.CLIPBOARD_UNAVAILABLE";
   }
 }
 
@@ -90,7 +94,7 @@ function download(): void {
       <Button variant="ghost" :disabled="!input" @click="input = ''">{{
         t("actions.clear")
       }}</Button>
-      <Button :disabled="!input" @click="run">{{ t("actions.run") }}</Button>
+      <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />
     </div>
     <p v-if="error" class="error-panel" role="alert">{{ t(error) }}</p>
 

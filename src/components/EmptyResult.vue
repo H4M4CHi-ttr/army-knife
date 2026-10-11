@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<script setup vapor lang="ts">
 import { ArrowDownToLine } from "@lucide/vue";
-import { useI18n } from "vue-i18n";
-const { t } = useI18n();
+import { useAppI18n } from "@/i18n/useAppI18n";
+const { t } = useAppI18n();
 </script>
 <template>
   <div class="empty-result">

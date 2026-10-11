@@ -1023,6 +1023,7 @@ main:focus {
 }
 .run-bar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 20px;
   align-items: center;
@@ -1031,7 +1032,20 @@ main:focus {
   padding-top: 18px;
 }
 .run-bar > .hint {
-  max-width: 760px;
+  flex: 1 1 280px;
+  max-width: 58ch;
+}
+.run-bar > .apply-control {
+  flex: 0 0 auto;
+  max-width: 100%;
+  margin-left: auto;
+}
+.execution-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--primary);
+  font-size: 0.75rem;
 }
 .run-bar > button {
   min-width: 92px;

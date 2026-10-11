@@ -1,6 +1,7 @@
 //! Deterministic, local-only processing. The module has no network or persistence APIs.
 
 mod csv_profile;
+mod har;
 mod logs;
 mod sets;
 
@@ -55,6 +56,9 @@ enum Request {
         #[serde(rename = "ignoreEmpty")]
         ignore_empty: bool,
     },
+    Har {
+        text: String,
+    },
 }
 
 #[derive(Serialize)]
@@ -63,6 +67,7 @@ enum Output {
     Csv(csv_profile::CsvResult),
     Logs(logs::LogsResult),
     Sets(sets::SetsResult),
+    Har(Box<har::HarResult>),
 }
 
 #[derive(Serialize)]
@@ -114,6 +119,10 @@ fn process(request: Request) -> Result<Output, EngineError> {
             ensure_input_size(left.len().saturating_add(right.len()))?;
             sets::analyze(&left, &right, mode, trim, case_insensitive, ignore_empty)
                 .map(Output::Sets)
+        }
+        Request::Har { text } => {
+            ensure_input_size(text.len())?;
+            har::analyze(&text).map(|result| Output::Har(Box::new(result)))
         }
     }
 }

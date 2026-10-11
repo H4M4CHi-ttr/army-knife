@@ -1,47 +1,43 @@
-<script setup lang="ts">
-import { computed, ref, shallowRef, watch } from "vue";
-import { useI18n } from "vue-i18n";
-import { FlaskConical, Play, Trash2, CircleCheck } from "@lucide/vue";
+<script setup vapor lang="ts">
+import { computed, ref } from "vue";
+import { useAppI18n } from "@/i18n/useAppI18n";
+import { FlaskConical, Trash2, CircleCheck } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import CodeInput from "@/components/CodeInput.vue";
 import OutputActions from "@/components/OutputActions.vue";
 import EmptyResult from "@/components/EmptyResult.vue";
-import { compareJson, formatJson, ToolError, type JsonDiffResult } from "@/lib/tools";
+import ApplyControl from "@/components/ApplyControl.vue";
+import { useToolExecution } from "@/composables/useToolExecution";
+import { compareJson, formatJson, type JsonDiffResult } from "@/lib/tools";
 
 const props = defineProps<{ id: "json-diff" | "json-format" }>();
-const { t } = useI18n();
+const { t } = useAppI18n();
 const left = ref("");
 const right = ref("");
 const indent = ref(2);
-const error = ref("");
-const diff = shallowRef<JsonDiffResult | null>(null);
-const formatted = ref<string | null>(null);
+const { result, error, control, apply, cancel, setAuto } = useToolExecution<{
+  diff: JsonDiffResult | null;
+  formatted: string | null;
+}>({
+  source: () => [left.value, right.value, indent.value],
+  canRun: () =>
+    Boolean(left.value.trim()) && (props.id !== "json-diff" || Boolean(right.value.trim())),
+  mode: () => (left.value.length + right.value.length <= 8192 ? "instant" : "deferred"),
+  execute: () =>
+    props.id === "json-diff"
+      ? { diff: compareJson(left.value, right.value), formatted: null }
+      : { diff: null, formatted: formatJson(left.value, indent.value) },
+});
+const diff = computed(() => result.value?.diff ?? null);
+const formatted = computed(() => result.value?.formatted ?? null);
 const output = computed(() =>
   props.id === "json-diff" ? JSON.stringify(diff.value, null, 2) : (formatted.value ?? ""),
-);
-watch(
-  [left, right, indent],
-  () => {
-    diff.value = null;
-    formatted.value = null;
-    error.value = "";
-  },
-  { flush: "sync" },
 );
 function sample() {
   left.value =
     '{"service":"army-knife","version":1,"features":{"wasm":true,"cloud":false},"languages":["en","ja"]}';
   right.value =
     '{"languages":["en","ja","ko"],"service":"army-knife","version":2,"features":{"wasm":true},"theme":"system"}';
-}
-function run() {
-  error.value = "";
-  try {
-    if (props.id === "json-diff") diff.value = compareJson(left.value, right.value);
-    else formatted.value = formatJson(left.value, indent.value);
-  } catch (failure) {
-    error.value = failure instanceof ToolError ? failure.code : "INTERNAL_ERROR";
-  }
 }
 function preview(value: unknown): string {
   const text = JSON.stringify(value);
@@ -96,9 +92,7 @@ function preview(value: unknown): string {
     </div>
     <div class="run-bar">
       <p class="hint">{{ t(`tool.${id}.hint`) }}</p>
-      <Button :disabled="!left.trim() || (id === 'json-diff' && !right.trim())" @click="run"
-        ><Play class="size-3.5" />{{ t("actions.run") }}</Button
-      >
+      <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />
     </div>
   </div>
   <p v-if="error" class="error-panel" role="alert">{{ t(`errors.${error}`) }}</p>

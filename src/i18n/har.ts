@@ -1,0 +1,161 @@
+export const harMessages = {
+  en: {
+    "tool.har.name": "HAR Inspector",
+    "tool.har.description":
+      "Find slow requests, HTTP errors, and response sizes in a browser network recording.",
+    "tool.har.hint":
+      "Import a HAR 1.2 file from DevTools. Recorded URLs are never requested. Up to 16 MiB / 100,000 entries.",
+    "har.input": "HAR network recording",
+    "har.requests": "Requests",
+    "har.httpErrors": "HTTP errors",
+    "har.transfer": "Known response bytes",
+    "har.average": "Average duration",
+    "har.unknown": "Unknown",
+    "har.unknownSizes":
+      "Partial size total: {known} requests have known sizes; {unknown} have unknown sizes.",
+    "har.sizeNote":
+      "Bytes are response headersSize + bodySize. Decoded body sizes and vendor-specific fields are not substituted.",
+    "har.statuses": "Status codes",
+    "har.groups": "Request breakdown",
+    "har.hosts": "By host",
+    "har.mimeTypes": "By media type",
+    "har.host": "Host",
+    "har.mime": "Media type",
+    "har.partial": "Partial total",
+    "har.omitted": "Top 20 groups shown; {count} additional groups omitted.",
+    "har.slowest": "Slowest 20 requests",
+    "har.duration": "Duration",
+    "har.status": "Status",
+    "har.timeNote":
+      "Durations use recorded entry.time. Requests can overlap; their sum is not page load time.",
+    "har.unknownTimings":
+      "{count} requests have unknown durations and are excluded from the average and slowest list.",
+    "errors.INVALID_HAR":
+      "Enter a valid HAR log.entries document. Check request URLs, status codes, sizes, and timing fields.",
+  },
+  ja: {
+    "tool.har.name": "HAR 解析",
+    "tool.har.description":
+      "ブラウザの通信記録から、遅いリクエスト・HTTP エラー・応答サイズを確認。",
+    "tool.har.hint":
+      "DevTools から出力した HAR 1.2 を読み込みます。記録された URL への通信は行いません。16 MiB・10 万件まで。",
+    "har.input": "HAR 通信記録",
+    "har.requests": "リクエスト数",
+    "har.httpErrors": "HTTP エラー",
+    "har.transfer": "判明分の応答バイト数",
+    "har.average": "平均所要時間",
+    "har.unknown": "不明",
+    "har.unknownSizes": "サイズは判明分のみの合計です。{known} 件が判明、{unknown} 件が不明です。",
+    "har.sizeNote":
+      "バイト数は応答の headersSize + bodySize です。展開後のサイズや独自フィールドでの補完は行いません。",
+    "har.statuses": "ステータスコード",
+    "har.groups": "リクエストの内訳",
+    "har.hosts": "ホスト別",
+    "har.mimeTypes": "メディアタイプ別",
+    "har.host": "ホスト",
+    "har.mime": "メディアタイプ",
+    "har.partial": "判明分のみ",
+    "har.omitted": "上位 20 グループを表示しています。残り {count} グループは省略しています。",
+    "har.slowest": "所要時間が長い 20 件",
+    "har.duration": "所要時間",
+    "har.status": "ステータス",
+    "har.timeNote":
+      "所要時間は記録された entry.time です。通信は並行するため、合計はページ読み込み時間を表しません。",
+    "har.unknownTimings":
+      "所要時間が不明な {count} 件は、平均と所要時間順の一覧から除外しています。",
+    "errors.INVALID_HAR":
+      "HAR の log.entries を含む有効な JSON を入力してください。URL・ステータス・サイズ・時間の値も確認してください。",
+  },
+  "zh-CN": {
+    "tool.har.name": "HAR 分析",
+    "tool.har.description": "从浏览器网络记录中查找慢请求、HTTP 错误和响应大小。",
+    "tool.har.hint":
+      "导入 DevTools 导出的 HAR 1.2。不会访问记录中的 URL。最多 16 MiB / 100,000 条。",
+    "har.input": "HAR 网络记录",
+    "har.requests": "请求数",
+    "har.httpErrors": "HTTP 错误",
+    "har.transfer": "已知响应字节数",
+    "har.average": "平均耗时",
+    "har.unknown": "未知",
+    "har.unknownSizes": "仅合计已知大小：{known} 个请求已知，{unknown} 个未知。",
+    "har.sizeNote": "字节数为响应的 headersSize + bodySize，不使用解码后的大小或厂商字段替代。",
+    "har.statuses": "状态码",
+    "har.groups": "请求分布",
+    "har.hosts": "按主机",
+    "har.mimeTypes": "按媒体类型",
+    "har.host": "主机",
+    "har.mime": "媒体类型",
+    "har.partial": "仅已知部分",
+    "har.omitted": "显示前 20 组，另有 {count} 组未显示。",
+    "har.slowest": "最慢的 20 个请求",
+    "har.duration": "耗时",
+    "har.status": "状态",
+    "har.timeNote": "耗时使用记录的 entry.time。请求可能并行，其总和不代表页面加载时间。",
+    "har.unknownTimings": "{count} 个请求的耗时未知，未计入平均值和最慢请求列表。",
+    "errors.INVALID_HAR":
+      "请输入含有 log.entries 的有效 HAR JSON，并检查 URL、状态码、大小和时间字段。",
+  },
+  "zh-TW": {
+    "tool.har.name": "HAR 分析",
+    "tool.har.description": "從瀏覽器網路記錄中找出慢速請求、HTTP 錯誤與回應大小。",
+    "tool.har.hint":
+      "匯入 DevTools 匯出的 HAR 1.2。不會存取記錄中的 URL。最多 16 MiB / 100,000 筆。",
+    "har.input": "HAR 網路記錄",
+    "har.requests": "請求數",
+    "har.httpErrors": "HTTP 錯誤",
+    "har.transfer": "已知回應位元組數",
+    "har.average": "平均耗時",
+    "har.unknown": "未知",
+    "har.unknownSizes": "僅加總已知大小：{known} 個請求已知，{unknown} 個未知。",
+    "har.sizeNote": "位元組數為回應的 headersSize + bodySize，不以解碼後的大小或廠商欄位代替。",
+    "har.statuses": "狀態碼",
+    "har.groups": "請求分布",
+    "har.hosts": "依主機",
+    "har.mimeTypes": "依媒體類型",
+    "har.host": "主機",
+    "har.mime": "媒體類型",
+    "har.partial": "僅已知部分",
+    "har.omitted": "顯示前 20 組，另有 {count} 組未顯示。",
+    "har.slowest": "最慢的 20 個請求",
+    "har.duration": "耗時",
+    "har.status": "狀態",
+    "har.timeNote": "耗時使用記錄的 entry.time。請求可能並行，其總和不代表頁面載入時間。",
+    "har.unknownTimings": "{count} 個請求的耗時未知，未計入平均值與最慢請求清單。",
+    "errors.INVALID_HAR":
+      "請輸入包含 log.entries 的有效 HAR JSON，並檢查 URL、狀態碼、大小與時間欄位。",
+  },
+  ko: {
+    "tool.har.name": "HAR 분석",
+    "tool.har.description":
+      "브라우저 네트워크 기록에서 느린 요청, HTTP 오류, 응답 크기를 확인합니다.",
+    "tool.har.hint":
+      "DevTools에서 내보낸 HAR 1.2 파일을 가져오세요. 기록된 URL에는 접속하지 않습니다. 최대 16 MiB / 100,000건.",
+    "har.input": "HAR 네트워크 기록",
+    "har.requests": "요청 수",
+    "har.httpErrors": "HTTP 오류",
+    "har.transfer": "확인된 응답 바이트",
+    "har.average": "평균 소요 시간",
+    "har.unknown": "알 수 없음",
+    "har.unknownSizes":
+      "확인된 크기만 합산합니다. {known}건은 확인되었고 {unknown}건은 알 수 없습니다.",
+    "har.sizeNote":
+      "바이트 수는 응답의 headersSize + bodySize입니다. 디코딩된 크기나 공급업체 전용 필드로 대체하지 않습니다.",
+    "har.statuses": "상태 코드",
+    "har.groups": "요청 분포",
+    "har.hosts": "호스트별",
+    "har.mimeTypes": "미디어 유형별",
+    "har.host": "호스트",
+    "har.mime": "미디어 유형",
+    "har.partial": "확인된 부분만",
+    "har.omitted": "상위 20개 그룹을 표시하며 나머지 {count}개 그룹은 생략했습니다.",
+    "har.slowest": "가장 느린 요청 20개",
+    "har.duration": "소요 시간",
+    "har.status": "상태",
+    "har.timeNote":
+      "소요 시간은 기록된 entry.time을 사용합니다. 요청은 동시에 실행될 수 있으므로 합계는 페이지 로딩 시간이 아닙니다.",
+    "har.unknownTimings":
+      "소요 시간을 알 수 없는 요청 {count}건은 평균과 가장 느린 요청 목록에서 제외했습니다.",
+    "errors.INVALID_HAR":
+      "log.entries가 포함된 유효한 HAR JSON을 입력하고 URL, 상태 코드, 크기와 시간 필드를 확인하세요.",
+  },
+};

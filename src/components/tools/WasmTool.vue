@@ -1,17 +1,19 @@
-<script setup lang="ts">
-import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
-import { useI18n } from "vue-i18n";
-import { FlaskConical, Play, Square, Trash2, LoaderCircle } from "@lucide/vue";
+<script setup vapor lang="ts">
+import { computed, ref } from "vue";
+import { useAppI18n } from "@/i18n/useAppI18n";
+import { FlaskConical, Trash2, LoaderCircle } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import CodeInput from "@/components/CodeInput.vue";
 import OutputActions from "@/components/OutputActions.vue";
 import EmptyResult from "@/components/EmptyResult.vue";
-import { runEngine, EngineError } from "@/lib/wasm/client";
+import ApplyControl from "@/components/ApplyControl.vue";
+import { useToolExecution } from "@/composables/useToolExecution";
+import { runEngine } from "@/lib/wasm/client";
 import type { EngineRequest, EngineResult, CsvRequest, SetOperation } from "@/lib/wasm/types";
 
 const props = defineProps<{ id: "csv" | "logs" | "sets" }>();
-const { t } = useI18n();
+const { t } = useAppI18n();
 const input = ref("");
 const right = ref("");
 const delimiter = ref<CsvRequest["delimiter"]>(",");
@@ -21,11 +23,23 @@ const pattern = ref("");
 const caseInsensitive = ref(false);
 const ignoreEmpty = ref(true);
 const mode = ref<SetOperation>("intersection");
-const result = shallowRef<EngineResult | null>(null);
-const error = ref("");
-const busy = ref(false);
-let controller: AbortController | undefined;
-let generation = 0;
+const { result, error, busy, control, apply, cancel, setAuto } = useToolExecution<
+  Exclude<EngineResult, { operation: "har" }>
+>({
+  source: () => [
+    input.value,
+    right.value,
+    delimiter.value,
+    header.value,
+    trim.value,
+    pattern.value,
+    caseInsensitive.value,
+    ignoreEmpty.value,
+    mode.value,
+  ],
+  canRun: () => Boolean(input.value || (props.id === "sets" && right.value)),
+  execute: (signal) => runEngine(request(), { signal }),
+});
 const modes: SetOperation[] = [
   "intersection",
   "union",
@@ -42,21 +56,6 @@ const output = computed(() =>
       : JSON.stringify(result.value, null, 2),
 );
 const filename = computed(() => `army-knife-${props.id}.${props.id === "sets" ? "txt" : "json"}`);
-
-function invalidate() {
-  generation++;
-  controller?.abort();
-  controller = undefined;
-  busy.value = false;
-  result.value = null;
-  error.value = "";
-}
-watch(
-  [input, right, delimiter, header, trim, pattern, caseInsensitive, ignoreEmpty, mode],
-  invalidate,
-  { flush: "sync" },
-);
-onBeforeUnmount(invalidate);
 
 function sample() {
   if (props.id === "csv") {
@@ -75,50 +74,31 @@ function sample() {
   }
 }
 
-async function run() {
-  const id = ++generation;
-  controller?.abort();
-  controller = new AbortController();
-  const request: EngineRequest =
-    props.id === "csv"
+function request(): Exclude<EngineRequest, { operation: "har" }> {
+  return props.id === "csv"
+    ? {
+        operation: "csv",
+        text: input.value,
+        delimiter: delimiter.value,
+        header: header.value,
+        trim: trim.value,
+      }
+    : props.id === "logs"
       ? {
-          operation: "csv",
+          operation: "logs",
           text: input.value,
-          delimiter: delimiter.value,
-          header: header.value,
-          trim: trim.value,
+          pattern: pattern.value,
+          caseInsensitive: caseInsensitive.value,
         }
-      : props.id === "logs"
-        ? {
-            operation: "logs",
-            text: input.value,
-            pattern: pattern.value,
-            caseInsensitive: caseInsensitive.value,
-          }
-        : {
-            operation: "sets",
-            left: input.value,
-            right: right.value,
-            mode: mode.value,
-            trim: trim.value,
-            caseInsensitive: caseInsensitive.value,
-            ignoreEmpty: ignoreEmpty.value,
-          };
-  busy.value = true;
-  error.value = "";
-  result.value = null;
-  try {
-    const next = await runEngine(request, { signal: controller.signal });
-    if (generation === id) result.value = next;
-  } catch (failure) {
-    if (generation === id)
-      error.value = failure instanceof EngineError ? failure.code : "INTERNAL_ERROR";
-  } finally {
-    if (generation === id) {
-      busy.value = false;
-      controller = undefined;
-    }
-  }
+      : {
+          operation: "sets",
+          left: input.value,
+          right: right.value,
+          mode: mode.value,
+          trim: trim.value,
+          caseInsensitive: caseInsensitive.value,
+          ignoreEmpty: ignoreEmpty.value,
+        };
 }
 </script>
 
@@ -135,7 +115,6 @@ async function run() {
           @click="
             input = '';
             right = '';
-            invalidate();
           "
           ><Trash2 class="size-3.5" />{{ t("actions.clear") }}</Button
         >
@@ -210,12 +189,7 @@ async function run() {
     </div>
     <div class="run-bar">
       <p class="hint">{{ t(`tool.${id}.hint`) }}</p>
-      <Button v-if="busy" variant="outline" @click="controller?.abort()"
-        ><Square class="size-3.5" />{{ t("actions.cancel") }}</Button
-      >
-      <Button v-else :disabled="!input && !right" @click="run"
-        ><Play class="size-3.5" />{{ t("actions.run") }}</Button
-      >
+      <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />
     </div>
   </div>
   <div v-if="error" class="error-panel" role="alert">{{ t(`errors.${error}`) }}</div>

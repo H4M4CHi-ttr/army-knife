@@ -1,6 +1,6 @@
-<script setup lang="ts">
+<script setup vapor lang="ts">
 import { ref } from "vue";
-import { useI18n } from "vue-i18n";
+import { useAppI18n } from "@/i18n/useAppI18n";
 import { Upload } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +20,7 @@ const props = withDefaults(
   { maxBytes: 16 * 1024 * 1024, rows: 10, file: true },
 );
 const emit = defineEmits<{ "update:modelValue": [value: string] }>();
-const { t } = useI18n();
+const { t } = useAppI18n();
 const picker = ref<HTMLInputElement>();
 const fileError = ref("");
 async function onFile(event: Event) {
@@ -66,7 +66,7 @@ async function onFile(event: Event) {
       :id="`${inputId}-file`"
       ref="picker"
       type="file"
-      accept=".csv,.tsv,.txt,.log,.json,text/*,application/json"
+      accept=".csv,.tsv,.txt,.log,.json,.har,.env,text/*,application/json"
       hidden
       :aria-label="`${label}: ${t('actions.import')}`"
       @change="onFile"

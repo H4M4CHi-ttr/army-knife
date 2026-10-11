@@ -6,7 +6,11 @@ export type ToolId =
   | "unicode"
   | "json-diff"
   | "json-format"
-  | "contrast";
+  | "contrast"
+  | "har"
+  | "env"
+  | "url"
+  | "explain";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -18,6 +22,40 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "har",
+    category: "network",
+    wasm: true,
+    devtoys: false,
+    keywords:
+      "har http request response network waterfall performance latency devtools 通信 応答 遅延 性能 リクエスト",
+    color: "orange",
+  },
+  {
+    id: "env",
+    category: "data",
+    wasm: false,
+    devtoys: false,
+    keywords: "env dotenv environment config compare duplicate missing 環境変数 設定 比較 重複",
+    color: "green",
+  },
+  {
+    id: "url",
+    category: "network",
+    wasm: false,
+    devtoys: false,
+    keywords: "url uri query parameter search params fragment hostname URL クエリ パラメータ 構造",
+    color: "blue",
+  },
+  {
+    id: "explain",
+    category: "data",
+    wasm: false,
+    devtoys: false,
+    keywords:
+      "postgres postgresql explain analyze json sql plan query database scan execution 実行計画 データベース クエリ",
+    color: "purple",
+  },
   {
     id: "csv",
     category: "data",

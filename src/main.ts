@@ -1,7 +1,7 @@
-import { createApp } from "vue";
+import { createApp, vaporInteropPlugin } from "vue";
 import App from "./App.vue";
 import { i18n } from "./i18n";
 import "./style.css";
 import "./styles/fonts.css";
 
-createApp(App).use(i18n).mount("#app");
+createApp(App).use(vaporInteropPlugin).use(i18n).mount("#app");

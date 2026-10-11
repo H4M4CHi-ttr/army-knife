@@ -1,12 +1,12 @@
-<script setup lang="ts">
+<script setup vapor lang="ts">
 import { computed, ref } from "vue";
-import { useI18n } from "vue-i18n";
-import { ArrowLeftRight, Check, X } from "@lucide/vue";
+import { useAppI18n } from "@/i18n/useAppI18n";
+import { ArrowLeftRight, Check, X, Zap } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import OutputActions from "@/components/OutputActions.vue";
 import { analyzeContrast } from "@/lib/tools";
-const { t } = useI18n();
+const { t } = useAppI18n();
 const foreground = ref("#334155");
 const background = ref("#FFFFFF");
 const result = computed(() => {
@@ -72,6 +72,9 @@ const checks = computed(() =>
       ></label>
     </div>
     <p class="hint">{{ t("tool.contrast.hint") }}</p>
+    <span class="execution-label" data-testid="instant-updates"
+      ><Zap class="size-3.5" />{{ t("execution.instant") }}</span
+    >
   </div>
   <p v-if="!result" class="error-panel" role="alert">{{ t("errors.COLOR_INVALID") }}</p>
   <section v-else class="result-panel" aria-live="polite">

@@ -1,19 +1,35 @@
-<script setup lang="ts">
+<script setup vapor lang="ts">
 import { computed, ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
+import { useAppI18n } from "@/i18n/useAppI18n";
 import { Button } from "@/components/ui/button";
 import { copyText, downloadText } from "@/lib/io";
-import { analyzeCidr, type CidrResult, ToolError } from "@/lib/tools";
+import { analyzeCidr, type CidrResult } from "@/lib/tools";
+import ApplyControl from "@/components/ApplyControl.vue";
+import { useToolExecution } from "@/composables/useToolExecution";
 
-const { t, locale } = useI18n();
+const { t, locale } = useAppI18n();
 const input = ref("");
-const result = ref<CidrResult | null>(null);
-const error = ref("");
+const {
+  result,
+  error: executionError,
+  control,
+  apply,
+  cancel,
+  setAuto,
+} = useToolExecution<CidrResult>({
+  source: input,
+  canRun: () => Boolean(input.value.trim()),
+  mode: "instant",
+  execute: () => analyzeCidr(input.value),
+});
+const copyError = ref("");
+const error = computed(
+  () => copyError.value || (executionError.value ? `errors.${executionError.value}` : ""),
+);
 const copied = ref(false);
 
 watch(input, () => {
-  result.value = null;
-  error.value = "";
+  copyError.value = "";
   copied.value = false;
 });
 
@@ -37,25 +53,14 @@ function count(value: string): string {
   return new Intl.NumberFormat(locale.value).format(BigInt(value));
 }
 
-function run(): void {
-  error.value = "";
-  copied.value = false;
-  try {
-    result.value = analyzeCidr(input.value);
-  } catch (caught) {
-    result.value = null;
-    error.value = caught instanceof ToolError ? `errors.${caught.code}` : "states.unknownError";
-  }
-}
-
 async function copy(): Promise<void> {
   if (!result.value) return;
   try {
     await copyText(JSON.stringify(result.value, null, 2));
     copied.value = true;
-    error.value = "";
+    copyError.value = "";
   } catch {
-    error.value = "errors.CLIPBOARD_UNAVAILABLE";
+    copyError.value = "errors.CLIPBOARD_UNAVAILABLE";
   }
 }
 
@@ -71,7 +76,7 @@ function download(): void {
 
 <template>
   <div class="tool-panel">
-    <form class="cidr-form" @submit.prevent="run">
+    <form class="cidr-form" @submit.prevent="apply">
       <label for="cidr-input" class="field-label">{{ t("cidr.input") }}</label>
       <input
         id="cidr-input"
@@ -97,7 +102,7 @@ function download(): void {
         <Button type="button" variant="ghost" :disabled="!input" @click="input = ''">{{
           t("actions.clear")
         }}</Button>
-        <Button type="submit" :disabled="!input.trim()">{{ t("actions.run") }}</Button>
+        <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />
       </div>
     </form>
 

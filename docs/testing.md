@@ -7,6 +7,7 @@ The repository's [GitHub Actions workflow](../.github/workflows/ci.yml) tests th
 | Component               | Version or lock                                                                                              |
 | ----------------------- | ------------------------------------------------------------------------------------------------------------ |
 | Linux runner            | `ubuntu-24.04`                                                                                               |
+| Vue / Vapor             | `3.6.0-rc.11`, including the test-only server renderer                                                       |
 | Vite+                   | `1.1.0`                                                                                                      |
 | Node.js                 | `24.19.0`                                                                                                    |
 | pnpm                    | `11.25.0`, selected by `package.json`                                                                        |
@@ -31,15 +32,15 @@ The quality job has a 25-minute timeout and performs these steps in order:
 2. Build fonts and run `python scripts/build-fonts.py --check` against the resulting assets.
 3. Run native Rust tests and `cargo clippy --all-targets --locked -- -D warnings`.
 4. Compile the Rust crate for `wasm32-unknown-unknown` and generate browser bindings with the matching wasm-bindgen CLI.
-5. Load and execute the actual generated `.wasm` in Node through `pnpm test:wasm`. This verifies the CSV, log, and set operations, structured errors, limits, and large integer preservation across the JavaScript/WASM boundary.
-6. Type-check the Vue application and run the Vite+ unit tests.
+5. Load and execute the actual generated `.wasm` in Node through `pnpm test:wasm`. This verifies the CSV, log, set, and HAR operations, structured errors, limits, and large integer preservation across the JavaScript/WASM boundary.
+6. Type-check the Vue application, run the Vite+ unit tests, and run `pnpm verify:vapor` for production Vapor compilation and VDOM interoperability.
 7. Produce the production build for `/army-knife/` and verify its deployable asset graph with `pnpm verify:dist`.
 8. Install Chromium and Firefox with their system dependencies and run all Playwright projects against the built site.
 9. Upload the browser report and visual evidence, including on browser test failure. Only a fully successful `main` run uploads the Pages artifact.
 
-The pure TypeScript tests cover IPv4 and IPv6 parsing and subnet boundaries, exact address counts, bounded JSON parsing and structural diffs, JSON Pointer escaping, decimal precision rejection, prototype-safe objects, Unicode positions and invisible character classification, WCAG contrast thresholds, and preference storage validation. Boundary and failure cases are tested alongside successful examples.
+The pure TypeScript tests cover IPv4 and IPv6 parsing and subnet boundaries, exact address counts, bounded JSON parsing and structural diffs, JSON Pointer escaping, decimal precision rejection, prototype-safe objects, Unicode positions and invisible character classification, WCAG contrast thresholds, preference storage validation and migration, dotenv diagnostics and comparison, ordered URL query editing, PostgreSQL EXPLAIN metrics, and automatic/manual execution scheduling. Boundary and failure cases are tested alongside successful examples.
 
-The App integration tests use `@vue/test-utils` and happy-dom to mount the actual Vue application, settings dialog, and tool components. They execute the real JSON comparison and inspect its displayed changes, enforce disabled-tool routing, check that CSV and log inputs are discarded on navigation, and verify theme, language, opt-in, and preference-only persistence through the UI. Only the network-dependent font loader is replaced in this suite. WASM success is never simulated; the routing test verifies that entering text and switching tools does not start the engine. The compiled engine and real browser loading are verified separately by the WASM smoke test and Playwright.
+The App integration tests use `@vue/test-utils` and happy-dom to mount the actual Vue application, settings dialog, and tool components. They execute the real JSON comparison and inspect its displayed changes, enforce disabled-tool routing, check that CSV and log inputs are discarded on navigation, and verify theme, language, opt-in, and preference-only persistence through the UI. Only the network-dependent font loader is replaced in this suite. WASM success is never simulated; the routing test verifies that switching tools before the 800ms automatic deadline cancels the pending engine start. Small JSON input updates synchronously; large input waits for the debounce or an explicit manual action. The compiled engine and real browser loading are verified separately by the WASM smoke test and Playwright.
 
 ## Browser coverage
 
@@ -57,9 +58,15 @@ Tests start a fresh production preview at `http://127.0.0.1:4173/army-knife/`. R
 The browser scenarios verify:
 
 - DevToys overlaps are disabled initially; opt-in, opt-out, theme, and language preferences survive reloads.
-- The production WebAssembly asset is used for CSV, log, and set processing. Downloaded results are checked against the full expected data, including integers larger than JavaScript's safe integer range and quoted CSV fields.
-- IPv6 `/0` produces the exact `2^128` address count, `/31` handles both point-to-point hosts, and changing an input clears its old result.
+- The production WebAssembly asset is used for CSV, log, set, and HAR processing. Downloaded results are checked against the full expected data, including integers larger than JavaScript's safe integer range and quoted CSV fields.
+- IPv6 `/0` produces the exact `2^128` address count, `/31` handles both point-to-point hosts, and changing valid lightweight input immediately replaces the old result.
 - Unicode findings identify invisible and bidirectional controls with the expected positions.
+- Large JSON input resets an 800ms countdown on every edit. Playwright Clock checks the remaining-time label and progress bar, then verifies the latest result. Manual apply bypasses waiting, manual-only mode persists, and stale results cannot be downloaded.
+- HAR results count HTTP failures, aggregate only known response sizes, group hosts, and rank actual slow requests. Recorded URLs are never fetched.
+- Dotenv comparisons distinguish missing, changed, and equal values and report duplicates; values are initially hidden in the result table but explicit exports include the full report.
+- URL query editing preserves repeated keys, order, and bare flags and updates the output immediately.
+- PostgreSQL EXPLAIN keeps per-loop rows/times, does not add parent and child durations, and accepts unrelated 64-bit identifiers without rounding.
+- Vapor-rendered results and child component slots react to locale changes through the VDOM settings dialog.
 - Structural JSON diffs escape JSON Pointer paths and reject inputs whose numeric precision would be lost.
 - Inputs never appear in local storage, session storage, or the page URL. Reloading clears inputs while preserving only validated preferences.
 - Each locale activates the correct self-hosted Noto and code font CSS, and those font faces actually load.
@@ -68,7 +75,7 @@ The browser scenarios verify:
 
 Every scenario also has a network audit. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
 
-The suite uses [Playwright downloads](https://playwright.dev/docs/downloads), [network events](https://playwright.dev/docs/network), and a [managed test web server](https://playwright.dev/docs/test-webserver). The viewport projects exercise layout in Chromium and Firefox at small widths; they do not emulate mobile Safari or claim coverage of every device.
+The suite uses [Playwright Clock](https://playwright.dev/docs/clock) for deterministic countdown testing, [Playwright downloads](https://playwright.dev/docs/downloads), [network events](https://playwright.dev/docs/network), and a [managed test web server](https://playwright.dev/docs/test-webserver). The viewport projects exercise layout in Chromium and Firefox at small widths; they do not emulate mobile Safari or claim coverage of every device.
 
 ## Reviewing the artifacts
 
@@ -77,7 +84,7 @@ Each run that reaches the browser tests uploads `browser-report-<run ID>-<attemp
 - `playwright-report/`: the HTML report and its embedded attachments.
 - `test-results/`: screenshots and retained failure traces.
 
-Open `playwright-report/index.html` from the downloaded artifact to inspect the test results and the explicit light/dark dashboard and IPv6 result screenshots. The report is retained on successful runs too, so visual review does not depend on a failure. Failed scenarios retain a Playwright trace and an automatic failure screenshot. The suite uses one retry on CI; the report shows both the first attempt and the retry where applicable.
+Open `playwright-report/index.html` from the downloaded artifact to inspect the test results and the explicit light/dark dashboard, IPv6, countdown, HAR, dotenv, URL editor, and PostgreSQL plan screenshots. The report is retained on successful runs too, so visual review does not depend on a failure. Failed scenarios retain a Playwright trace and an automatic failure screenshot. The suite uses one retry on CI; the report shows both the first attempt and the retry where applicable.
 
 To inspect the report with Playwright's report viewer, run `pnpm exec playwright show-report /path/to/playwright-report`. Visual artifacts support review; there are no screenshot baseline comparisons that would silently accept a layout change.
 
@@ -99,6 +106,7 @@ pnpm build:wasm
 pnpm test:wasm
 pnpm typecheck
 vp test
+pnpm verify:vapor
 vp build
 pnpm verify:dist
 ```

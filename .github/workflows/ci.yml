@@ -107,6 +107,9 @@ jobs:
       - name: Run the Vite+ unit tests
         run: vp test
 
+      - name: Verify production Vapor compilation and VDOM interoperability
+        run: pnpm verify:vapor
+
       - name: Test production verification and license collection failure cases
         run: node --test scripts/verify-dist.test.mjs scripts/build-rust-notices.test.mjs
 

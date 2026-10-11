@@ -11,7 +11,22 @@ export interface Preferences {
   theme: Theme;
   enabledTools: ToolId[];
   favorites: ToolId[];
+  knownTools: ToolId[];
+  autoApply: boolean;
 }
+
+// The first release did not record which tools were available. Remember that
+// catalog so new complementary tools appear without re-enabling an old choice.
+const INITIAL_TOOLS = [
+  "csv",
+  "logs",
+  "sets",
+  "cidr",
+  "unicode",
+  "json-diff",
+  "json-format",
+  "contrast",
+];
 
 export function detectLocale(languages: readonly string[] = []): Locale {
   for (const language of languages) {
@@ -32,6 +47,8 @@ export function defaultPreferences(locale: Locale = "en"): Preferences {
     theme: "system",
     enabledTools: tools.filter((tool) => !tool.devtoys).map((tool) => tool.id),
     favorites: [],
+    knownTools: tools.map((tool) => tool.id),
+    autoApply: true,
   };
 }
 
@@ -45,6 +62,14 @@ export function parsePreferences(raw: string | null, locale: Locale): Preference
     if (record.version !== 1) return defaults;
     const ids = (input: unknown, fallback: ToolId[]): ToolId[] =>
       Array.isArray(input) ? [...new Set(input.filter(isToolId))] : fallback;
+    const known = new Set(
+      Array.isArray(record.knownTools) ? record.knownTools.filter(isToolId) : INITIAL_TOOLS,
+    );
+    const enabled = ids(record.enabledTools, defaults.enabledTools);
+    const allOff = Array.isArray(record.enabledTools) && record.enabledTools.length === 0;
+    const additions = allOff
+      ? []
+      : tools.filter((tool) => !known.has(tool.id) && !tool.devtoys).map((tool) => tool.id);
     return {
       version: 1,
       locale: LOCALES.includes(record.locale as Locale)
@@ -53,8 +78,10 @@ export function parsePreferences(raw: string | null, locale: Locale): Preference
       theme: ["system", "light", "dark"].includes(record.theme as string)
         ? (record.theme as Theme)
         : "system",
-      enabledTools: ids(record.enabledTools, defaults.enabledTools),
+      enabledTools: [...new Set([...enabled, ...additions])],
       favorites: ids(record.favorites, []),
+      knownTools: defaults.knownTools,
+      autoApply: typeof record.autoApply === "boolean" ? record.autoApply : true,
     };
   } catch {
     return defaults;
@@ -84,6 +111,8 @@ export function createPreferences(
         theme: preferences.theme,
         enabledTools: preferences.enabledTools.filter(isToolId),
         favorites: preferences.favorites.filter(isToolId),
+        knownTools: tools.map((tool) => tool.id),
+        autoApply: preferences.autoApply,
       };
       try {
         if (storage) {

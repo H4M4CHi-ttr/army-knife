@@ -1,13 +1,13 @@
-<script setup lang="ts">
+<script setup vapor lang="ts">
 import { ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
+import { useAppI18n } from "@/i18n/useAppI18n";
 import { Check, Copy, Download } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { copyText, downloadText } from "@/lib/io";
 const props = withDefaults(defineProps<{ text: string; filename?: string; type?: string }>(), {
   filename: "army-knife-result.txt",
 });
-const { t } = useI18n();
+const { t } = useAppI18n();
 const copied = ref(false);
 const error = ref(false);
 watch(

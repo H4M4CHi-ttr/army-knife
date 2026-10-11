@@ -1,21 +1,61 @@
 # DevToys overlap policy
 
-Reviewed against the [official DevToys tool list](https://devtoys.app/) on **2026-10-11**, and the [default-tools repository](https://github.com/DevToys-app/DevToys.Tools). DevToys extensions are open-ended, so this is a comparison with the official bundled tools, with known older bundled tools treated conservatively. It is not a claim that no third-party DevToys extension offers a similar feature.
+This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool list](https://devtoys.app/) and the [default-tools repository](https://github.com/DevToys-app/DevToys.Tools). DevToys extensions are open-ended, so this is a comparison with the official bundled tools, with known older bundled tools treated conservatively. It is not a claim that no third-party DevToys extension offers a similar feature.
 
-| Army Knife tool                       | Default | Reason                                                                                                                                                                                                  |
-| ------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| CIDR calculator, IPv4 and IPv6        | On      | No corresponding bundled tool in the official list.                                                                                                                                                     |
-| Unicode invisible-character inspector | On      | Focuses on code-point locations, bidi controls, joiners, variation selectors, and invisible formatting characters. This is distinct from the bundled text analyzer's general text utilities.            |
-| JSON structural diff                  | On      | Compares the parsed JSON tree and reports JSON Pointer paths; ignores object-key order while preserving array order. It is distinct from the bundled text comparer and JSON formatter.                  |
-| List operations                       | Off     | Union, intersection, and differences overlap with the bundled List Comparer.                                                                                                                            |
-| JSON formatter                        | Off     | JSON formatting is a bundled DevToys feature.                                                                                                                                                           |
-| WCAG contrast checker                 | Off     | Color Picker & Contrast shipped in DevToys 1.x. Even though it is absent from the current 2.0 list, treat it as overlap. See the [upstream report](https://github.com/DevToys-app/DevToys/issues/1483). |
+| Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
+| -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| HAR inspector                          | On      | Summarizes a recorded HTTP archive: request durations, status codes, response sizes, hosts, and media types. No corresponding bundled HAR analyzer appears in the reviewed official list.               |
+| .env comparison and inspection         | On      | Parses environment definitions to compare keys and values and report duplicate definitions and malformed lines. This semantic configuration check is distinct from the bundled general text comparer.   |
+| URL structure and ordered query editor | On      | Inspects URL components and edits query entries with their order, duplicate keys, and bare flags intact. The bundled URL encoder/decoder provides text conversion; see the source comparison below.     |
+| PostgreSQL EXPLAIN JSON inspector      | On      | Inspects recorded plan nodes, row estimates, and timings. The bundled SQL formatter changes SQL presentation; it does not analyze PostgreSQL execution-plan JSON.                                       |
+| CSV profiler                           | On      | Profiles columns in existing CSV/TSV data. This is distinct from the bundled JSON Array to Table/CSV converter.                                                                                         |
+| Log explorer                           | On      | Filters existing log lines and aggregates severity and repeated messages. The bundled regular-expression tester focuses on testing patterns rather than this log-analysis workflow.                     |
+| CIDR calculator, IPv4 and IPv6         | On      | No corresponding bundled tool in the official list.                                                                                                                                                     |
+| Unicode invisible-character inspector  | On      | Focuses on code-point locations, bidi controls, joiners, variation selectors, and invisible formatting characters. This is distinct from the bundled text analyzer's general text utilities.            |
+| JSON structural diff                   | On      | Compares the parsed JSON tree and reports JSON Pointer paths; ignores object-key order while preserving array order. It is distinct from the bundled text comparer and JSON formatter.                  |
+| List operations                        | Off     | Union, intersection, and differences overlap with the bundled List Comparer.                                                                                                                            |
+| JSON formatter                         | Off     | JSON formatting is a bundled DevToys feature.                                                                                                                                                           |
+| WCAG contrast checker                  | Off     | Color Picker & Contrast shipped in DevToys 1.x. Even though it is absent from the current 2.0 list, treat it as overlap. See the [upstream report](https://github.com/DevToys-app/DevToys/issues/1483). |
 
 Cron parsing and JSONPath testing are explicitly present in the official bundled list; neither is implemented in the initial release. If added later, they must be **off by default**. The same applies to Base64, JSON/YAML conversion, date conversion, URL/HTML encoding, hashes, UUIDs, and other listed bundled features.
 
 Tool visibility preferences belong in browser settings. Tool input contents must not be persisted as part of those preferences. Newly introduced overlapping tools must stay off for existing users unless they explicitly enable them.
 
+### Why the URL tool is enabled
+
+The reviewed upstream [UrlEncoderDecoderGuiTool.cs](https://github.com/DevToys-app/DevToys.Tools/blob/main/src/DevToys.Tools/Tools/EncodersDecoders/Url/UrlEncoderDecoderGuiTool.cs) exposes an encode/decode switch, an optional multiline switch, a text input, and a converted text output. Its conversion path calls `UrlHelper.EncodeOrDecode`; it does not expose a parsed component view or an ordered query-entry editor.
+
+Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-related fields, path, and fragment, and edits an ordered sequence of query keys and values. Repeated keys remain separate entries, and a bare flag is distinguished from an explicit empty value. Query decoding and encoding are necessary parts of that editing operation. The app does not expose a standalone text URL encoder/decoder mode. A future standalone mode would be an overlapping feature and must be off by default. This classification is specific to the reviewed bundled implementation and should be revisited when upstream adds relevant capabilities.
+
 ## Calculation semantics and limits
+
+### HAR
+
+- Accepts a recorded [HAR 1.2](https://www.softwareishard.com/blog/har-12-spec/) `log.entries` document, with a **16 MiB UTF-8 input** and **100,000-entry** limit. Rust/WASM analysis runs inside a Web Worker. Recorded URLs are parsed as data and are never requested, replayed, or opened.
+- Reports status-code counts, the most frequent **20 host and media-type groups**, and the **20 slowest requests**. Omitted groups are counted explicitly. This is an analyzer of the fields it uses, not a complete HAR schema validator.
+- Known response bytes are `response.headersSize + response.bodySize` only when both values are known. Missing, null, or `-1` sizes contribute to the unknown count rather than an invented zero-size response. Decoded content sizes and vendor-specific fields do not substitute for these fields.
+- Durations use recorded `entry.time`. Unknown durations are excluded from averages and slowest-request lists. Requests can overlap, so accumulated durations are not presented as page-load time.
+
+### .env
+
+- Each input allows **256 KiB UTF-8**, **10,000 physical lines**, **2,000 valid definitions including duplicates**, and keys of at most **128 ASCII identifier characters**. The parser is a documented dotenv-style subset, not a shell interpreter or a promise of compatibility with every dotenv library. [Node.js's environment-variable documentation](https://nodejs.org/api/environment_variables.html) also explains why dotenv syntax needs an explicit specification.
+- Supports optional `export`, `#` comments outside quotes, and single- or double-quoted multiline values. CRLF/CR is normalized to LF. Double-quoted `\n` and `\r` become line breaks; other backslashes remain literal. There is no variable expansion, command substitution, file access, or shell execution.
+- The last valid definition wins. All valid duplicate line numbers are retained, while at most **200 diagnostic rows per input** are returned; summary counts cover every detected issue. Malformed definitions are omitted and mark the comparison incomplete, so missing-key results are not silently presented as conclusive.
+- Keys are case-sensitive and returned in stable ordinal order. Comparisons use decoded string values, not text-line ordering. Inputs, outputs, and diagnostic state remain in memory. The UI pages through **100 result rows** at a time; explicit copy/download includes all parsed keys and full values, including values hidden in the table.
+
+### URL
+
+- Accepts an absolute hierarchical URL with a non-empty host, limited to **16 KiB UTF-8** and **200 query entries**. Relative/opaque URLs, embedded control characters, malformed query percent encoding/UTF-8, and unpaired UTF-16 surrogates are rejected. Output produced by editing also has a **16 KiB** limit.
+- Uses the [WHATWG URL Standard](https://url.spec.whatwg.org/) through the browser's `URL` and `URLSearchParams` APIs. Host case, IDNs, default ports, and path segments can be normalized. Credential fields, path, and fragment retain the parser's percent encoding. Constructing these URL objects does not contact the host.
+- Query entries preserve order and duplicate keys. `flag` and `flag=` stay distinguishable; empty ampersand segments have no entries and are omitted. Editing uses form encoding: a space becomes `+`, a literal plus sign becomes `%2B`. No address is turned into a navigation link or opened by the tool.
+
+### PostgreSQL EXPLAIN
+
+- Accepts the [PostgreSQL EXPLAIN `FORMAT JSON` output](https://www.postgresql.org/docs/18/sql-explain.html) array, or one statement object with a `Plan` field. Input is limited to **512 KiB UTF-8**, JSON depth **64**, **50,000 JSON values**, **20 statements**, and **1,000 plan nodes** across all statements. The tool consumes existing output and has no database connection or SQL execution API.
+- Numeric tokens are retained losslessly until a supported metric is read. Unknown fields such as a 64-bit `Query Identifier` are ignored without first rounding them into JavaScript numbers. Supported metrics reject negative values, invalid types, and decimal precision loss; estimated rows and loop counts must be safe integers. Duplicate JSON object keys are rejected, and parsed objects have no prototype.
+- Plan nodes appear in deterministic depth-first order. The report includes node type, relation/index context, estimated and actual rows, actual loops, row-estimate ratio, costs, and recorded timings. Absent measurements remain null; zero estimates and unexecuted nodes have explicit states instead of fabricated finite ratios.
+- [PostgreSQL's EXPLAIN interpretation guide](https://www.postgresql.org/docs/18/using-explain.html) specifies that actual rows and times are per-loop averages and that a parent's time includes child work. The inspector preserves those semantics, uses the statement's recorded planning/execution times, and never sums node times into a claimed wall-clock duration. Costs are planner units, not milliseconds; a `Seq Scan` or `Sort` node alone does not establish a performance problem.
+- The UI pages through **100 nodes** at a time. Explicit copy/download contains the complete bounded report, regardless of the current filter or page.
 
 ### CIDR
 
