@@ -44,6 +44,12 @@ The App integration tests use `@vue/test-utils` and happy-dom to mount the actua
 
 ## Browser coverage
 
+The Linux permission calculator adds exhaustive 12-bit mode tests and bounded
+symbolic/umask vectors. Its real-App tests exercise synchronous matrix/input
+updates, special bits, preview errors and disposal. `tests/e2e/chmod.spec.ts`
+checks Chromium/Firefox at both sizes, all five locales, keyboard checkboxes,
+light/dark visual evidence, clipboard output, and input privacy.
+
 The shortcut dictionary additionally has normalization and data-integrity tests plus real-App integration tests for focus-only capture, ordered strokes, OS distinctions, modifier-only prefixes, manual/on-screen input, filters, provenance, and all five locales. `tests/e2e/shortcuts.spec.ts` covers the production shortcut view in all four projects, including keyboard operation, responsive themes, source visibility, query clearing, and the exact-asset network/privacy audit. These tests validate the investigator; vendor bindings remain documentation-checked rather than execution-tested in each vendor application.
 
 [Playwright's configuration](../playwright.config.ts) runs the same scenarios in four projects:

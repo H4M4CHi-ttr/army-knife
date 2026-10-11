@@ -13,10 +13,12 @@ import {
   Link2,
   Workflow,
   Keyboard,
+  FileLock2,
 } from "@lucide/vue";
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  chmod: FileLock2,
   shortcuts: Keyboard,
   har: Activity,
   env: FileKey2,

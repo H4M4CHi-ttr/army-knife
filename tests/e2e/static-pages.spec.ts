@@ -39,6 +39,7 @@ async function preferences(page: Page, enabledTools: readonly ToolId[], locale: 
 }
 
 function inputSelector(id: ToolId): string {
+  if (id === "chmod") return "#chmod-mode";
   if (id.startsWith("json-")) return "#json-left";
   if (id === "sets") return "#sets-left";
   if (id === "env") return "#env-left";

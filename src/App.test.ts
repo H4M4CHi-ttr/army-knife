@@ -153,6 +153,7 @@ describe("App integration with real local tools", () => {
       .map((card) => card.attributes("data-testid"))
       .sort();
     expect(cards).toEqual([
+      "tool-card-chmod",
       "tool-card-cidr",
       "tool-card-csv",
       "tool-card-env",
