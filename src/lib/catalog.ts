@@ -1,4 +1,5 @@
 export type ToolId =
+  | "chmod"
   | "csv"
   | "logs"
   | "sets"
@@ -23,6 +24,15 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "chmod",
+    category: "data",
+    wasm: false,
+    devtoys: false,
+    keywords:
+      "chmod linux unix permissions octal rwx setuid setgid sticky umask file directory 権限 パーミッション 八進 权限 權限 권한",
+    color: "orange",
+  },
   {
     id: "shortcuts",
     category: "text",

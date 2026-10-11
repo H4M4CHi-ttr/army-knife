@@ -4,6 +4,7 @@ This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool l
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
 | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Linux permission calculator            | On      | Inspects chmod rwx/special mode bits, scoped symbolic changes, and separate umask creation examples. No corresponding bundled permission calculator appears in the reviewed official list.              |
 | Shortcut investigator                  | On      | Looks up documented default shortcut assignments across applications and Web apps. No corresponding bundled shortcut dictionary appears in the reviewed official tool list.                             |
 | HAR inspector                          | On      | Summarizes a recorded HTTP archive: request durations, status codes, response sizes, hosts, and media types. No corresponding bundled HAR analyzer appears in the reviewed official list.               |
 | .env comparison and inspection         | On      | Parses environment definitions to compare keys and values and report duplicate definitions and malformed lines. This semantic configuration check is distinct from the bundled general text comparer.   |
@@ -29,6 +30,16 @@ The reviewed upstream [UrlEncoderDecoderGuiTool.cs](https://github.com/DevToys-a
 Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-related fields, path, and fragment, and edits an ordered sequence of query keys and values. Repeated keys remain separate entries, and a bare flag is distinguished from an explicit empty value. Query decoding and encoding are necessary parts of that editing operation. The app does not expose a standalone text URL encoder/decoder mode. A future standalone mode would be an overlapping feature and must be off by default. This classification is specific to the reviewed bundled implementation and should be revisited when upstream adds relevant capabilities.
 
 ## Calculation semantics and limits
+
+### Linux permissions
+
+The [permission calculator specification](chmod.md) documents the complete
+12-bit octal editor, explicit-class symbolic subset, GNU directory set-ID
+preservation, five-digit GNU command examples, and separate bitwise umask
+examples. Calculations are instant and bounded to 256 UTF-8 bytes / 32 symbolic
+clauses. There is no filesystem, shell, ACL, or effective-access simulation.
+The official DevToys list and default-tools tree were rechecked on 2026-10-12;
+no corresponding bundled tool was found. This does not cover every extension.
 
 ### HAR
 
