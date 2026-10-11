@@ -136,6 +136,12 @@ async function assertNoOverflow(page: Page): Promise<void> {
 
 async function screenshot(page: Page, testInfo: TestInfo, name: string): Promise<void> {
   await page.evaluate(() => document.fonts.ready);
+  // Input and download actions can scroll the viewport or a result table.
+  // Normalize the review capture so fixed/sticky UI stays at the page's top.
+  await page.evaluate(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    for (const table of document.querySelectorAll(".table-scroll")) table.scrollLeft = 0;
+  });
   const path = testInfo.outputPath(`${name}.png`);
   await page.screenshot({ path, fullPage: true, animations: "disabled" });
   await testInfo.attach(name, { path, contentType: "image/png" });

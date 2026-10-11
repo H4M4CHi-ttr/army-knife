@@ -118,7 +118,7 @@ const bytes = (value: string | null) => (value === null ? t("har.unknown") : `${
       </select>
     </div>
     <div class="table-scroll">
-      <table class="data-table har-table">
+      <table class="data-table har-table har-groups-table">
         <thead>
           <tr>
             <th>{{ t(grouping === "hosts" ? "har.host" : "har.mime") }}</th>
@@ -227,6 +227,13 @@ const bytes = (value: string | null) => (value === null ? t("har.unknown") : `${
 }
 .har-slow-table {
   min-width: 620px;
+}
+.har-groups-table {
+  min-width: 640px;
+}
+.har-groups-table th:first-child {
+  width: 210px;
+  min-width: 180px;
 }
 .har-request-url {
   display: block;
