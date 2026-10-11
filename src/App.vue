@@ -37,6 +37,7 @@ import SettingsDialog from "@/components/SettingsDialog.vue";
 import { getTool, isToolId, tools, type Category, type ToolId } from "@/lib/catalog";
 import { settings } from "@/lib/preferences";
 import { setFontLocale } from "@/lib/fonts";
+import { searchTools } from "@/lib/search";
 
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
 const JsonTool = defineAsyncComponent(() => import("@/components/tools/JsonTool.vue"));
@@ -78,19 +79,7 @@ const selectedTool = computed(() =>
     ? getTool(requestedId.value)
     : null,
 );
-const matches = computed(() =>
-  enabled.value.filter((tool) => {
-    const haystack =
-      `${t(`tool.${tool.id}.name`)} ${t(`tool.${tool.id}.description`)} ${tool.keywords}`.toLocaleLowerCase(
-        locale.value,
-      );
-    return query.value
-      .toLocaleLowerCase(locale.value)
-      .trim()
-      .split(/\s+/)
-      .every((part) => haystack.includes(part));
-  }),
-);
+const matches = computed(() => searchTools(query.value, enabled.value));
 const shown = computed(() =>
   matches.value.filter(
     (tool) =>
@@ -315,7 +304,7 @@ onBeforeUnmount(() => {
             autocomplete="off"
             spellcheck="false"
             :maxlength="150"
-            @keydown.enter="selectedTool && matches[0] && chooseTool(matches[0].id)"
+            @keydown.enter="query.trim() && matches[0] && chooseTool(matches[0].id)"
           /><kbd>⌘ / Ctrl K</kbd>
           <div v-if="query && selectedTool" class="search-results">
             <a v-for="tool in matches" :key="tool.id" :href="`#/tool/${tool.id}`"
