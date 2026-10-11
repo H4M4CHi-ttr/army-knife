@@ -14,7 +14,7 @@ permissions:
 jobs:
   compare:
     name: Held-out multilingual benchmark
-    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'feat/multilingual-natural-search'
+    if: github.event_name == 'workflow_dispatch' || (github.head_ref == 'feat/multilingual-natural-search' || github.head_ref == 'experiment/multilingual-search-bench')
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
