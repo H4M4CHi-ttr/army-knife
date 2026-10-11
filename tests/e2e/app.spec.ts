@@ -162,6 +162,7 @@ test("DevToys tools start off and deliberate settings survive reload", async ({ 
   await page.getByTestId("locale-select").selectOption("ja");
   await expect(page).toHaveURL(/\/army-knife\/ja\/$/);
   await expect(page.getByTestId("tool-card-json-format")).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page.locator("html")).toHaveClass(/dark/);
@@ -170,6 +171,7 @@ test("DevToys tools start off and deliberate settings survive reload", async ({ 
   await settings(page);
   await page.getByTestId("toggle-json-format").click();
   await page.getByTestId("settings-close").click();
+  await page.evaluate(() => document.fonts.ready);
   await page.reload();
   await expect(page.getByTestId("tool-card-json-format")).toHaveCount(0);
 });

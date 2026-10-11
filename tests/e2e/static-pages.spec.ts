@@ -432,7 +432,13 @@ test("static explanations fit desktop and mobile viewports in both themes", asyn
     }));
     expect(geometry.content).toBeLessThanOrEqual(geometry.width + 1);
     await page.evaluate(() => document.fonts.ready);
-    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" }));
+    await page.evaluate(async () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      // Give both the scroll and the subsequent compositor paint a frame.
+      await new Promise<void>((done) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => done())),
+      );
+    });
     const path = testInfo.outputPath(`static-guide-${theme}.png`);
     await page.screenshot({ path, fullPage: true, animations: "disabled" });
     await testInfo.attach(`static-guide-${theme}`, { path, contentType: "image/png" });
