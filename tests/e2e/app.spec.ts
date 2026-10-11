@@ -593,14 +593,18 @@ test("EXPLAIN JSON preserves per-loop metrics and ignores unrelated large intege
 
 test("Vapor output reacts to language and color changes while VDOM settings stay accessible", async ({
   page,
-}) => {
+}, testInfo) => {
   await dashboard(page);
   await enableTool(page, "contrast");
   await page.goto("./#/tool/contrast");
   await expect(page.locator(".color-controls")).toBeVisible();
-  await page.getByRole("textbox").first().fill("#000000");
-  await page.getByRole("textbox").last().fill("#FFFFFF");
-  expect(JSON.parse(await downloadResult(page)).ratio).toBe(21);
+  await page.getByRole("textbox", { name: "Text color HEX", exact: true }).fill("#000000");
+  await page.getByRole("textbox", { name: "Background color HEX", exact: true }).fill("#FFFFFF");
+  expect(JSON.parse(await downloadResult(page))).toMatchObject({
+    foreground: "#000000",
+    background: "#FFFFFF",
+    ratio: 21,
+  });
   await settings(page);
   await page.getByTestId("locale-select").selectOption("ja");
   await page.getByTestId("settings-close").click();
@@ -608,4 +612,5 @@ test("Vapor output reacts to language and color changes while VDOM settings stay
   await expect(page.getByRole("button", { name: "コピー", exact: true })).toBeVisible();
   await expect(page.locator(".contrast-ratio strong")).toContainText("21.00");
   await assertNoOverflow(page);
+  await screenshot(page, testInfo, "contrast-vapor-ja");
 });
