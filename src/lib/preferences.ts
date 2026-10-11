@@ -1,8 +1,8 @@
 import { reactive, watch } from "vue";
 import { isToolId, tools, type ToolId } from "./catalog";
 
-export const LOCALES = ["ja", "en", "zh-CN", "zh-TW", "ko"] as const;
-export type Locale = (typeof LOCALES)[number];
+import { LOCALES, type Locale } from "./locales";
+export { LOCALES, type Locale } from "./locales";
 export type Theme = "system" | "light" | "dark";
 export const STORAGE_KEY = "army-knife:preferences:v1";
 export interface Preferences {
@@ -101,9 +101,11 @@ export function createPreferences(
     status.available = false;
   }
   const preferences = reactive(parsePreferences(raw, locale));
+  let refreshing = false;
   const stop = watch(
     preferences,
     () => {
+      if (refreshing) return;
       // Construct an allowlist rather than serializing arbitrary reactive state.
       const safe: Preferences = {
         version: 1,
@@ -125,10 +127,33 @@ export function createPreferences(
     },
     { deep: true, flush: "sync" },
   );
+  function refreshFromStorage(): boolean {
+    if (!storage) return false;
+    let stored: string | null;
+    try {
+      stored = storage.getItem(STORAGE_KEY);
+      status.available = true;
+    } catch {
+      status.available = false;
+      return false;
+    }
+    // A missing record or inaccessible storage must not discard preferences
+    // that were kept in memory while this document was suspended.
+    if (!stored) return false;
+    const latest = parsePreferences(stored, preferences.locale);
+    refreshing = true;
+    try {
+      Object.assign(preferences, latest);
+    } finally {
+      refreshing = false;
+    }
+    return true;
+  }
   return {
     preferences,
     status,
     stop,
+    refreshFromStorage,
     reset: () => Object.assign(preferences, defaultPreferences(locale)),
   };
 }

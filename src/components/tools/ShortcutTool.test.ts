@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test"
 import App from "../../App.vue";
 import { i18n } from "../../i18n";
 import { defaultPreferences, settings, STORAGE_KEY } from "../../lib/preferences";
+import { toolPath } from "../../lib/routes";
 
 vi.mock("../../lib/fonts", () => ({
   setFontLocale: vi.fn(async (locale: string) => {
@@ -14,6 +15,7 @@ vi.mock("../../lib/fonts", () => ({
 let app: VueWrapper | undefined;
 
 beforeEach(() => {
+  vi.stubEnv("BASE_URL", "/army-knife/");
   document.body.replaceChildren();
   document.documentElement.classList.remove("dark");
   settings.reset();
@@ -28,10 +30,11 @@ afterEach(async () => {
   app = undefined;
   await flushPromises();
   document.body.replaceChildren();
+  vi.unstubAllEnvs();
 });
 
 async function mountTool(): Promise<VueWrapper> {
-  window.history.replaceState(null, "", "/army-knife/#/tool/shortcuts");
+  window.history.replaceState(null, "", toolPath("en", "shortcuts"));
   const host = document.createElement("div");
   document.body.append(host);
   app = mount(App, { attachTo: host, global: { plugins: [vaporInteropPlugin, i18n] } });
@@ -183,8 +186,10 @@ describe("shortcut investigation through the real app", () => {
     expect(license.attributes("rel")).toContain("noopener");
     const notice = rows[0]!.get('[data-testid="shortcut-notice"]');
     const licenseText = rows[0]!.get('[data-testid="shortcut-license-text"]');
-    expect(notice.attributes("href")).toBe("/licenses/shortcut-sources/notices.html");
-    expect(licenseText.attributes("href")).toBe("/licenses/shortcut-sources/CC-BY-4.0.txt");
+    expect(notice.attributes("href")).toBe("/army-knife/licenses/shortcut-sources/notices.html");
+    expect(licenseText.attributes("href")).toBe(
+      "/army-knife/licenses/shortcut-sources/CC-BY-4.0.txt",
+    );
     expect(notice.attributes("rel")).toContain("noopener");
     expect(licenseText.attributes("rel")).toContain("noopener");
     const sourceNotes = rows[0]!.get(".shortcut-card-source details");
@@ -199,11 +204,11 @@ describe("shortcut investigation through the real app", () => {
     expect(localStorage.getItem(STORAGE_KEY)).not.toContain(marker);
     expect(sessionStorage.length).toBe(0);
     expect(window.location.href).not.toContain(marker);
-    window.history.replaceState(null, "", "/army-knife/#/tool/unicode");
-    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    window.history.replaceState(null, "", toolPath("en", "unicode"));
+    window.dispatchEvent(new PopStateEvent("popstate"));
     await flushPromises();
-    window.history.replaceState(null, "", "/army-knife/#/tool/shortcuts");
-    window.dispatchEvent(new HashChangeEvent("hashchange"));
+    window.history.replaceState(null, "", toolPath("en", "shortcuts"));
+    window.dispatchEvent(new PopStateEvent("popstate"));
     await vi.waitFor(() => expect(wrapper.find("#shortcut-capture").exists()).toBe(true));
     expect(capture(wrapper).value).toBe("");
     expect((wrapper.get('[data-testid="shortcut-text"]').element as HTMLInputElement).value).toBe(

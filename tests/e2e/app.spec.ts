@@ -23,7 +23,11 @@ async function staticAssetPaths(directory: string, prefix = "/army-knife/"): Pro
 let allowedPaths: Promise<Set<string>> | undefined;
 function assetAllowlist(): Promise<Set<string>> {
   allowedPaths ??= staticAssetPaths(resolve(process.cwd(), "dist")).then(
-    (paths) => new Set(["/army-knife/", ...paths]),
+    (paths) =>
+      new Set([
+        ...paths,
+        ...paths.filter((path) => path.endsWith("/index.html")).map((path) => path.slice(0, -10)),
+      ]),
   );
   return allowedPaths;
 }
@@ -80,12 +84,12 @@ const test = base.extend<{ networkAudit: NetworkAudit }>({
 });
 
 async function dashboard(page: Page): Promise<void> {
-  await page.goto("./");
+  await page.goto("./en/");
   await expect(page.getByTestId("tool-card-csv")).toBeVisible();
 }
 
 async function tool(page: Page, id: string): Promise<void> {
-  await page.goto(`./#/tool/${id}`);
+  await page.goto(`./en/tools/${id}/`);
   const inputId = id.startsWith("json-")
     ? "json-left"
     : id === "sets"
@@ -156,7 +160,9 @@ test("DevToys tools start off and deliberate settings survive reload", async ({ 
   await settings(page);
   await page.getByTestId("theme-dark").click();
   await page.getByTestId("locale-select").selectOption("ja");
-  await page.getByTestId("settings-close").click();
+  await expect(page).toHaveURL(/\/army-knife\/ja\/$/);
+  await expect(page.getByTestId("tool-card-json-format")).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page.locator("html")).toHaveClass(/dark/);
@@ -165,6 +171,7 @@ test("DevToys tools start off and deliberate settings survive reload", async ({ 
   await settings(page);
   await page.getByTestId("toggle-json-format").click();
   await page.getByTestId("settings-close").click();
+  await page.evaluate(() => document.fonts.ready);
   await page.reload();
   await expect(page.getByTestId("tool-card-json-format")).toHaveCount(0);
 });
@@ -286,7 +293,6 @@ test("only preferences persist; input text never enters storage or location", as
 
 test("all five languages load the correct local UI and programming fonts", async ({ page }) => {
   await dashboard(page);
-  await settings(page);
   const cases = [
     {
       locale: "en",
@@ -315,7 +321,11 @@ test("all five languages load the correct local UI and programming fonts", async
     { locale: "ko", sans: "Noto Sans KR Variable", mono: "Army Knife Mono K", text: "한글과자료" },
   ];
   for (const entry of cases) {
+    await settings(page);
+    const previous = await page.getByTestId("locale-select").inputValue();
     await page.getByTestId("locale-select").selectOption(entry.locale);
+    if (previous === entry.locale) await page.getByTestId("settings-close").click();
+    await expect(page).toHaveURL(new RegExp(`/army-knife/${entry.locale}/$`));
     await expect(page.locator("html")).toHaveAttribute("lang", entry.locale);
     await expect(page.locator(`link[data-font-locale="${entry.locale}"]`)).toHaveAttribute(
       "media",
@@ -602,7 +612,7 @@ test("Vapor output reacts to language and color changes while VDOM settings stay
 }, testInfo) => {
   await dashboard(page);
   await enableTool(page, "contrast");
-  await page.goto("./#/tool/contrast");
+  await page.goto("./en/tools/contrast/");
   await expect(page.locator(".color-controls")).toBeVisible();
   await page.getByRole("textbox", { name: "Text color HEX", exact: true }).fill("#000000");
   await page.getByRole("textbox", { name: "Background color HEX", exact: true }).fill("#FFFFFF");
@@ -613,7 +623,9 @@ test("Vapor output reacts to language and color changes while VDOM settings stay
   });
   await settings(page);
   await page.getByTestId("locale-select").selectOption("ja");
-  await page.getByTestId("settings-close").click();
+  await expect(page).toHaveURL(/\/army-knife\/ja\/tools\/contrast\/$/);
+  await page.locator('.color-controls input:not([type="color"])').nth(0).fill("#000000");
+  await page.locator('.color-controls input:not([type="color"])').nth(1).fill("#FFFFFF");
   await expect(page.getByTestId("instant-updates")).toContainText("入力を即時反映");
   await expect(page.getByRole("button", { name: "コピー", exact: true })).toBeVisible();
   await expect(page.locator(".contrast-ratio strong")).toContainText("21.00");
