@@ -1,4 +1,4 @@
-import { tools, type ToolDefinition, type ToolId } from "../catalog";
+import { tools, type ToolDefinition } from "../catalog";
 import { messages } from "../../i18n";
 import { searchIntents, type SearchIntentMap } from "./intents";
 
