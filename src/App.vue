@@ -35,6 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import ToolIcon from "@/components/ToolIcon.vue";
 import SettingsDialog from "@/components/SettingsDialog.vue";
 import { getTool, tools, type Category, type ToolId } from "@/lib/catalog";
+import type { QuickToolId } from "@/lib/tools/quick-converters";
 import { settings } from "@/lib/preferences";
 import { setFontLocale } from "@/lib/fonts";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
@@ -51,6 +52,7 @@ const ExplainTool = defineAsyncComponent(() => import("@/components/tools/Explai
 const ShortcutTool = defineAsyncComponent(() => import("@/components/tools/ShortcutTool.vue"));
 const ChmodTool = defineAsyncComponent(() => import("@/components/tools/ChmodTool.vue"));
 const Base64Tool = defineAsyncComponent(() => import("@/components/tools/Base64Tool.vue"));
+const QuickTool = defineAsyncComponent(() => import("@/components/tools/QuickTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
@@ -758,6 +760,11 @@ onBeforeUnmount(() => {
             <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ChmodTool v-else-if="selectedTool.id === 'chmod'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <Base64Tool v-else-if="selectedTool.id === 'base64'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <QuickTool
+              v-else-if="['data-units', 'css-units', 'unicode-normalize', 'slug', 'unicode-escape'].includes(selectedTool.id)"
+              :id="selectedTool.id as QuickToolId"
+              :key="`${selectedTool.id}:${preferences.locale}`"
+            />
           </template>
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">
