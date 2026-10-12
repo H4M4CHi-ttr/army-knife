@@ -49,6 +49,8 @@ function inputSelector(id: ToolId): string {
   if (id === "css-gradient") return "#gradient-kind";
   if (id === "svg-placeholder") return "#placeholder-width";
   if (id === "color-palette") return "#palette-base";
+  if (id === "data-units" || id === "css-units") return "#quick-input";
+  if (id === "unicode-normalize" || id === "slug" || id === "unicode-escape") return "#quick-text";
   return `#${id}-input`;
 }
 

@@ -4,6 +4,7 @@ import { chmodGuide } from "./chmod-guide.ts";
 import { base64Guide } from "./base64-guide.ts";
 import { utilityGuides } from "./utility-guides.ts";
 import { designGuides } from "./design-guides.ts";
+import { quickGuides } from "./quick-guides.ts";
 
 /** Public documentation only. User input never becomes part of this data. */
 export interface ToolGuide {
@@ -144,6 +145,7 @@ export const toolGuides = {
   ...designGuides,
   chmod: chmodGuide,
   base64: base64Guide,
+  ...quickGuides,
   csv: localized("name,score\nAda,98\nLinus,\nGrace,99", {
     ja: {
       introduction:

@@ -35,6 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import ToolIcon from "@/components/ToolIcon.vue";
 import SettingsDialog from "@/components/SettingsDialog.vue";
 import { getTool, tools, type Category, type ToolId } from "@/lib/catalog";
+import type { QuickToolId } from "@/lib/tools/quick-converters";
 import { settings } from "@/lib/preferences";
 import { setFontLocale } from "@/lib/fonts";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
@@ -60,6 +61,7 @@ const GradientTool = defineAsyncComponent(() => import("@/components/tools/Gradi
 const PlaceholderTool = defineAsyncComponent(() => import("@/components/tools/PlaceholderTool.vue"));
 const PathBatchTool = defineAsyncComponent(() => import("@/components/tools/PathBatchTool.vue"));
 const PaletteTool = defineAsyncComponent(() => import("@/components/tools/PaletteTool.vue"));
+const QuickTool = defineAsyncComponent(() => import("@/components/tools/QuickTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
@@ -779,6 +781,11 @@ onBeforeUnmount(() => {
             <PlaceholderTool v-else-if="selectedTool.id === 'svg-placeholder'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <PathBatchTool v-else-if="selectedTool.id === 'path-batch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <PaletteTool v-else-if="selectedTool.id === 'color-palette'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <QuickTool
+              v-else-if="['data-units', 'css-units', 'unicode-normalize', 'slug', 'unicode-escape'].includes(selectedTool.id)"
+              :id="selectedTool.id as QuickToolId"
+              :key="`${selectedTool.id}:${preferences.locale}`"
+            />
           </template>
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">
