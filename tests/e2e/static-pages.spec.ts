@@ -56,6 +56,8 @@ function inputSelector(id: ToolId): string {
   if (id === "color-palette") return "#palette-base";
   if (id === "data-units" || id === "css-units") return "#quick-input";
   if (id === "unicode-normalize" || id === "slug" || id === "unicode-escape") return "#quick-text";
+  if (id === "sri") return "#sri-hex";
+  if (id === "encoding" || id === "magic") return '[data-testid="selected-file"]';
   return `#${id}-input`;
 }
 

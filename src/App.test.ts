@@ -193,12 +193,15 @@ describe("App integration with real local tools", () => {
       "tool-card-http-reference",
       "tool-card-json-diff",
       "tool-card-logs",
+      "tool-card-magic",
       "tool-card-og-tags",
+      "tool-card-set-cookie",
       "tool-card-shortcuts",
       "tool-card-slug",
       "tool-card-unicode",
       "tool-card-unicode-normalize",
       "tool-card-url",
+      "tool-card-user-agent",
     ]);
     expect(wrapper.find(".tool-panel").exists()).toBe(false);
     expect(setFontLocale).toHaveBeenCalledWith("en");

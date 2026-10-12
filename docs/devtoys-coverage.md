@@ -9,6 +9,11 @@ This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool l
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
 | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SRI integrity generator                  | Off     | Hashing overlaps with bundled hash generators; SRI-specific HTML is additional, but conservatively requires opt-in. No third-party dependency. |
+| BOM & line-ending inspector              | Off     | Text encoding and conversion overlap some bundled tools, so conservative opt-in is used. |
+| Magic bytes inspector                    | On      | Local fixed binary signatures with extension comparison, not a generic bundled DevToys format converter. |
+| User-Agent inspector                     | On      | Passive browser/OS/client-hints heuristic analysis, distinct from bundled URL tools. |
+| Set-Cookie attribute inspector           | On      | Static attribute/prefix/SameSite validation, distinct from bundled URL tools. |
 | Base64 UTF-8 text converter            | Off     | Standard and URL-safe RFC 4648 text conversion overlaps with the official bundled Base64 encoder/decoder; explicitly opt in from Settings. No third-party package is added.                         |
 | Linux permission calculator            | On      | Inspects chmod rwx/special mode bits, scoped symbolic changes, and separate umask creation examples. No corresponding bundled permission calculator appears in the reviewed official list.              |
 | Shortcut investigator                  | On      | Looks up documented default shortcut assignments across applications and Web apps. No corresponding bundled shortcut dictionary appears in the reviewed official tool list.                             |
@@ -51,6 +56,17 @@ These converters use only browser-native APIs without adding dependencies, and n
 - **Unicode escapes (#109):** strict U+XXXX, JS \uXXXX (UTF-16 surrogate-aware), and JS \u{...} code point forms. Decoding does not evaluate code; rejects invalid input and unpaired surrogates. Output is complete, with a maximum of 64 point details previewed.
 
 All text inputs are limited to **16 KiB**. Small inputs apply immediately; after 2,048 UTF-16 code units the existing 800ms debounce/manual control applies.
+
+## Five new local inspector tools
+
+SRI and BOM inspection default off conservatively under the overlap policy; the other three default on. No additional runtime package or CDN is required.
+
+- SRI: exact binary bytes, SHA-256/384/512 Web Crypto digests, Base64 integrity strings, HTML examples with placeholder local paths. Unknown extensions and raw hex show both template tags with an explicit warning, not a guessed resource type. Files up to **8 MiB**, hex input up to **64 Ki characters**. Does not fetch URLs or authenticate origins; does not modify the selected file.
+- BOM: strict UTF-8/UTF-16LE/BE byte analysis, BOM and CRLF/LF/CR counts and proportions; supports deliberately requested BOM-free UTF-8 + chosen newline download only after valid strict decode. BOM-less UTF-16 inference is heuristic and clearly marked. Not an arbitrary charset detector. Files up to **8 MiB**.
+- Magic Bytes: file signatures and last 128 bytes for ZIP trailer hints; the full file is never parsed. Multiple formats, extension and untrusted declared MIME mismatches may be flagged. No trust/malware guarantee, filename MIME data is not authoritative. Files up to **8 MiB**.
+- User-Agent: text **8 KiB**, known-token classification only. Spoofed/frozen UA and missing Client Hints mean results are guesses, not a compatibility or security guarantee.
+- Set-Cookie: text **64 KiB** and **64 physical non-empty header lines**, each a separate header, with semicolon-delimited attrs. Expires commas remain intact. Inspect flags, SameSite, Partitioned and name prefixes, including context-sensitive warnings about absent attributes. Does not accept comma-concatenated Set-Cookie headers as separate values, and does not perform HTTP requests. Cookie values do not reach results or exports.
+- Binary tasks run in dedicated, cancellable Workers with a 15-second watchdog and in-memory output only. File reads have a size guard before allocation. Input data is never persisted, sent, or embedded in links. No new package licensing obligations.
 
 ## Calculation semantics and limits
 

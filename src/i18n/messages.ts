@@ -16,6 +16,7 @@ import { base64Messages } from "./base64.ts";
 import { fiveToolMessages } from "./five-tools.ts";
 import { utilityMessages } from "./utility.ts";
 import { inspectorMessages } from "./inspectors.ts";
+import { fileHttpInspectorMessages } from "./file-http-inspectors.ts";
 import { designToolMessages } from "./design-tool-messages.ts";
 import { designLabels } from "./design-labels.ts";
 import { quickMessages } from "./quick.ts";
@@ -32,6 +33,7 @@ export const messages = {
     ...fiveToolMessages.en,
     ...utilityMessages.en,
     ...inspectorMessages.en,
+    ...fileHttpInspectorMessages.en,
     ...designToolMessages.en,
     ...designLabels.en,
     ...quickMessages["en"],
@@ -50,6 +52,7 @@ export const messages = {
     ...fiveToolMessages.ja,
     ...utilityMessages.ja,
     ...inspectorMessages.ja,
+    ...fileHttpInspectorMessages.ja,
     ...designToolMessages.ja,
     ...designLabels.ja,
     ...quickMessages["ja"],
@@ -68,6 +71,7 @@ export const messages = {
     ...fiveToolMessages["zh-CN"],
     ...utilityMessages["zh-CN"],
     ...inspectorMessages["zh-CN"],
+    ...fileHttpInspectorMessages["zh-CN"],
     ...designToolMessages["zh-CN"],
     ...designLabels["zh-CN"],
     ...quickMessages["zh-CN"],
@@ -86,6 +90,7 @@ export const messages = {
     ...fiveToolMessages["zh-TW"],
     ...utilityMessages["zh-TW"],
     ...inspectorMessages["zh-TW"],
+    ...fileHttpInspectorMessages["zh-TW"],
     ...designToolMessages["zh-TW"],
     ...designLabels["zh-TW"],
     ...quickMessages["zh-TW"],
@@ -104,6 +109,7 @@ export const messages = {
     ...fiveToolMessages.ko,
     ...utilityMessages.ko,
     ...inspectorMessages.ko,
+    ...fileHttpInspectorMessages.ko,
     ...designToolMessages.ko,
     ...designLabels.ko,
     ...quickMessages["ko"],

@@ -65,6 +65,8 @@ const PlaceholderTool = defineAsyncComponent(() => import("@/components/tools/Pl
 const PathBatchTool = defineAsyncComponent(() => import("@/components/tools/PathBatchTool.vue"));
 const PaletteTool = defineAsyncComponent(() => import("@/components/tools/PaletteTool.vue"));
 const QuickTool = defineAsyncComponent(() => import("@/components/tools/QuickTool.vue"));
+const FileInspectorTool = defineAsyncComponent(() => import("@/components/tools/FileInspectorTool.vue"));
+const TextInspectorTool = defineAsyncComponent(() => import("@/components/tools/TextInspectorTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
@@ -798,6 +800,14 @@ onBeforeUnmount(() => {
               v-else-if="['data-units', 'css-units', 'unicode-normalize', 'slug', 'unicode-escape'].includes(selectedTool.id)"
               :id="selectedTool.id as QuickToolId"
               :key="`${selectedTool.id}:${preferences.locale}`"
+            />
+            <FileInspectorTool
+              v-else-if="selectedTool.id === 'sri' || selectedTool.id === 'encoding' || selectedTool.id === 'magic'"
+              :kind="selectedTool.id" :key="`${selectedTool.id}:${preferences.locale}`"
+            />
+            <TextInspectorTool
+              v-else-if="selectedTool.id === 'user-agent' || selectedTool.id === 'set-cookie'"
+              :kind="selectedTool.id" :key="`${selectedTool.id}:${preferences.locale}`"
             />
           </template>
         </template>

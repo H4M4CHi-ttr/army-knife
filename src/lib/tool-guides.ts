@@ -5,6 +5,7 @@ import { base64Guide } from "./base64-guide.ts";
 import { fiveToolGuides } from "./five-tool-guides.ts";
 import { utilityGuides } from "./utility-guides.ts";
 import { inspectorGuides } from "./inspector-guides.ts";
+import { fileHttpInspectorGuides } from "./file-http-inspector-guides.ts";
 import { designGuides } from "./design-guides.ts";
 import { quickGuides } from "./quick-guides.ts";
 
@@ -145,6 +146,7 @@ function localized(
 export const toolGuides = {
   ...utilityGuides,
   ...inspectorGuides,
+  ...fileHttpInspectorGuides,
   ...designGuides,
   chmod: chmodGuide,
   base64: base64Guide,
