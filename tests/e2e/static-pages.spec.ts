@@ -444,7 +444,7 @@ test("changing language opens the same generated tool page and preserves only pr
           .__localeNavigationDocumentToken,
     ),
   ).toBe(documentToken);
-  await expect(page.locator("#unicode-input")).toHaveValue(`${PRIVATE_MARKER}\\u200b`);
+  await expect(page.locator("#unicode-input")).toHaveValue(`${PRIVATE_MARKER}\u200b`);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     SITE_ORIGIN + toolPath("ja", "unicode"),
