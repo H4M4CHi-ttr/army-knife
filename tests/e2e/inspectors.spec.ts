@@ -83,6 +83,7 @@ test("Cookie values are omitted from all results and not persisted or transmitte
     "Set-Cookie: other=secondary; SameSite=None",
   );
   await expect(page.locator(".inspector-cookie")).toHaveCount(2);
+  await expect(page.getByTestId("cookie-table").locator("tbody tr")).toHaveCount(2);
   await expect(page.locator(".inspector-cookie").last()).toContainText("SameSite=None");
   await expect(page.locator(".inspector-cookie").last()).toContainText("Secure");
   const output = await page.evaluate(() => ({
