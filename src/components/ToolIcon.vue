@@ -15,6 +15,11 @@ import {
   Keyboard,
   FileLock2,
   Binary,
+  BookOpen,
+  CaseSensitive,
+  FileCode2,
+  GitMerge,
+  Paintbrush,
 } from "@lucide/vue";
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
@@ -39,6 +44,11 @@ const icons = {
   "dummy-text": ScanText,
   "css-specificity": Contrast,
   "fluid-type": TableProperties,
+  "text-stats": CaseSensitive,
+  "string-literals": FileCode2,
+  "http-reference": BookOpen,
+  "git-conflicts": GitMerge,
+  "color-converter": Paintbrush,
 };
 </script>
 <template><component :is="icons[id]" aria-hidden="true" :stroke-width="1.7" /></template>

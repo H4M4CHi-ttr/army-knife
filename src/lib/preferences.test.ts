@@ -113,6 +113,8 @@ describe("private browser preferences", () => {
       "env",
       "url",
       "explain",
+      "http-reference",
+      "git-conflicts",
     ]);
     expect(migrated.enabledTools).not.toContain("cidr");
     expect(migrated.enabledTools).not.toContain("json-format");

@@ -18,7 +18,12 @@ export type ToolId =
   | "url-encode"
   | "dummy-text"
   | "css-specificity"
-  | "fluid-type";
+  | "fluid-type"
+  | "text-stats"
+  | "string-literals"
+  | "http-reference"
+  | "git-conflicts"
+  | "color-converter";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -179,6 +184,11 @@ export const tools: readonly ToolDefinition[] = [
     keywords: "color contrast wcag accessibility aa aaa 色 配色 コントラスト",
     color: "orange",
   },
+  { id: "text-stats", category: "text", wasm: false, devtoys: true, keywords: "text statistics case upper lower title camel snake word grapheme bytes Unicode 文字 統計 大文字 小文字 字素 통계", color: "rose" },
+  { id: "string-literals", category: "text", wasm: false, devtoys: true, keywords: "escape unescape string literal JSON JS C XML CSV SQL quotes backslash エスケープ 文字列 引用符 转义 跳脫 이스케이프", color: "purple" },
+  { id: "http-reference", category: "network", wasm: false, devtoys: false, keywords: "http status code mime content type media type 200 404 500 response extension status ステータス MIME 状态 狀態 상태", color: "blue" },
+  { id: "git-conflicts", category: "text", wasm: false, devtoys: false, keywords: "git merge diff3 conflict marker ours theirs ancestor inspect マージ コンフリクト 競合 冲突 衝突 충돌", color: "orange" },
+  { id: "color-converter", category: "design", wasm: false, devtoys: true, keywords: "color colour hex rgb hsl hsv alpha sRGB picker convert CSS 色 変換 配色 颜色 顏色 색상", color: "green" },
 ] as const;
 
 export function isToolId(value: unknown): value is ToolId {
