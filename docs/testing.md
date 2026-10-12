@@ -76,6 +76,7 @@ The browser scenarios verify:
 - PostgreSQL EXPLAIN keeps per-loop rows/times, does not add parent and child durations, and accepts unrelated 64-bit identifiers without rounding.
 - Vapor-rendered results and child component slots react to locale changes through the VDOM settings dialog.
 - Structural JSON diffs escape JSON Pointer paths and reject inputs whose numeric precision would be lost.
+- Internal tool, home, category, and language navigation keeps one document, updates the normal URL and page metadata, and supports Back/Forward. Refreshing a normal tool URL still loads its complete static HTML; inputs do not survive tool or language changes.
 - Inputs never appear in local storage, session storage, or the page URL. Reloading clears inputs while preserving only validated preferences.
 - Each locale activates the correct self-hosted Noto and code font CSS, and those font faces actually load.
 - The settings dialog accepts keyboard operation, traps focus while open, closes with Escape, and restores focus to its trigger.

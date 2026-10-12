@@ -5,7 +5,7 @@ import App from "./App.vue";
 import { i18n } from "./i18n";
 import { setFontLocale } from "./lib/fonts";
 import { defaultPreferences, settings, STORAGE_KEY } from "./lib/preferences";
-import { legacyToolRedirect, localeHomePath, toolPath } from "./lib/routes";
+import { legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "./lib/routes";
 import * as engine from "./lib/wasm/client";
 
 // The real font loader owns network resources. Its behavior has separate unit
@@ -18,6 +18,25 @@ vi.mock("./lib/fonts", () => ({
 
 let app: VueWrapper | undefined;
 
+function staticPageResponse(pathname: string): Response {
+  const route = resolvePageRoute(pathname);
+  if (route.kind === "unknown") return new Response("", { status: 404 });
+  const locale = route.locale;
+  const guide = route.kind === "tool" ? 'data-tool="' + route.toolId + '"' : 'data-page="home"';
+  const html =
+    '<!doctype html><html lang="' +
+    locale +
+    '"><head><title>Static test guide</title><meta name="description" content="Static description" />' +
+    '<link rel="canonical" href="https://h4m4chi-ttr.github.io' +
+    pathname +
+    '" /></head><body><article id="page-guide" data-locale="' +
+    locale +
+    '" ' +
+    guide +
+    '><h1>Static test guide</h1></article></body></html>';
+  return new Response(html, { headers: { "content-type": "text/html" } });
+}
+
 beforeEach(() => {
   vi.stubEnv("BASE_URL", "/army-knife/");
   window.history.replaceState(null, "", localeHomePath("en"));
@@ -29,6 +48,13 @@ beforeEach(() => {
   i18n.global.locale.value = "en";
   localStorage.clear();
   sessionStorage.clear();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: string | URL) => {
+      const pathname = new URL(input.toString(), window.location.origin).pathname;
+      return staticPageResponse(pathname);
+    }),
+  );
 });
 
 afterEach(async () => {
@@ -40,6 +66,7 @@ afterEach(async () => {
   }
   await flushPromises();
   document.body.replaceChildren();
+  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
 
@@ -102,6 +129,7 @@ describe("App integration with real local tools", () => {
     const guide = document.createElement("article");
     guide.id = "page-guide";
     guide.dataset.tool = "url";
+    guide.dataset.locale = "en";
     guide.innerHTML = "<h1>URL parser guide</h1><p>Static usage remains available.</p>";
     document.body.append(guide);
     const wrapper = await mountPage(toolPath("en", "url"));
