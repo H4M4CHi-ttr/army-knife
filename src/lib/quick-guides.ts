@@ -102,22 +102,32 @@ const localeResults: Record<Locale, Record<QuickToolId, string>> = {
   },
 };
 
-const ids: QuickToolId[] = [
-  "data-units", "css-units", "unicode-normalize", "slug", "unicode-escape",
-];
-const locales: Locale[] = ["ja", "en", "zh-CN", "zh-TW", "ko"];
+function guide(id: QuickToolId, locale: Locale): ToolGuide {
+  const translations: Record<string, string> = quickMessages[locale];
+  return {
+    introduction: translations["tool." + id + ".description"]!,
+    steps: generic[locale].steps,
+    exampleInput: examples[id].input,
+    exampleResult: localeResults[locale][id],
+    limitations: [translations["tool." + id + ".hint"]!, generic[locale].restriction],
+  };
+}
 
-/** Every converter gets a localized, no-JavaScript static guide. */
-export const quickGuides = Object.fromEntries(ids.map((id) => [
-  id,
-  Object.fromEntries(locales.map((locale) => {
-    const translations: Record<string, string> = quickMessages[locale];
-    return [locale, {
-      introduction: translations["tool." + id + ".description"]!,
-      steps: generic[locale].steps,
-      exampleInput: examples[id].input,
-      exampleResult: localeResults[locale][id],
-      limitations: [translations["tool." + id + ".hint"]!, generic[locale].restriction],
-    } satisfies ToolGuide];
-  })),
-])) as Record<QuickToolId, Record<Locale, ToolGuide>>;
+function localized(id: QuickToolId): Record<Locale, ToolGuide> {
+  return {
+    ja: guide(id, "ja"),
+    en: guide(id, "en"),
+    "zh-CN": guide(id, "zh-CN"),
+    "zh-TW": guide(id, "zh-TW"),
+    ko: guide(id, "ko"),
+  };
+}
+
+/** Every converter gets a typed and localized, no-JavaScript static guide. */
+export const quickGuides = {
+  "data-units": localized("data-units"),
+  "css-units": localized("css-units"),
+  "unicode-normalize": localized("unicode-normalize"),
+  slug: localized("slug"),
+  "unicode-escape": localized("unicode-escape"),
+} satisfies Record<QuickToolId, Record<Locale, ToolGuide>>;
