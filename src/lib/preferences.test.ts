@@ -24,6 +24,7 @@ describe("private browser preferences", () => {
     expect(defaults.enabledTools).toContain("csv");
     expect(defaults.favorites).toEqual([]);
     expect(defaults.autoApply).toBe(true);
+    expect(defaults.searchMode).toBe("lexical");
     expect(defaults.knownTools).toEqual(tools.map((tool) => tool.id));
   });
 
@@ -72,8 +73,14 @@ describe("private browser preferences", () => {
       favorites: ["cidr"],
       knownTools: tools.map((tool) => tool.id),
       autoApply: false,
+      searchMode: "lexical",
     });
     expect(Object.hasOwn(parsed, "secretInput")).toBe(false);
+  });
+
+  it("rejects invalid search modes without losing existing preferences", () => {
+    expect(parsePreferences('{"version":1,"searchMode":"remote"}', "en").searchMode).toBe("lexical");
+    expect(parsePreferences('{"version":1,"searchMode":"hybrid"}', "ja").searchMode).toBe("hybrid");
   });
 
   it("preserves an intentional empty tool selection and explicit overlapping tools", () => {
@@ -113,8 +120,10 @@ describe("private browser preferences", () => {
     expect(migrated.favorites).toEqual(["csv"]);
     expect(migrated.knownTools).toEqual(tools.map((tool) => tool.id));
     expect(migrated.autoApply).toBe(true);
+    expect(migrated.searchMode).toBe("lexical");
     migrated.enabledTools = ["har"];
     migrated.autoApply = false;
+    migrated.searchMode = "classifier";
     expect(parsePreferences(JSON.stringify(migrated), "en")).toEqual(migrated);
   });
 
@@ -135,6 +144,7 @@ describe("private browser preferences", () => {
       "favorites",
       "knownTools",
       "locale",
+      "searchMode",
       "theme",
       "version",
     ]);

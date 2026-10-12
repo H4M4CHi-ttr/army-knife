@@ -38,6 +38,8 @@ import { getTool, isToolId, tools, type Category, type ToolId } from "@/lib/cata
 import { settings } from "@/lib/preferences";
 import { setFontLocale } from "@/lib/fonts";
 import { searchTools } from "@/lib/search";
+import { ClassifierClient } from "@/lib/search/classifier-client";
+import { mergeRankings } from "@/lib/search/classifier-runtime";
 
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
 const JsonTool = defineAsyncComponent(() => import("@/components/tools/JsonTool.vue"));
@@ -51,6 +53,10 @@ const ExplainTool = defineAsyncComponent(() => import("@/components/tools/Explai
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
+const classifierRank = ref<{ query: string; ids: ToolId[] } | null>(null);
+const classifierStatus = ref<"idle" | "loading" | "ready" | "error">("idle");
+let classifierWorker: ClassifierClient | null = null;
+let classifierFailed = false;
 const activeCategory = ref<Category | "all">("all");
 const favoritesOnly = ref(false);
 const mobileOpen = ref(false);
@@ -79,7 +85,20 @@ const selectedTool = computed(() =>
     ? getTool(requestedId.value)
     : null,
 );
-const matches = computed(() => searchTools(query.value, enabled.value));
+const matches = computed(() => {
+  const fallback = searchTools(query.value, enabled.value);
+  const result = classifierRank.value;
+  if (!query.value.trim() || preferences.searchMode === "lexical" ||
+      !result || result.query !== query.value) return fallback;
+  const ranked = preferences.searchMode === "classifier"
+    ? result.ids
+    : mergeRankings(searchTools(query.value, tools).map((tool) => tool.id), result.ids);
+  const allowed = new Map(enabled.value.map((tool) => [tool.id, tool]));
+  return ranked.flatMap((id) => {
+    const match = allowed.get(id);
+    return match ? [match] : [];
+  });
+});
 const shown = computed(() =>
   matches.value.filter(
     (tool) =>
@@ -159,6 +178,56 @@ function onKey(event: KeyboardEvent) {
     query.value = "";
   }
 }
+watch(
+  [query, () => preferences.searchMode],
+  ([input, mode], _, onCleanup) => {
+    classifierRank.value = null;
+    if (mode === "lexical") {
+      classifierWorker?.stop();
+      classifierWorker = null;
+      classifierFailed = false;
+      classifierStatus.value = "idle";
+      return;
+    }
+    if (classifierFailed) {
+      classifierStatus.value = "error";
+      return;
+    }
+
+    const client = (classifierWorker ??= new ClassifierClient());
+    classifierStatus.value = "loading";
+    let obsolete = false;
+    const start = async () => {
+      try {
+        if (input.trim()) {
+          const ids = await client.rank(input);
+          if (!obsolete && query.value === input && preferences.searchMode !== "lexical") {
+            classifierRank.value = { query: input, ids };
+          }
+        } else {
+          await client.load();
+        }
+        if (!obsolete && preferences.searchMode !== "lexical") {
+          classifierStatus.value = "ready";
+        }
+      } catch {
+        // No silent remote fallback, no uncaught errors, no query persistence.
+        if (!obsolete) {
+          classifierFailed = true;
+          classifierStatus.value = "error";
+          client.stop();
+          if (classifierWorker === client) classifierWorker = null;
+        }
+      }
+    };
+    const timer = window.setTimeout(() => { void start(); }, input.trim() ? 100 : 0);
+    onCleanup(() => {
+      obsolete = true;
+      window.clearTimeout(timer);
+    });
+  },
+  { immediate: true },
+);
 watch(() => preferences.theme, applyTheme, { immediate: true });
 watch(
   () => preferences.locale,
@@ -196,6 +265,8 @@ onMounted(() => {
   systemTheme.addEventListener("change", applyTheme);
 });
 onBeforeUnmount(() => {
+  classifierWorker?.stop();
+  classifierWorker = null;
   window.removeEventListener("hashchange", onHash);
   window.removeEventListener("keydown", onKey);
   systemTheme.removeEventListener("change", applyTheme);
@@ -307,6 +378,7 @@ onBeforeUnmount(() => {
             @keydown.enter="query.trim() && matches[0] && chooseTool(matches[0].id)"
           /><kbd>⌘ / Ctrl K</kbd>
           <div v-if="query && selectedTool" class="search-results">
+            <p v-if="preferences.searchMode !== 'lexical'" class="hint" role="status">{{ t(`search.status.${classifierStatus}`) }}</p>
             <a v-for="tool in matches" :key="tool.id" :href="`#/tool/${tool.id}`"
               ><ToolIcon :id="tool.id" />{{ t(`tool.${tool.id}.name`) }}<ArrowUpRight
             /></a>
@@ -355,6 +427,7 @@ onBeforeUnmount(() => {
             </div>
           </section>
           <div class="collection-toolbar">
+            <p v-if="preferences.searchMode !== 'lexical'" class="hint classifier-status" role="status" data-testid="classifier-status">{{ t(`search.status.${classifierStatus}`) }}</p>
             <h2>
               {{ t("app.collection") }}<span>{{ shown.length.toString().padStart(2, "0") }}</span>
             </h2>

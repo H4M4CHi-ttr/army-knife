@@ -1,0 +1,64 @@
+name: Generate compact search classifier (experiment)
+
+on:
+  push:
+    branches:
+      - experiment/browser-search-classifier
+    paths:
+      - .github/workflows/generate-search-model.yml
+      - scripts/search-compare/export-browser-classifier.py
+      - src/lib/search/compare-benchmark.test.ts
+      - src/lib/search/intents.ts
+      - src/i18n/**
+      - src/lib/catalog.ts
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    if: github.repository == 'H4M4CHi-ttr/army-knife' && github.actor == 'H4M4CHi-ttr'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: experiment/browser-search-classifier
+          persist-credentials: true
+
+      - uses: voidzero-dev/setup-vp@v1.21.2
+        with:
+          version: "1.1.0"
+          node-version: "24.19.0"
+          run-install: false
+          cache: true
+          cache-dependency-path: pnpm-lock.yaml
+
+      - run: vp install --frozen-lockfile
+
+      - name: Export exact 312 examples from the search index
+        env:
+          SEARCH_COMPARE_OUTPUT: scripts/search-compare/.out
+        run: vp test src/lib/search/compare-benchmark.test.ts
+
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.12.12"
+
+      - name: Install exact training dependencies
+        run: python -m pip install --disable-pip-version-check "scikit-learn==1.7.2"
+
+      - name: Export reproducible, gzip-compressed coefficients
+        run: python scripts/search-compare/export-browser-classifier.py
+
+      - name: Commit generated model on the dedicated experiment branch only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- public/models/classifier-v1.json.gz
+          if git diff --staged --quiet; then
+            echo "Classifier model is unchanged."
+          else
+            git commit -m "build(search): include local pretrained 0.41 MB classifier asset"
+            git push origin HEAD:refs/heads/experiment/browser-search-classifier
+          fi
