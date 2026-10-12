@@ -22,6 +22,7 @@ for(const locale of ["ja","en","zh-CN","zh-TW","ko"]){
     for(const [id,input,output] of tools){
       await enable(page,id,input,locale);
       await expect(page.getByTestId(output)).toBeVisible();
+      if(id==="svg-placeholder") await expect(page.getByTestId("svg-placeholder-preview")).toBeVisible();
     }
     await page.locator("#palette-base").fill("#FF0000");
     await page.locator("#palette-count").fill("3");

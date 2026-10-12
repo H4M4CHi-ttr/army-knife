@@ -17,7 +17,7 @@ const previewUrl=ref(""),pngError=ref(false);
 function revoke(){if(previewUrl.value)URL.revokeObjectURL(previewUrl.value);previewUrl.value="";}
 watch(result,value=>{revoke();pngError.value=false;
   if(value)previewUrl.value=URL.createObjectURL(new Blob([value.svg],{type:"image/svg+xml"}));
-});
+},{immediate:true});
 onScopeDispose(revoke);
 async function savePng(){
   const value=result.value;if(!value)return;
