@@ -45,6 +45,10 @@ function inputSelector(id: ToolId): string {
   if (id === "env") return "#env-left";
   if (id === "contrast") return ".color-controls";
   if (id === "shortcuts") return '[data-testid="shortcut-capture"]';
+  if (id === "cubic-bezier") return "#bezier-duration";
+  if (id === "css-gradient") return "#gradient-kind";
+  if (id === "svg-placeholder") return "#placeholder-width";
+  if (id === "color-palette") return "#palette-base";
   return `#${id}-input`;
 }
 

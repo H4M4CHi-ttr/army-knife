@@ -14,6 +14,8 @@ import { shortcutMessages } from "./shortcuts.ts";
 import { chmodMessages } from "./chmod.ts";
 import { base64Messages } from "./base64.ts";
 import { utilityMessages } from "./utility.ts";
+import { designToolMessages } from "./design-tool-messages.ts";
+import { designLabels } from "./design-labels.ts";
 
 export const messages = {
   en: {
@@ -25,6 +27,8 @@ export const messages = {
     ...chmodMessages.en,
     ...base64Messages.en,
     ...utilityMessages.en,
+    ...designToolMessages.en,
+    ...designLabels.en,
     ...toolMessagesEn,
     "contrast.largeHint":
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
@@ -38,6 +42,8 @@ export const messages = {
     ...chmodMessages.ja,
     ...base64Messages.ja,
     ...utilityMessages.ja,
+    ...designToolMessages.ja,
+    ...designLabels.ja,
     ...toolMessagesJa,
     "contrast.largeHint":
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
@@ -51,6 +57,8 @@ export const messages = {
     ...chmodMessages["zh-CN"],
     ...base64Messages["zh-CN"],
     ...utilityMessages["zh-CN"],
+    ...designToolMessages["zh-CN"],
+    ...designLabels["zh-CN"],
     ...toolZhCN,
     "contrast.largeHint":
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
@@ -64,6 +72,8 @@ export const messages = {
     ...chmodMessages["zh-TW"],
     ...base64Messages["zh-TW"],
     ...utilityMessages["zh-TW"],
+    ...designToolMessages["zh-TW"],
+    ...designLabels["zh-TW"],
     ...toolZhTW,
     "contrast.largeHint":
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
@@ -77,6 +87,8 @@ export const messages = {
     ...chmodMessages.ko,
     ...base64Messages.ko,
     ...utilityMessages.ko,
+    ...designToolMessages.ko,
+    ...designLabels.ko,
     ...toolKo,
     "contrast.largeHint":
       "큰 텍스트는 18pt(24 CSS px) 이상, 굵은 글씨는 14pt(약 18.7 CSS px) 이상입니다. 판정에는 반올림 전 비율을 사용합니다.",
