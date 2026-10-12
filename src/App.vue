@@ -50,6 +50,7 @@ const UrlTool = defineAsyncComponent(() => import("@/components/tools/UrlTool.vu
 const ExplainTool = defineAsyncComponent(() => import("@/components/tools/ExplainTool.vue"));
 const ShortcutTool = defineAsyncComponent(() => import("@/components/tools/ShortcutTool.vue"));
 const ChmodTool = defineAsyncComponent(() => import("@/components/tools/ChmodTool.vue"));
+const Base64Tool = defineAsyncComponent(() => import("@/components/tools/Base64Tool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
@@ -756,6 +757,7 @@ onBeforeUnmount(() => {
             <ExplainTool v-else-if="selectedTool.id === 'explain'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ChmodTool v-else-if="selectedTool.id === 'chmod'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <Base64Tool v-else-if="selectedTool.id === 'base64'" :key="`${selectedTool.id}:${preferences.locale}`" />
           </template>
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">

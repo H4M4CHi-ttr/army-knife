@@ -19,7 +19,7 @@ describe("private browser preferences", () => {
     expect(defaults.enabledTools).toEqual(
       tools.filter((tool) => !tool.devtoys).map((tool) => tool.id),
     );
-    for (const id of ["sets", "json-format", "contrast"])
+    for (const id of ["sets", "json-format", "contrast", "base64"])
       expect(defaults.enabledTools).not.toContain(id);
     expect(defaults.enabledTools).toContain("csv");
     expect(defaults.favorites).toEqual([]);
@@ -117,6 +117,7 @@ describe("private browser preferences", () => {
     expect(migrated.enabledTools).not.toContain("cidr");
     expect(migrated.enabledTools).not.toContain("json-format");
     expect(migrated.enabledTools).not.toContain("contrast");
+    expect(migrated.enabledTools).not.toContain("base64");
     expect(migrated.locale).toBe("ja");
     expect(migrated.theme).toBe("dark");
     expect(migrated.favorites).toEqual(["csv"]);

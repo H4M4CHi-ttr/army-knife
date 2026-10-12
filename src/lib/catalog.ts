@@ -12,7 +12,8 @@ export type ToolId =
   | "env"
   | "url"
   | "shortcuts"
-  | "explain";
+  | "explain"
+  | "base64";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -24,6 +25,14 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "base64",
+    category: "text",
+    wasm: false,
+    devtoys: true,
+    keywords: "base64 base64url rfc4648 encode decode utf-8 text encoding バイナリ 変換 エンコード デコード 编码 解码 編碼 解碼 인코딩 디코딩",
+    color: "purple",
+  },
   {
     id: "chmod",
     category: "data",
