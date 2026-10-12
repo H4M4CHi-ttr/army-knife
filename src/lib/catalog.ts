@@ -18,7 +18,12 @@ export type ToolId =
   | "url-encode"
   | "dummy-text"
   | "css-specificity"
-  | "fluid-type";
+  | "fluid-type"
+  | "timestamp"
+  | "jwt"
+  | "ids"
+  | "password"
+  | "og-tags";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -178,6 +183,46 @@ export const tools: readonly ToolDefinition[] = [
     devtoys: true,
     keywords: "color contrast wcag accessibility aa aaa 色 配色 コントラスト",
     color: "orange",
+  },
+  {
+    id: "timestamp",
+    category: "data",
+    wasm: false,
+    devtoys: true,
+    keywords: "date datetime ISO8601 RFC3339 unix timestamp epoch timezone UTC millis 秒 時間 日時 时区 時區 타임스탬프 시간",
+    color: "blue",
+  },
+  {
+    id: "jwt",
+    category: "network",
+    wasm: false,
+    devtoys: true,
+    keywords: "jwt json web token header payload claims exp nbf iat authentication 認証 解码 解碼 인증 토큰",
+    color: "rose",
+  },
+  {
+    id: "ids",
+    category: "data",
+    wasm: false,
+    devtoys: true,
+    keywords: "uuid v4 v7 ulid random identifier id generator UUID 生成 产生 產生 생성",
+    color: "purple",
+  },
+  {
+    id: "password",
+    category: "text",
+    wasm: false,
+    devtoys: true,
+    keywords: "password random token secure hex secret generate crypto パスワード 秘密 随机 密码 密碼 비밀번호",
+    color: "green",
+  },
+  {
+    id: "og-tags",
+    category: "network",
+    wasm: false,
+    devtoys: false,
+    keywords: "open graph twitter card metadata html meta og tags seo social share preview SNS OGP 分享 공유 メタタグ",
+    color: "blue",
   },
 ] as const;
 
