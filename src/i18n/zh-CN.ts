@@ -79,6 +79,7 @@ export const zhCN: Messages = {
   "largeInput.summary": "大文本共 {characters} 个字符，仅显示前 {preview} 个字符；分析仍使用全文。",
   "largeInput.replace": "替换文本",
   "largeInput.download": "下载原文",
+  "largeInput.outputPreview": "预览最多显示 1,000 个条目与 8,192 个字符。复制或下载可获取完整结果。",
   "largeInput.loading": "正在浏览器内读取或验证文本…",
   "labels.utf8": "仅支持 UTF-8 文本 · 最大 {size} MiB",
   "labels.bytes": "{count} 字节",

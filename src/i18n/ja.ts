@@ -80,6 +80,7 @@ export const ja: Messages = {
   "largeInput.summary": "大きな入力（{characters}文字）のため先頭{preview}文字だけを表示しています。解析には全文を使用します。",
   "largeInput.replace": "テキストを入れ替える",
   "largeInput.download": "元の全文を保存",
+  "largeInput.outputPreview": "表示は先頭1,000項目・8,192文字までです。コピー・ダウンロードには全件を含みます。",
   "largeInput.loading": "ブラウザ内で読み込み・サイズ確認中…",
   "labels.utf8": "UTF-8 テキスト専用・最大 {size} MiB",
   "labels.bytes": "{count} バイト",

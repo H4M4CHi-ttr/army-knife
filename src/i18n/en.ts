@@ -80,6 +80,7 @@ export const en = {
   "largeInput.summary": "Large input: {characters} characters. Only the first {preview} are shown; the full text is kept for analysis.",
   "largeInput.replace": "Replace text",
   "largeInput.download": "Download original",
+  "largeInput.outputPreview": "Showing at most 1,000 items and 8,192 characters. Copy or download includes all results.",
   "largeInput.loading": "Validating or reading text locally…",
   "labels.utf8": "UTF-8 text only · max {size} MiB",
   "labels.bytes": "{count} bytes",

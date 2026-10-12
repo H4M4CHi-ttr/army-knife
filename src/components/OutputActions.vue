@@ -4,7 +4,7 @@ import { useAppI18n } from "@/i18n/useAppI18n";
 import { Check, Copy, Download } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { copyText, downloadText } from "@/lib/io";
-const props = withDefaults(defineProps<{ text: string; filename?: string; type?: string }>(), {
+const props = withDefaults(defineProps<{ text: string | (() => string); filename?: string; type?: string }>(), {
   filename: "army-knife-result.txt",
 });
 const { t } = useAppI18n();
@@ -17,9 +17,12 @@ watch(
     error.value = false;
   },
 );
+function resolveText(): string {
+  return typeof props.text === "function" ? props.text() : props.text;
+}
 async function copy() {
   try {
-    await copyText(props.text);
+    await copyText(resolveText());
     copied.value = true;
     error.value = false;
   } catch {
@@ -34,7 +37,7 @@ async function copy() {
         t(copied ? "actions.copied" : "actions.copy")
       }}</Button
     >
-    <Button variant="outline" size="sm" @click="downloadText(text, filename, type)"
+    <Button variant="outline" size="sm" @click="downloadText(resolveText(), filename, type)"
       ><Download class="size-3.5" />{{ t("actions.download") }}</Button
     >
     <span v-if="error" role="status" class="hint error-text">{{

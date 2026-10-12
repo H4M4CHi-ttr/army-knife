@@ -80,6 +80,7 @@ export const zhTW: Messages = {
   "largeInput.summary": "大型文字共有 {characters} 個字元，僅顯示前 {preview} 個字元；分析仍使用全文。",
   "largeInput.replace": "取代文字",
   "largeInput.download": "下載原文",
+  "largeInput.outputPreview": "預覽最多顯示 1,000 個項目與 8,192 個字元。複製或下載可取得完整結果。",
   "largeInput.loading": "正在瀏覽器內讀取或驗證文字…",
   "labels.utf8": "僅支援 UTF-8 文字 · 最大 {size} MiB",
   "labels.bytes": "{count} 位元組",
