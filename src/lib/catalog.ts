@@ -18,7 +18,12 @@ export type ToolId =
   | "url-encode"
   | "dummy-text"
   | "css-specificity"
-  | "fluid-type";
+  | "fluid-type"
+  | "sri"
+  | "encoding"
+  | "magic"
+  | "user-agent"
+  | "set-cookie";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -30,6 +35,31 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "sri", category: "network", wasm: false, devtoys: true,
+    keywords: "sri subresource integrity sha256 sha384 sha512 cryptographic hash checksum script link リソース 改ざん 完全性 哈希 完整性 무결성",
+    color: "rose",
+  },
+  {
+    id: "encoding", category: "data", wasm: false, devtoys: true,
+    keywords: "file bom utf8 utf16le utf16be crlf lf cr newline line endings encoding 文字コード 改行 编码 字符集 인코딩",
+    color: "blue",
+  },
+  {
+    id: "magic", category: "data", wasm: false, devtoys: false,
+    keywords: "magic bytes signature file binary mime filetype png pdf gif jpg zip hex signature マジック バイト 署名 格式 시그니처",
+    color: "orange",
+  },
+  {
+    id: "user-agent", category: "network", wasm: false, devtoys: false,
+    keywords: "user agent browser os device client hints chrome firefox safari bot crawler ユーザーエージェント ブラウザ 浏览器 사용자인증",
+    color: "purple",
+  },
+  {
+    id: "set-cookie", category: "network", wasm: false, devtoys: false,
+    keywords: "set-cookie cookie samesite httponly secure partitioned prefix expires web http クッキー セキュリティ 属性 安全 쿠키",
+    color: "green",
+  },
   {
     id: "html-entities", category: "text", wasm: false, devtoys: true,
     keywords: "html entities escape unescape unicode markup エンティティ エスケープ デコード 转义 實體 이스케이프",
