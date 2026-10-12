@@ -97,8 +97,8 @@ describe("SRI and raw-byte handling (#128)", () => {
   it("uses exact raw bytes including empty input and different line endings", async () => {
     expect((await generateSri(new Uint8Array(), "SHA-256")).integrity)
       .toBe("sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=");
-    const first = await generateSri(ascii("a\nb"), "SHA-384", true);
-    const second = await generateSri(ascii("a\r\nb"), "SHA-384", true);
+    const first = await generateSri(ascii("a\nb"), "SHA-384", "stylesheet");
+    const second = await generateSri(ascii("a\r\nb"), "SHA-384", "stylesheet");
     expect(first.integrity).not.toBe(second.integrity);
     expect(first.html).toContain('rel="stylesheet"');
     expect(first.html).toContain(first.integrity);
@@ -107,6 +107,12 @@ describe("SRI and raw-byte handling (#128)", () => {
     expect(() => parseHexBytes("A")).toThrowError("INVALID_REQUEST");
     expect(() => parseHexBytes("xx")).toThrowError("INVALID_REQUEST");
     expect(() => parseHexBytes("00".repeat(FILE_INSPECTOR_LIMITS.hexCharacters))).toThrowError("INPUT_TOO_LARGE");
+    const unknown = await generateSri(ascii("some raw bytes"), "SHA-256");
+    expect(unknown.warnings).toContain("UNKNOWN_RESOURCE_KIND");
+    expect(unknown.html).toContain("<script ");
+    expect(unknown.html).toContain("<link ");
+    await expect(generateSri(new Uint8Array(FILE_INSPECTOR_LIMITS.fileBytes + 1), "SHA-256"))
+      .rejects.toThrowError("INPUT_TOO_LARGE");
   });
   it("enforces the binary size ceiling", () => {
     expect(() => inspectMagic(new Uint8Array(FILE_INSPECTOR_LIMITS.fileBytes + 1))).toThrowError("INPUT_TOO_LARGE");
