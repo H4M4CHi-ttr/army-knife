@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";
 import { describe, expect, it } from "vite-plus/test";
 import { tools } from "../catalog";
-import { searchTools } from "./index";
+import { searchLabel, searchTools } from "./index";
 import { searchIntents } from "./intents";
 import { messages } from "../../i18n";
 
@@ -18,12 +18,12 @@ const fixture = JSON.parse(
 ) as { items: Example[] };
 
 function originalSubstringSearch(query: string, language: Example["language"]): string[] {
-  const dict = messages[language] as Readonly<Record<string, string>>;
+  const dict = messages[language] as Readonly<Record<string, unknown>>;
   const parts = query.toLowerCase().trim().split(/\s+/);
   return tools.filter((tool) => {
     const text = [
-      dict["tool." + tool.id + ".name"] ?? "",
-      dict["tool." + tool.id + ".description"] ?? "",
+      searchLabel(dict, "tool." + tool.id + ".name") ?? "",
+      searchLabel(dict, "tool." + tool.id + ".description") ?? "",
       tool.keywords,
     ].join(" ").toLowerCase();
     return parts.every((word) => text.includes(word));
@@ -63,9 +63,9 @@ describe("frozen multilingual search comparison fixture", () => {
     for (const tool of tools) {
       corpus.push({ label: tool.id, language: "und", kind: "keywords", text: tool.keywords });
       for (const [language, intents] of Object.entries(searchIntents)) {
-        const dict = messages[language as keyof typeof messages] as Readonly<Record<string, string>>;
+        const dict = messages[language as keyof typeof messages] as Readonly<Record<string, unknown>>;
         for (const kind of ["name", "description"] as const) {
-          const text = dict["tool." + tool.id + "." + kind];
+          const text = searchLabel(dict, "tool." + tool.id + "." + kind);
           expect(text, language + "/" + tool.id + "/" + kind).toBeTruthy();
           corpus.push({ label: tool.id, language, kind, text: text! });
         }
