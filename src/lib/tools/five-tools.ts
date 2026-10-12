@@ -99,14 +99,14 @@ export interface JwtInspection {
   claimsTimes: { name: string; utc: string }[];
 }
 
-function decodeBase64Url(value: string): string {
+function decodeBase64Url(value: string, binaryOnly = false): string {
   if (!/^[A-Za-z0-9_-]+$/.test(value) || value.length % 4 === 1) invalid();
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
   let decoded: string;
   try {
     decoded = atob(normalized);
     if (btoa(decoded).replace(/=+$/, "") !== normalized) invalid();
-    return new TextDecoder("utf-8", { fatal: true })
+    return binaryOnly ? "" : new TextDecoder("utf-8", { fatal: true })
       .decode(Uint8Array.from(decoded, (character) => character.charCodeAt(0)));
   } catch { invalid(); }
 }
@@ -125,7 +125,7 @@ export function inspectJwt(input: string, nowSeconds = Date.now() / 1000): JwtIn
   const segments = input.trim().split(".");
   if (segments.length !== 3 || !segments[0] || !segments[1] ||
       (segments[2] && !/^[A-Za-z0-9_-]+$/.test(segments[2]))) invalid();
-  if (segments[2]) decodeBase64Url(segments[2]); // Reject noncanonical signature encoding.
+  if (segments[2]) decodeBase64Url(segments[2], true); // Signatures are binary, not UTF-8.
   const header = jsonObject(decodeBase64Url(segments[0]));
   const payload = jsonObject(decodeBase64Url(segments[1]));
   const times: JwtInspection["claimsTimes"] = [];
