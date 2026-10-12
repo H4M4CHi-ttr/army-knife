@@ -231,9 +231,9 @@ function sample() {
         <div v-for="row in [
           ['encoding', encoding.encoding], ['bom', encoding.bom],
           ['valid', encoding.valid ? t('inspector.yes') : t('inspector.no')],
-          ['crlf', encoding.crlf + " (" + eolRatio(encoding.crlf, encoding) + ")"],
-          ['lf', encoding.lf + " (" + eolRatio(encoding.lf, encoding) + ")"],
-          ['cr', encoding.cr + " (" + eolRatio(encoding.cr, encoding) + ")"]
+          ['crlf', encoding.crlf + ' (' + eolRatio(encoding.crlf, encoding) + ')'],
+          ['lf', encoding.lf + ' (' + eolRatio(encoding.lf, encoding) + ')'],
+          ['cr', encoding.cr + ' (' + eolRatio(encoding.cr, encoding) + ')']
         ]" :key="row[0]" class="metric">
           <span class="metric-label">{{ t("inspector." + row[0]) }}</span><strong class="metric-value">{{ row[1] }}</strong>
         </div>
