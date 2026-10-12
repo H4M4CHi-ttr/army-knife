@@ -47,6 +47,9 @@ describe("JWT inspector (#17)", () => {
     expect(result.notYetValid).toBe(false);
     expect(result.claimsTimes.map((x) => x.name)).toEqual(["iat", "nbf", "exp"]);
     expect(result.payload).toContain("demo");
+    // Real JWS signatures are arbitrary bytes and must not be interpreted as UTF-8.
+    const signed = inspectJwt(b64({ alg: "HS256" }) + "." + b64({ sub: "demo" }) + ".____");
+    expect(signed.signaturePresent).toBe(true);
   });
   it("rejects invalid JSON, corrupt base64url, non-object claims and oversized input", () => {
     expect(() => inspectJwt("a.b.c")).toThrow();
