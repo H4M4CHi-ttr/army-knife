@@ -5,7 +5,7 @@ import App from "../../App.vue";
 import { i18n } from "../../i18n";
 import { chmodMessages } from "../../i18n/chmod";
 import { defaultPreferences, settings, STORAGE_KEY } from "../../lib/preferences";
-import { toolPath } from "../../lib/routes";
+import { resolvePageRoute, toolPath } from "../../lib/routes";
 
 vi.mock("../../lib/fonts", () => ({
   setFontLocale: vi.fn(async (locale: string) => {
@@ -14,6 +14,25 @@ vi.mock("../../lib/fonts", () => ({
 }));
 
 let app: VueWrapper | undefined;
+
+function staticPageResponse(pathname: string): Response {
+  const route = resolvePageRoute(pathname, "/army-knife/");
+  if (route.kind === "unknown") return new Response("", { status: 404 });
+  const guide =
+    route.kind === "tool" ? 'data-tool="' + route.toolId + '"' : 'data-page="home"';
+  const html =
+    '<!doctype html><html lang="' +
+    route.locale +
+    '"><head><title>Static test guide</title><meta name="description" content="Static description" />' +
+    '<link rel="canonical" href="https://h4m4chi-ttr.github.io' +
+    pathname +
+    '" /></head><body><article id="page-guide" data-locale="' +
+    route.locale +
+    '" ' +
+    guide +
+    '><h1>Static test guide</h1></article></body></html>';
+  return new Response(html, { headers: { "content-type": "text/html" } });
+}
 
 beforeEach(() => {
   vi.stubEnv("BASE_URL", "/army-knife/");
@@ -24,6 +43,13 @@ beforeEach(() => {
   i18n.global.locale.value = "en";
   localStorage.clear();
   sessionStorage.clear();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: string | URL) => {
+      const pathname = new URL(input.toString(), window.location.origin).pathname;
+      return staticPageResponse(pathname);
+    }),
+  );
 });
 
 afterEach(async () => {
@@ -31,6 +57,7 @@ afterEach(async () => {
   app = undefined;
   await flushPromises();
   document.body.replaceChildren();
+  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
 
