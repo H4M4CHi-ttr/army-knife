@@ -7,12 +7,12 @@ import OutputActions from "@/components/OutputActions.vue";
 import { useToolExecution } from "@/composables/useToolExecution";
 import { ToolError } from "@/lib/tools/errors";
 import {
-  generateIdentifiers, generateSecrets, generateOgTags, inspectIdentifier, inspectJwt,
+  generateIdentifiers, generateSecrets, inspectIdentifier, inspectJwt,
   inspectTimestamp, type DateInputKind, type IdFormat, type JwtInspection,
-  type OgFields, type SecretGeneration, type TimestampInfo,
+  type SecretGeneration, type TimestampInfo,
 } from "@/lib/tools/five-tools";
 
-const props = defineProps<{ id: "timestamp" | "jwt" | "ids" | "password" | "og-tags" }>();
+const props = defineProps<{ id: "timestamp" | "jwt" | "ids" | "password" }>();
 const { t } = useAppI18n();
 
 const dateValue = ref("");
@@ -84,22 +84,6 @@ function errorCode(error: unknown): string {
   return error instanceof ToolError ? error.code : "INTERNAL_ERROR";
 }
 
-const ogTitle = ref("");
-const ogDescription = ref("");
-const ogUrl = ref("");
-const ogImage = ref("");
-const ogLocale = ref("ja_JP");
-const ogType = ref<OgFields["type"]>("website");
-const ogFields = computed<OgFields>(() => ({
-  title: ogTitle.value, description: ogDescription.value, url: ogUrl.value,
-  image: ogImage.value, locale: ogLocale.value, type: ogType.value,
-}));
-const { result: ogResult, error: ogError } = useToolExecution<ReturnType<typeof generateOgTags>>({
-  source: ogFields,
-  canRun: () => props.id === "og-tags" && Boolean(ogTitle.value || ogUrl.value),
-  mode: "instant",
-  execute: () => generateOgTags(ogFields.value),
-});
 </script>
 
 <template>
@@ -229,32 +213,7 @@ const { result: ogResult, error: ogError } = useToolExecution<ReturnType<typeof 
       </section>
     </template>
 
-    <template v-else-if="id === 'og-tags'">
-      <div class="five-grid">
-        <label class="five-field"><span class="field-label">{{ t("five.title") }} *</span>
-          <Input v-model="ogTitle" maxlength="200" data-testid="og-title" /></label>
-        <label class="five-field"><span class="field-label">URL *</span>
-          <Input v-model="ogUrl" maxlength="2048" data-testid="og-url" type="url" placeholder="https://example.com/post" /></label>
-        <label class="five-field"><span class="field-label">{{ t("five.imageUrl") }}</span>
-          <Input v-model="ogImage" maxlength="2048" placeholder="https://example.com/image.png" /></label>
-        <label class="five-field"><span class="field-label">{{ t("five.locale") }}</span>
-          <Input v-model="ogLocale" maxlength="40" placeholder="ja_JP" /></label>
-        <label class="five-field"><span class="field-label">{{ t("five.type") }}</span>
-          <select v-model="ogType" class="native-select"><option value="website">website</option><option value="article">article</option></select></label>
-      </div>
-      <label class="five-field"><span class="field-label">{{ t("five.description") }}</span>
-        <textarea v-model="ogDescription" maxlength="1000" class="five-textarea" rows="3" /></label>
-      <p class="hint">{{ t("tool.og-tags.hint") }}</p>
-      <p v-if="ogError" class="error-panel" role="alert">{{ t("errors." + ogError) }}</p>
-      <section v-if="ogResult" class="result-panel" aria-live="polite">
-        <div class="result-header"><h2>{{ t("labels.result") }}</h2>
-          <OutputActions :text="ogResult.html" filename="metadata.html" type="text/html" /></div>
-        <div class="five-preview"><span>{{ ogResult.host }}</span>
-          <strong>{{ ogTitle }}</strong><p>{{ ogDescription }}</p>
-          <small>{{ t("five.previewNoFetch") }}</small></div>
-        <pre class="five-code" data-testid="og-result">{{ ogResult.html }}</pre>
-      </section>
-    </template>
+
   </div>
 </template>
 
