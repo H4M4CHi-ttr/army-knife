@@ -649,8 +649,13 @@ test("large paste stays out of the live editor and the full text reaches local W
     document.body.append(raw);
     const before = performance.now();
     raw.value = content;
+    const nativeSet5MiBMs = performance.now() - before;
+    // A 5 MiB, soft-wrapped single line can itself freeze the test runner
+    // while computing scrollHeight. Probe native layout at a bounded size.
+    raw.value = "x".repeat(128 * 1024);
+    const layoutStart = performance.now();
     void raw.scrollHeight;
-    const nativeMs = performance.now() - before;
+    const nativeLayout128KiBMs = performance.now() - layoutStart;
     raw.remove();
     const data = new DataTransfer();
     data.setData("text/plain", content);
@@ -661,7 +666,8 @@ test("large paste stays out of the live editor and the full text reaches local W
     field.dispatchEvent(event);
     return {
       characters: content.length,
-      nativeTextareaSetAndLayoutMs: nativeMs,
+      nativeSet5MiBMs,
+      nativeLayout128KiBMs,
       interceptedPasteDispatchMs: performance.now() - started,
       preventedDomInsertion: event.defaultPrevented,
     };
