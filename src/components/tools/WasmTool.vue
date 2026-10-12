@@ -48,13 +48,41 @@ const modes: SetOperation[] = [
   "symmetricDifference",
 ];
 const levels = ["trace", "debug", "info", "warn", "error", "fatal", "other"] as const;
-const output = computed(() =>
-  !result.value
+/** Full exports are assembled only when the user clicks Copy or Download. */
+function outputText(): string {
+  const value = result.value;
+  return !value
     ? ""
-    : result.value.operation === "sets"
-      ? result.value.items.join("\n")
-      : JSON.stringify(result.value, null, 2),
-);
+    : value.operation === "sets"
+      ? value.items.join("\n")
+      : JSON.stringify(value, null, 2);
+}
+
+/** Never put an arbitrarily long result line into the DOM. */
+const setPreview = computed(() => {
+  const value = result.value;
+  if (!value || value.operation !== "sets") return { text: "", truncated: false };
+  const limit = 8_192;
+  let text = "";
+  let count = 0;
+  let truncated = false;
+  for (const item of value.items) {
+    if (count >= 1_000) {
+      truncated = true;
+      break;
+    }
+    const prefix = count ? "\n" : "";
+    const available = limit - text.length - prefix.length;
+    if (item.length > available) {
+      text += prefix + item.slice(0, Math.max(0, available)) + "…";
+      truncated = true;
+      break;
+    }
+    text += prefix + item;
+    count++;
+  }
+  return { text, truncated };
+});
 const filename = computed(() => `army-knife-${props.id}.${props.id === "sets" ? "txt" : "json"}`);
 
 function sample() {
@@ -200,7 +228,7 @@ function request(): Exclude<EngineRequest, { operation: "har" }> {
     <div class="result-header">
       <h2><span class="step-number">02</span>{{ t("labels.result") }}</h2>
       <OutputActions
-        :text="output"
+        :text="outputText"
         :filename="filename"
         :type="id === 'sets' ? undefined : 'application/json'"
       />
@@ -338,9 +366,9 @@ function request(): Exclude<EngineRequest, { operation: "har" }> {
         </div>
       </div>
       <pre class="code-output">{{
-        result.items.slice(0, 1000).join("\n") || t("states.noMatches")
+        setPreview.text || t("states.noMatches")
       }}</pre>
-      <p v-if="result.items.length > 1000" class="hint panel-note">{{ t("sets.previewHint") }}</p>
+      <p v-if="setPreview.truncated" class="hint panel-note">{{ t("largeInput.outputPreview") }}</p>
     </template>
   </section>
   <EmptyResult v-else-if="!busy" />
