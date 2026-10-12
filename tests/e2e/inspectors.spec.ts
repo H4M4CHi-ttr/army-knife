@@ -25,6 +25,7 @@ test("SRI uses exact file bytes and raw hex in local worker", async ({ page }) =
   await page.locator("#sri-hex").fill("00 FF 0A");
   await expect(page.getByTestId("selected-file")).toContainText("No file selected");
   await expect(page.getByTestId("sri-integrity")).toContainText("sha256-");
+  await expect(page.locator(".inspector-warnings")).toContainText("unknown");
   await expect(page.locator(".code-output")).toContainText([
     "sha256-", "/assets/app.js",
   ]);
