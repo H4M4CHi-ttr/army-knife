@@ -42,12 +42,13 @@ describe("Set-Cookie static report (#54)", () => {
     expect(report.cookies[1]?.warnings).toContain("HOST_PREFIX");
     expect(report.cookies[1]?.warnings).toContain("DUPLICATE_ATTRIBUTE");
     expect(report.cookies[2]?.warnings).toEqual(expect.arrayContaining([
-      "PARTITIONED_NEEDS_SECURE", "INVALID_MAX_AGE", "INVALID_EXPIRES",
+      "PARTITIONED_NEEDS_SECURE", "INVALID_MAX_AGE", "INVALID_EXPIRES", "MISSING_HTTPONLY", "MISSING_SAMESITE",
     ]));
   });
   it("does not split on Expires commas or invent cookies from invalid lines", () => {
     expect(inspectSetCookie("a=b; Expires=Mon, 02 Jun 2025 14:20:00 GMT").cookies).toHaveLength(1);
     expect(inspectSetCookie("not a cookie\nSet-Cookie: ok=value").skipped).toBe(1);
+    expect(inspectSetCookie("Set-Cookie: one=x, two=y").cookies[0]?.warnings).toContain("JOINED_HEADERS_POSSIBLE");
     expect(() => inspectSetCookie("x=y\n".repeat(TEXT_INSPECTOR_LIMITS.cookieLines + 1))).toThrowError("TOO_MANY_ROWS");
   });
 });
