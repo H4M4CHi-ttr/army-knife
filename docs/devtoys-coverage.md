@@ -4,6 +4,11 @@ This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool l
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
 | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SRI integrity generator                  | Off     | Hashing overlaps with bundled hash generators; SRI-specific HTML is additional, but conservatively requires opt-in. No third-party dependency. |
+| BOM & line-ending inspector              | Off     | Text encoding and conversion overlap some bundled tools, so conservative opt-in is used. |
+| Magic bytes inspector                    | On      | Local fixed binary signatures with extension comparison, not a generic bundled DevToys format converter. |
+| User-Agent inspector                     | On      | Passive browser/OS/client-hints heuristic analysis, distinct from bundled URL tools. |
+| Set-Cookie attribute inspector           | On      | Static attribute/prefix/SameSite validation, distinct from bundled URL tools. |
 | Base64 UTF-8 text converter            | Off     | Standard and URL-safe RFC 4648 text conversion overlaps with the official bundled Base64 encoder/decoder; explicitly opt in from Settings. No third-party package is added.                         |
 | Linux permission calculator            | On      | Inspects chmod rwx/special mode bits, scoped symbolic changes, and separate umask creation examples. No corresponding bundled permission calculator appears in the reviewed official list.              |
 | Shortcut investigator                  | On      | Looks up documented default shortcut assignments across applications and Web apps. No corresponding bundled shortcut dictionary appears in the reviewed official tool list.                             |
@@ -29,6 +34,17 @@ Tool visibility preferences belong in browser settings. Tool input contents must
 The reviewed upstream [UrlEncoderDecoderGuiTool.cs](https://github.com/DevToys-app/DevToys.Tools/blob/main/src/DevToys.Tools/Tools/EncodersDecoders/Url/UrlEncoderDecoderGuiTool.cs) exposes an encode/decode switch, an optional multiline switch, a text input, and a converted text output. Its conversion path calls `UrlHelper.EncodeOrDecode`; it does not expose a parsed component view or an ordered query-entry editor.
 
 Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-related fields, path, and fragment, and edits an ordered sequence of query keys and values. Repeated keys remain separate entries, and a bare flag is distinguished from an explicit empty value. Query decoding and encoding are necessary parts of that editing operation. The app does not expose a standalone text URL encoder/decoder mode. A future standalone mode would be an overlapping feature and must be off by default. This classification is specific to the reviewed bundled implementation and should be revisited when upstream adds relevant capabilities.
+
+## Five new local inspector tools
+
+SRI and BOM inspection default off conservatively under the overlap policy; the other three default on. No additional runtime package or CDN is required.
+
+- SRI: exact binary bytes, SHA-256/384/512 Web Crypto digests, Base64 integrity strings, HTML examples with placeholder local paths. Files up to **8 MiB**, hex input up to **64 Ki characters**. Does not fetch URLs or authenticate origins; does not modify the selected file.
+- BOM: strict UTF-8/UTF-16LE/BE byte analysis, BOM and CRLF/LF/CR; supports deliberately requested BOM-free UTF-8 + chosen newline download only after valid strict decode. BOM-less UTF-16 inference is heuristic and clearly marked. Not an arbitrary charset detector. Files up to **8 MiB**.
+- Magic Bytes: file signatures and last 128 bytes for ZIP trailer hints; the full file is never parsed. Multiple formats and extension mismatch may be flagged. No trust/malware guarantee, filename MIME data is not authoritative. Files up to **8 MiB**.
+- User-Agent: text **8 KiB**, known-token classification only. Spoofed/frozen UA and missing Client Hints mean results are guesses, not a compatibility or security guarantee.
+- Set-Cookie: text **64 KiB** and **64 physical non-empty header lines**, each a separate header, with semicolon-delimited attrs. Expires commas remain intact. Inspect flags, SameSite, Partitioned and name prefixes. Does not accept comma-concatenated Set-Cookie headers as separate values, and does not perform HTTP requests. Cookie values do not reach results or exports.
+- Binary tasks run in dedicated, cancellable Workers with a 15-second watchdog and in-memory output only. File reads have a size guard before allocation. Input data is never persisted, sent, or embedded in links. No new package licensing obligations.
 
 ## Calculation semantics and limits
 
