@@ -1,6 +1,6 @@
 import type { Locale } from "./locales";
 import type { ToolGuide } from "./tool-guides";
-import { inspectorMessages } from "../i18n/inspectors";
+import { inspectorMessages } from "../i18n/inspectors.ts";
 
 type InspectorId = "sri" | "encoding" | "magic" | "user-agent" | "set-cookie";
 const examples: Record<InspectorId, string> = {
