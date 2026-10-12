@@ -170,7 +170,7 @@ const { result: ogResult, error: ogError } = useToolExecution<ReturnType<typeof 
           </select>
         </label>
         <label class="five-field"><span class="field-label">{{ t("labels.count") }} (1–100)</span>
-          <Input v-model.number="idCount" type="number" min="1" max="100" step="1" data-testid="id-count" />
+          <input v-model.number="idCount" class="native-select" type="number" min="1" max="100" step="1" data-testid="id-count" />
         </label>
       </div>
       <Button data-testid="id-generate" @click="runIds">{{ t("five.generate") }}</Button>
@@ -200,10 +200,10 @@ const { result: ogResult, error: ogError } = useToolExecution<ReturnType<typeof 
           </select>
         </label>
         <label class="five-field"><span class="field-label">{{ t("five.length") }} (8–128)</span>
-          <Input v-model.number="secretLength" type="number" min="8" max="128" step="1" data-testid="secret-length" />
+          <input v-model.number="secretLength" class="native-select" type="number" min="8" max="128" step="1" data-testid="secret-length" />
         </label>
         <label class="five-field"><span class="field-label">{{ t("labels.count") }} (1–20)</span>
-          <Input v-model.number="secretCount" type="number" min="1" max="20" step="1" data-testid="secret-count" />
+          <input v-model.number="secretCount" class="native-select" type="number" min="1" max="20" step="1" data-testid="secret-count" />
         </label>
       </div>
       <div v-if="secretMode === 'password'" class="five-field">
