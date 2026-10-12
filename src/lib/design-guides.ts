@@ -27,5 +27,5 @@ export const designGuides=Object.fromEntries(Object.entries(examples).map(([id,e
       exampleResult:example.result,
       limitations:[designToolMessages[locale]["tool."+id+".hint" as keyof typeof designToolMessages[typeof locale]]],
     },
-  ])) as Record<Locale,ToolGuide>,
+  ])) as unknown as Record<Locale,ToolGuide>,
 ])) as Record<Id,Record<Locale,ToolGuide>>;
