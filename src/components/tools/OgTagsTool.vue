@@ -30,9 +30,9 @@ const { result, error } = useToolExecution<ReturnType<typeof generateOgTags>>({
       <label class="og-field"><span class="field-label">{{ t("five.title") }} *</span>
         <Input v-model="title" maxlength="200" data-testid="og-title" /></label>
       <label class="og-field"><span class="field-label">URL *</span>
-        <Input v-model="url" maxlength="2048" data-testid="og-url" type="url" placeholder="https://example.com/post" /></label>
+        <input v-model="url" class="native-select" maxlength="2048" data-testid="og-url" type="text" spellcheck="false" autocomplete="off" /></label>
       <label class="og-field"><span class="field-label">{{ t("five.imageUrl") }}</span>
-        <Input v-model="image" maxlength="2048" placeholder="https://example.com/image.png" /></label>
+        <Input v-model="image" maxlength="2048" placeholder="HTTPS image URL" /></label>
       <label class="og-field"><span class="field-label">{{ t("five.locale") }}</span>
         <Input v-model="locale" maxlength="40" placeholder="ja_JP" /></label>
       <label class="og-field"><span class="field-label">{{ t("five.type") }}</span>
