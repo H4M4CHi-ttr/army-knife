@@ -7,6 +7,7 @@ import OutputActions from "@/components/OutputActions.vue";
 import EmptyResult from "@/components/EmptyResult.vue";
 import ApplyControl from "@/components/ApplyControl.vue";
 import { useToolExecution } from "@/composables/useToolExecution";
+import { runInspectorWorker } from "@/lib/tools/inspector-worker";
 import {
   analyzeText, transformLiteral, TEXT_ADVANCED_LIMITS,
   type CaseStyle, type LiteralFormat, type LiteralDirection,
@@ -39,7 +40,17 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<Resu
   source,
   canRun: () => props.kind === "text-stats" || input.value.length > 0,
   mode: () => input.value.length <= TEXT_ADVANCED_LIMITS.deferredChars ? "instant" : "deferred",
-  execute: () => {
+  execute: (signal) => {
+    if (input.value.length > TEXT_ADVANCED_LIMITS.deferredChars) {
+      switch (props.kind) {
+        case "text-stats":
+          return runInspectorWorker({ kind: props.kind, input: input.value, locale: locale.value, style: caseStyle.value }, signal);
+        case "string-literals":
+          return runInspectorWorker({ kind: props.kind, input: input.value, format: literalFormat.value, direction: literalDirection.value }, signal);
+        case "git-conflicts":
+          return runInspectorWorker({ kind: props.kind, input: input.value }, signal);
+      }
+    }
     switch (props.kind) {
       case "text-stats":
         return { kind: props.kind, data: analyzeText(input.value, locale.value, caseStyle.value) };
@@ -81,7 +92,7 @@ function example() {
         literalFormat.value === "sql" ? "'It''s safe'" :
         literalFormat.value === "xml" ? "&lt;Hello&gt;" :
         literalFormat.value === "csv" ? '"Hello, world"' :
-        '"Hello\nworld"';
+        '"Hello\\nworld"';
       break;
     }
     case "http-reference": input.value = referenceKind.value === "status" ? "404" : "application/json; charset=utf-8"; break;

@@ -129,6 +129,7 @@ interface ActiveConflict {
   phase: Phase;
   ours: string[];
   base: string[];
+  hasBase: boolean;
   theirs: string[];
   invalid: boolean;
 }
@@ -150,14 +151,14 @@ export function inspectConflicts(input: string) {
     const number = i + 1;
     if (begin.test(line)) {
       if (active) { active.invalid = true; diagnostics.push({ line: number, code: "nested" }); }
-      else active = { start: number, label: line.slice(7).trim(), phase: "ours", ours: [], base: [], theirs: [], invalid: false };
+      else active = { start: number, label: line.slice(7).trim(), phase: "ours", ours: [], base: [], hasBase: false, theirs: [], invalid: false };
       continue;
     }
     if (ancestor.test(line)) {
       if (!active || active.phase !== "ours") {
         diagnostics.push({ line: number, code: active ? "order" : "stray" });
         if (active) active.invalid = true;
-      } else active.phase = "base";
+      } else { active.phase = "base"; active.hasBase = true; }
       continue;
     }
     if (divider.test(line)) {
@@ -176,7 +177,7 @@ export function inspectConflicts(input: string) {
         conflicts.push({
           start: active.start, end: number, label: active.label,
           ours: active.ours.join("\n"),
-          base: active.base.length ? active.base.join("\n") : null,
+          base: active.hasBase ? active.base.join("\n") : null,
           theirs: active.theirs.join("\n"),
           before: lines.slice(Math.max(0, active.start - 3), active.start - 1).join("\n"),
           after: lines.slice(i + 1, i + 3).join("\n"),

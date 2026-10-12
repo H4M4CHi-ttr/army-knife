@@ -65,7 +65,8 @@ test("inspector inputs stay in memory and are not sent", async ({page}) => {
   page.on("request", req => requests.push({url:req.url(),method:req.method(),body:req.postData()}));
   await enable(page, "git-conflicts", "en");
   const secret = "NEVER_PERSIST_INSPECTOR_2026_";
-  await page.locator("#git-conflicts-input").fill("<<<<<<< HEAD\n"+secret+"\n=======\nother\n>>>>>>> b");
+  await page.locator("#git-conflicts-input").fill("<<<<<<< HEAD\n"+secret.repeat(300)+"\n=======\nother\n>>>>>>> b");
+  await page.getByTestId("apply-now").click();
   await expect(page.getByTestId("git-conflicts-output")).toContainText(secret);
   const persisted = await page.evaluate(() => ({
     local: {...localStorage}, session: {...sessionStorage}, url: location.href,
