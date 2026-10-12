@@ -4,6 +4,7 @@ This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool l
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
 | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base64 UTF-8 text converter            | Off     | Standard and URL-safe RFC 4648 text conversion overlaps with the official bundled Base64 encoder/decoder; explicitly opt in from Settings. No third-party package is added.                         |
 | Linux permission calculator            | On      | Inspects chmod rwx/special mode bits, scoped symbolic changes, and separate umask creation examples. No corresponding bundled permission calculator appears in the reviewed official list.              |
 | Shortcut investigator                  | On      | Looks up documented default shortcut assignments across applications and Web apps. No corresponding bundled shortcut dictionary appears in the reviewed official tool list.                             |
 | HAR inspector                          | On      | Summarizes a recorded HTTP archive: request durations, status codes, response sizes, hosts, and media types. No corresponding bundled HAR analyzer appears in the reviewed official list.               |
@@ -30,6 +31,13 @@ The reviewed upstream [UrlEncoderDecoderGuiTool.cs](https://github.com/DevToys-a
 Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-related fields, path, and fragment, and edits an ordered sequence of query keys and values. Repeated keys remain separate entries, and a bare flag is distinguished from an explicit empty value. Query decoding and encoding are necessary parts of that editing operation. The app does not expose a standalone text URL encoder/decoder mode. A future standalone mode would be an overlapping feature and must be off by default. This classification is specific to the reviewed bundled implementation and should be revisited when upstream adds relevant capabilities.
 
 ## Calculation semantics and limits
+
+### Base64 text conversion
+
+- Local UTF-8 text ↔ RFC 4648 Base64, with explicit standard (padded) and URL-safe (unpadded) alphabets. Decoding permits both canonical padded and unpadded encodings, rejects whitespace, mixed alphabets, nonzero unused bits, and invalid UTF-8. Arbitrary binary files are not supported.
+- Input is bounded to **256 KiB**. UTF-8 byte count (encode) and ASCII character count (decode) are validated without truncation. Unpaired UTF-16 surrogates are rejected to prevent silent replacement; decoding preserves a UTF-8 BOM.
+- Inputs of up to **8,192 UTF-16 code units** are computed synchronously. Larger inputs use the common 800ms/manual execution controller and a dedicated cancellable same-origin Worker, with a 5-second timeout. Input/results remain in memory and are not logged, persisted, or transmitted.
+- DevToys bundles Base64 encoding/decoding, so the tool is **off by default** on fresh installations and remains off for existing users until explicitly enabled. No extra dependency or downloaded model is introduced.
 
 ### Linux permissions
 

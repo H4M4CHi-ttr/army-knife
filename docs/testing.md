@@ -44,6 +44,8 @@ The App integration tests use `@vue/test-utils` and happy-dom to mount the actua
 
 ## Browser coverage
 
+Base64 text conversion includes RFC 4648, Unicode, BOM, invalid UTF-8, alphabet/padding and size-limit unit tests. `tests/e2e/base64.spec.ts` covers fresh-install opt-in, standard and URL-safe conversions in all five locales across Chromium/Firefox desktop/small, noncanonical/error handling, Worker execution, output download and privacy checks.
+
 The Linux permission calculator adds exhaustive 12-bit mode tests and bounded
 symbolic/umask vectors. Its real-App tests exercise synchronous matrix/input
 updates, special bits, preview errors and disposal. `tests/e2e/chmod.spec.ts`
