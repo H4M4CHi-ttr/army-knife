@@ -30,12 +30,26 @@ const INITIAL_TOOLS = [
 
 export function detectLocale(languages: readonly string[] = []): Locale {
   for (const language of languages) {
-    const tag = language.toLowerCase();
-    if (tag.startsWith("ja")) return "ja";
-    if (tag.startsWith("ko")) return "ko";
-    if (/^zh-(tw|hk|mo|hant)/.test(tag)) return "zh-TW";
-    if (tag.startsWith("zh")) return "zh-CN";
-    if (tag.startsWith("en")) return "en";
+    let parsed: Intl.Locale;
+    try {
+      parsed = new Intl.Locale(language);
+    } catch {
+      continue;
+    }
+    const tag = parsed.baseName.toLowerCase();
+    const exact = LOCALES.find((locale) => locale.toLowerCase() === tag);
+    if (exact) return exact;
+    const primary = parsed.language;
+    if (primary === "zh") {
+      // An explicit script takes precedence over region (for example zh-Hans-HK).
+      if (parsed.script === "Hant") return "zh-TW";
+      if (parsed.script === "Hans") return "zh-CN";
+      return ["TW", "HK", "MO"].includes(parsed.region ?? "") ? "zh-TW" : "zh-CN";
+    }
+    // Brazilian Portuguese is the current Portuguese translation, including bare pt.
+    if (primary === "pt") return "pt-BR";
+    const generic = LOCALES.find((locale) => locale === primary);
+    if (generic) return generic;
   }
   return "en";
 }

@@ -14,12 +14,18 @@ input. Runtime asset URLs are fixed paths and do not contain input text.
 | `zh-CN` | Noto Sans SC Variable | Army Knife Mono SC | Sarasa Mono SC Regular |
 | `zh-TW` | Noto Sans TC Variable | Army Knife Mono TC | Sarasa Mono TC Regular |
 | `ko` | Noto Sans KR Variable | Army Knife Mono K | Sarasa Mono K Regular |
+| `es`, `fr`, `de`, `pt-BR`, `id`, `vi` | Noto Sans Variable | Army Knife Mono J | Sarasa Mono J Regular |
 
-English reuses the Japanese Sarasa family's Latin subset. It does not download
+English and the Spanish, French, German, Brazilian Portuguese, Indonesian and Vietnamese UI locales reuse the Japanese Sarasa family's Latin subset. They do not download
 all Japanese glyphs: CSS `unicode-range` causes the browser to request only the
 files necessary for displayed text. Selecting a locale selects its regional
 CJK glyph forms. The Sarasa build preserves the source font's entire character
 inventory, so pasted text is not limited to the current UI translation.
+
+The six added UI locales share `/fonts/en.css`; switching between them reuses the
+same stylesheet and downloaded WOFF2 resources. The existing Noto Sans package
+includes Latin, Latin Extended and Vietnamese subsets, including Vietnamese tone
+marks. `src/lib/locales.ts` owns this mapping independently of the public URL.
 
 `src/lib/fonts.ts` exports `setFontLocale(locale)`. Call it when initializing or
 changing the application's locale, and handle its rejected promise if local

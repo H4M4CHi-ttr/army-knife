@@ -2,7 +2,7 @@
 
 DevToys を補完する、ブラウザ内で動く開発者向けツール集です。入力したテキストやファイルをサーバーに送信せず、GitHub Pages の静的ファイルだけで処理します。
 
-**Vite+ / Vue 3.6 RC・Vapor Mode / shadcn-vue / Rust → WebAssembly** を使用。ライト・ダーク・システムテーマと、日本語・English・简体中文・繁體中文・한국어に対応しています。
+**Vite+ / Vue 3.6 RC・Vapor Mode / shadcn-vue / Rust → WebAssembly** を使用。ライト・ダーク・システムテーマと、日本語・English・简体中文・繁體中文・한국어・Español・Français・Deutsch・Português (Brasil)・Bahasa Indonesia・Tiếng Việt の11言語に対応しています。
 
 公開先は [H4M4CHi-ttr.github.io/army-knife/](https://h4m4chi-ttr.github.io/army-knife/) です。自分のリポジトリで公開する場合は [Pages の設定](#github-pages-への公開) を行ってください。
 
@@ -45,7 +45,7 @@ Base64 テキスト変換は RFC 4648 の標準 Base64（パディングあり�
 
 ### デザイン・ファイル名ツール（Issues #100, #101, #105, #129, #130）
 
-5ツールともVapor画面、5言語の説明ページ、純粋TypeScript、同一オリジンの既存依存のみで動きます。DevToysとの重複が未確定なため初期設定は保守的にオフ（設定で有効化）。
+5ツールともVapor画面、11言語の説明ページ、純粋TypeScript、同一オリジンの既存依存のみで動きます。DevToysとの重複が未確定なため初期設定は保守的にオフ（設定で有効化）。
 
 - **cubic-bezier**: CSSのx制御点は0〜1、y制御点は−5〜5、50〜20000ms。x(t)を42回の二分法で逆算し41点をプロットする近似です。CSS式は小数6桁。アニメーションはprefers-reduced-motionで無効化。
 - **グラデーション**: linear/radial、2〜8個の6/8桁HEX色と0〜100%の停止点。順序と同位置の停止点を保持。補間の見た目はブラウザーに依存します。
@@ -63,7 +63,7 @@ Base64 テキスト変換は RFC 4648 の標準 Base64（パディングあり�
 - **CSSセレクター詳細度**: CSS Selectors Level 4の**明示した限定サブセット**を解析。ID・クラス・属性・要素・疑似クラス・疑似要素、`:is()`/`:not()`/`:has()`の最大引数、`:where()`のゼロ、`:nth-child(... of ...)`などを扱います。文字4096、セレクター32件、ネスト8階層、トークン256件まで。未対応の関数や親セレクター文脈のない`&`ネストは推定せずエラーにします。
 - **fluid typography**: 最小/最大フォントサイズ 0.5〜256px、画面幅240〜10000px、ルート基準8〜32pxを指定し、線形補間から`clamp(..., calc(...vw + ...rem), ...)`を生成。CSS係数を小数6桁に丸めるため、極小の誤差があります。remの実表示はサイト側のルートフォントに依存します。
 
-文字列エンコードは入力最大64KiB、結果最大512Ki UTF-16コード単位で、長い入力だけ自動800ms遅延適用・手動適用に切り替わります。入力と出力はメモリだけで保持し、通信、保存、HTML実行をしません。すべてVapor Modeのツール画面・5言語辞書・各言語固有の説明ページから利用できます。
+文字列エンコードは入力最大64KiB、結果最大512Ki UTF-16コード単位で、長い入力だけ自動800ms遅延適用・手動適用に切り替わります。入力と出力はメモリだけで保持し、通信、保存、HTML実行をしません。すべてVapor Modeのツール画面・11言語辞書・各言語固有の説明ページから利用できます。
 
 DevToys と重なる機能は **設定から明示的に有効にするまで表示・起動されません**。以前の DevToys に含まれていたコントラスト機能も保守的にオフにしています。比較対象と判断根拠は [DevToys overlap policy](docs/devtoys-coverage.md) に記載しています。
 
@@ -138,8 +138,12 @@ VueUse 15 の `useDebounceFn` と `useIntervalFn` を [共通実行処理](src/c
 | 简体中文 | Noto Sans SC Variable | Army Knife Mono SC     |
 | 繁體中文 | Noto Sans TC Variable | Army Knife Mono TC     |
 | 한국어   | Noto Sans KR Variable | Army Knife Mono K      |
+| Español / Français / Deutsch | Noto Sans Variable | Army Knife Mono J |
+| Português (Brasil) / Bahasa Indonesia / Tiếng Việt | Noto Sans Variable | Army Knife Mono J |
 
-コードフォントは Sarasa Mono の地域別書体をもとに、**Army Knife Mono** という別の内部名へ変更した WOFF2 サブセットです。英語は J のラテン文字部分を共有します。元の文字範囲を保つよう分割し、CSS の `unicode-range` で必要なファイルを配信します。各言語向けのシステムフォントと汎用フォントもフォールバックに指定しています。
+コードフォントは Sarasa Mono の地域別書体をもとに、**Army Knife Mono** という別の内部名へ変更した WOFF2 サブセットです。英語と追加6言語は既存の Noto Sans と J のコードフォントを共有します。ベトナム語の声調記号も既存の配信ファイルに含まれます。元の文字範囲を保つよう分割し、CSS の `unicode-range` で必要なファイルを配信します。各言語向けのシステムフォントと汎用フォントもフォールバックに指定しています。
+
+言語は設定画面で選択でき、ツールの説明・操作画面・検索対象・言語別URLに反映されます。追加6言語の検索ではアクセント記号の省略も扱います。ブラウザーの `es-MX`、`fr-CA` などの地域付きタグに対応し、`pt` / `pt-PT` は現在のポルトガル語訳である `pt-BR` に対応付けます。翻訳追加の手順と、ダミーテキストなどUI以外のデータ言語の範囲は [翻訳構成](docs/i18n.md) を参照してください。
 
 フォントはアプリの MIT ライセンスとは別に **SIL Open Font License 1.1** で配布します。原文の著作権・ライセンス、Reserved Font Name、改変後の命名を扱い、チェックサムを固定したソースから生成・検証します。方式、制約、配信ファイルの検査は [フォント設計](docs/fonts.md)、帰属は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
 
@@ -151,7 +155,7 @@ Vue と関連コンパイラー・テスト用 server renderer は **3.6.0-rc.11
 
 vue-i18n 11 の `useI18n()` は VDOM のコンポーネントインスタンスを前提とするため、Vapor 内では [useAppI18n](src/i18n/useAppI18n.ts) からアプリ共通のリアクティブな Composer を利用します。ローカルスコープの翻訳や `$t` への依存はありません。
 
-`pnpm verify:vapor` は実際のツール SFC が Vapor にコンパイルされることを検査し、本番コンパイルしたフィクスチャを DOM 環境で実行して、非同期コンポーネント、props・events・slots、入力、5 言語、破棄・再マウントを確認します。RC の更新時にもこの検査とブラウザテストを通してください。設計上 VDOM と相互運用ランタイムも配信するため、アプリ全体が Vapor 単独の最小ランタイムになる構成ではありません。
+`pnpm verify:vapor` は実際のツール SFC が Vapor にコンパイルされることを検査し、本番コンパイルしたフィクスチャを DOM 環境で実行して、非同期コンポーネント、props・events・slots、入力、11 言語、破棄・再マウントを確認します。RC の更新時にもこの検査とブラウザテストを通してください。設計上 VDOM と相互運用ランタイムも配信するため、アプリ全体が Vapor 単独の最小ランタイムになる構成ではありません。
 
 一次資料: [Vue 3.6 RC / Vapor の相互運用](https://github.com/vuejs/core/releases/tag/v3.6.0-rc.1)、[採用 RC](https://github.com/vuejs/core/releases/tag/v3.6.0-rc.11)、[vue-i18n の Vapor 対応状況](https://github.com/intlify/vue-i18n/issues/2234)。
 
@@ -221,7 +225,7 @@ GitHub Actions でも同じ品質ゲートを実行し、ブラウザ検査を�
 
 [ワークフロー](.github/workflows/ci.yml) は pull request・`main` への push・手動実行でテストします。**成功した `main` の production build だけを Pages に渡します。** PR や他のブランチからは公開しません。Pages が未設定の場合は設定を自動変更せず、デプロイ段階で失敗します。
 
-Pages 用のベースパスは `/army-knife/` です。各ツールは `/army-knife/ja/tools/cidr/` のような通常 URL で直接開けます。5 言語それぞれの実 HTML に説明・使い方・例があり、同じページでツールを操作できます。旧 `#/tool/cidr` リンクも対応する通常ページへ移動します。無効にしたツールは説明だけ閲覧でき、操作には設定での有効化が必要です。[URL・静的生成の設計](docs/static-pages.md)、[GitHub の公式手順](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) と [CI の詳細](docs/testing.md#pages-deployment-and-permissions) を参照してください。
+Pages 用のベースパスは `/army-knife/` です。各ツールは `/army-knife/ja/tools/cidr/` のような通常 URL で直接開けます。11 言語それぞれの実 HTML に説明・使い方・例があり、同じページでツールを操作できます。旧 `#/tool/cidr` リンクも対応する通常ページへ移動します。無効にしたツールは説明だけ閲覧でき、操作には設定での有効化が必要です。[URL・静的生成の設計](docs/static-pages.md)、[GitHub の公式手順](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages) と [CI の詳細](docs/testing.md#pages-deployment-and-permissions) を参照してください。
 
 ## ドキュメントとライセンス
 

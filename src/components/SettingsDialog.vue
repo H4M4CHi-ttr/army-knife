@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import ToolIcon from "./ToolIcon.vue";
 import { settings, type Theme } from "@/lib/preferences";
+import { languageNames as languages } from "@/lib/locales";
 import { tools, type ToolId } from "@/lib/catalog";
 defineProps<{ open: boolean; fontError: boolean }>();
 const emit = defineEmits<{ "update:open": [value: boolean]; closed: [event: Event] }>();
@@ -22,13 +23,6 @@ const themes: { value: Theme; icon: typeof Sun }[] = [
   { value: "dark", icon: Moon },
   { value: "system", icon: Monitor },
 ];
-const languages = {
-  ja: "日本語",
-  en: "English",
-  "zh-CN": "简体中文",
-  "zh-TW": "繁體中文",
-  ko: "한국어",
-};
 const base = import.meta.env.BASE_URL;
 const fontBase = `${base}fonts/licenses/`;
 function toggleTool(id: ToolId, enabled: boolean) {

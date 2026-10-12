@@ -1,4 +1,4 @@
-import type { Locale } from "./locales";
+import type { CoreLocale as Locale } from "./locales";
 import type { ToolGuide } from "./tool-guides";
 
 export const base64Guide = {

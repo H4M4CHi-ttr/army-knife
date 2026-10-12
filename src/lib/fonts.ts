@@ -1,9 +1,10 @@
 import "../styles/fonts.css";
+import { LOCALES, localeFontPacks, type CoreLocale, type Locale } from "./locales.ts";
 
-export const fontLocales = ["ja", "en", "zh-CN", "zh-TW", "ko"] as const;
-export type FontLocale = (typeof fontLocales)[number];
+export const fontLocales = LOCALES;
+export type FontLocale = Locale;
 
-const pendingStylesheets = new Map<FontLocale, Promise<HTMLLinkElement>>();
+const pendingStylesheets = new Map<CoreLocale, Promise<HTMLLinkElement>>();
 let requestSequence = 0;
 let activeStylesheet: HTMLLinkElement | undefined;
 
@@ -13,10 +14,10 @@ export function fontStylesheetHref(locale: FontLocale): string {
     throw new Error(`Unsupported font locale: ${String(locale)}`);
   }
 
-  return `${import.meta.env.BASE_URL}fonts/${locale}.css`;
+  return `${import.meta.env.BASE_URL}fonts/${localeFontPacks[locale]}.css`;
 }
 
-function loadStylesheet(locale: FontLocale): Promise<HTMLLinkElement> {
+function loadStylesheet(locale: CoreLocale): Promise<HTMLLinkElement> {
   const existing = pendingStylesheets.get(locale);
   if (existing) return existing;
 
@@ -59,7 +60,7 @@ export async function setFontLocale(locale: FontLocale): Promise<void> {
   fontStylesheetHref(locale);
   document.documentElement.lang = locale;
   const sequence = ++requestSequence;
-  const stylesheet = await loadStylesheet(locale);
+  const stylesheet = await loadStylesheet(localeFontPacks[locale]);
 
   if (sequence !== requestSequence) return;
   if (activeStylesheet && activeStylesheet !== stylesheet) {

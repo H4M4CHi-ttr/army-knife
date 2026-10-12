@@ -37,6 +37,8 @@ import SettingsDialog from "@/components/SettingsDialog.vue";
 import { getTool, tools, type Category, type ToolId } from "@/lib/catalog";
 import type { QuickToolId } from "@/lib/tools/quick-converters";
 import { settings } from "@/lib/preferences";
+import { languageNames } from "@/lib/locales";
+import { matchesSearch } from "@/lib/search";
 import { setFontLocale } from "@/lib/fonts";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
@@ -82,13 +84,6 @@ let settingsTrigger: HTMLElement | null = null;
 let focusHeadingAfterSettingsClose = false;
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const logo = `${import.meta.env.BASE_URL}favicon.svg`;
-const languageNames = {
-  ja: "日本語",
-  en: "English",
-  "zh-CN": "简体中文",
-  "zh-TW": "繁體中文",
-  ko: "한국어",
-};
 const categoryIcons = { data: Database, text: TextCursorInput, network: Network, design: Palette };
 const categories: Category[] = ["data", "text", "network", "design"];
 const enabled = computed(() => tools.filter((tool) => preferences.enabledTools.includes(tool.id)));
@@ -109,51 +104,14 @@ const guideHasHeading = computed(() => {
     ? guide.dataset.tool === route.toolId
     : guide.dataset.page === "home";
 });
-const pageStates = {
-  ja: {
-    disabled: "このツールは設定で無効になっています",
-    disabledHint: "説明は引き続き読めます。操作するには設定でこのツールを有効にしてください。",
-    unknown: "ページが見つかりません",
-    unknownHint: "ツール一覧から利用したいツールを選んでください。",
-  },
-  en: {
-    disabled: "This tool is disabled in your settings",
-    disabledHint: "You can still read the guide. Enable this tool in Settings to use it.",
-    unknown: "Page not found",
-    unknownHint: "Choose a tool from the tool collection.",
-  },
-  "zh-CN": {
-    disabled: "此工具已在设置中停用",
-    disabledHint: "您仍可阅读说明。请在设置中启用此工具后使用。",
-    unknown: "找不到页面",
-    unknownHint: "请从工具列表中选择所需的工具。",
-  },
-  "zh-TW": {
-    disabled: "此工具已在設定中停用",
-    disabledHint: "您仍可閱讀說明。請在設定中啟用此工具後使用。",
-    unknown: "找不到頁面",
-    unknownHint: "請從工具清單中選擇所需的工具。",
-  },
-  ko: {
-    disabled: "설정에서 이 도구가 비활성화되어 있습니다",
-    disabledHint: "설명은 계속 읽을 수 있습니다. 사용하려면 설정에서 이 도구를 활성화하세요.",
-    unknown: "페이지를 찾을 수 없습니다",
-    unknownHint: "도구 목록에서 사용할 도구를 선택하세요.",
-  },
-};
-const pageState = computed(() => pageStates[preferences.locale]);
 const matches = computed(() =>
-  enabled.value.filter((tool) => {
-    const haystack =
-      `${t(`tool.${tool.id}.name`)} ${t(`tool.${tool.id}.description`)} ${tool.keywords}`.toLocaleLowerCase(
-        locale.value,
-      );
-    return query.value
-      .toLocaleLowerCase(locale.value)
-      .trim()
-      .split(/\s+/)
-      .every((part) => haystack.includes(part));
-  }),
+  enabled.value.filter((tool) =>
+    matchesSearch(
+      query.value,
+      `${t(`tool.${tool.id}.name`)} ${t(`tool.${tool.id}.description`)} ${tool.keywords}`,
+      preferences.locale,
+    ),
+  ),
 );
 const shown = computed(() =>
   matches.value.filter(
@@ -738,8 +696,8 @@ onBeforeUnmount(() => {
           </div>
           <section v-if="!selectedTool" class="library-empty" data-testid="tool-disabled">
             <Box class="size-9" />
-            <h2>{{ pageState.disabled }}</h2>
-            <p>{{ pageState.disabledHint }}</p>
+            <h2>{{ t("page.disabled") }}</h2>
+            <p>{{ t("page.disabledHint") }}</p>
             <Button variant="outline" data-testid="disabled-settings" @click="openSettings">{{
               t("nav.settings")
             }}</Button>
@@ -790,8 +748,8 @@ onBeforeUnmount(() => {
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">
           <Box class="size-9" />
-          <h1 ref="heading" tabindex="-1">{{ pageState.unknown }}</h1>
-          <p>{{ pageState.unknownHint }}</p>
+          <h1 ref="heading" tabindex="-1">{{ t("page.unknown") }}</h1>
+          <p>{{ t("page.unknownHint") }}</p>
           <a class="back-link" :href="homeHref">{{ t("actions.back") }}</a>
         </section>
         <p v-if="!status.available" class="notice" role="status">

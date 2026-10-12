@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vite-plus/test";
 import { createI18n } from "vue-i18n";
 import { messages } from "./index";
+import { LOCALES } from "../lib/locales";
 
 function flatten(value: Record<string, unknown>, prefix = ""): Record<string, string> {
   return Object.fromEntries(
@@ -19,6 +20,9 @@ function parameters(message: string) {
 
 const source = flatten(messages.en);
 describe("the complete translated interface", () => {
+  it("registers exactly the public language catalog", () => {
+    expect(Object.keys(messages).sort()).toEqual([...LOCALES].sort());
+  });
   for (const [language, translations] of Object.entries(messages)) {
     it(`${language} has every message and compiles with the same named parameters`, () => {
       const translated = flatten(translations);

@@ -65,7 +65,9 @@ The shortcut dictionary additionally has normalization and data-integrity tests 
 | `chromium-small`   | Chromium | 390 × 844   |
 | `firefox-small`    | Firefox  | 390 × 844   |
 
-Tests start a fresh production preview at `http://127.0.0.1:4173/army-knife/`. Reusing an existing server is disabled, so a developer's unrelated or stale server cannot satisfy the test. Browser contexts use English initially, UTC, reduced motion, and blocked service workers. The suite explicitly exercises all five supported locales.
+Tests start a fresh production preview at `http://127.0.0.1:4173/army-knife/`. Reusing an existing server is disabled, so a developer's unrelated or stale server cannot satisfy the test. Browser contexts use English initially, UTC, reduced motion, and blocked service workers. The suite explicitly exercises all eleven supported locales.
+
+`tests/e2e/locales.spec.ts` adds Spanish, French, German, Brazilian Portuguese, Indonesian, and Vietnamese to the existing five-language coverage. In Chromium and Firefox at desktop and small viewports, it checks language selection and URLs, translated search and guides, an actual CIDR calculation with localized number formatting, loaded font faces, shared stylesheet reuse, light/dark screenshots, horizontal overflow, and language persistence across reloads. UI message tests require all 717 keys and matching interpolation parameters for every locale; guide tests require all 30 tools and preserve the English example inputs. Static-page verification checks all 341 localized documents and their reciprocal language links.
 
 The browser scenarios verify:
 

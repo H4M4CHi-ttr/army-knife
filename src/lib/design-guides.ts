@@ -1,4 +1,4 @@
-import { LOCALES, type Locale } from "./locales.ts";
+import { CORE_LOCALES as LOCALES, type CoreLocale as Locale } from "./locales.ts";
 import type { ToolGuide } from "./tool-guides.ts";
 import { designToolMessages } from "../i18n/design-tool-messages.ts";
 const help:Record<Locale,readonly [string,string]> = {

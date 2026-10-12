@@ -6,6 +6,8 @@ import { build } from "vite-plus";
 import vue from "@vitejs/plugin-vue";
 import { parse, compileScript } from "vue/compiler-sfc";
 import { Window } from "happy-dom";
+import { LOCALES } from "../src/lib/locales.ts";
+import { messages } from "../src/i18n/messages.ts";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const sourcePath = (relative) => fileURLToPath(new URL(`../${relative}`, import.meta.url));
@@ -154,13 +156,8 @@ try {
   assert.equal(text("[data-probe-notes]"), "textarea edit");
   assert.equal(text("[data-parent-slot]"), "VDOM slot: input edit");
 
-  for (const [locale, label] of [
-    ["en", "Copy"],
-    ["ja", "コピー"],
-    ["zh-CN", "复制"],
-    ["zh-TW", "複製"],
-    ["ko", "복사"],
-  ]) {
+  for (const locale of LOCALES) {
+    const label = messages[locale]["actions.copy"];
     probe.setLocale(locale);
     await flush();
     assert.equal(element("[data-vapor-probe]").getAttribute("data-locale"), locale);
@@ -168,6 +165,10 @@ try {
     assert.equal(text("[data-button-slot]"), `${label} 0`);
     assert.equal(element("[data-probe-input]").getAttribute("aria-label"), label);
   }
+
+  // Keep the remaining state/disposal assertions in their original Korean locale.
+  probe.setLocale("ko");
+  await flush();
 
   element("[data-probe-apply]").click();
   await flush();
@@ -190,7 +191,7 @@ try {
   assert.equal(element("#fixture").childElementCount, 0);
   assert.deepEqual([...probe.errors, ...diagnostics], []);
   console.log(
-    `Vapor verified: ${vaporSources.length} application SFCs; production async interop, shadcn/Reka slots and events, Input/Textarea v-model, 5 locales, VueUse state, mount/dispose/remount.`,
+    `Vapor verified: ${vaporSources.length} application SFCs; production async interop, shadcn/Reka slots and events, Input/Textarea v-model, ${LOCALES.length} locales, VueUse state, mount/dispose/remount.`,
   );
 } finally {
   await window.happyDOM.close();

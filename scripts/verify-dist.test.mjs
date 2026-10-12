@@ -96,7 +96,7 @@ function withFixture(fn) {
 test('accepts valid local artifacts and ignores documentation URLs and comments', () => withFixture((root) => {
   const result = verifyDist(root);
   assert.equal(result.ok, true, result.errors.join('\n'));
-  assert.equal(result.counts.locales, 5);
+  assert.equal(result.counts.locales, 11);
   assert.equal(result.counts.licenses, 6);
   assert.equal(result.counts.wasm, 1);
 }));

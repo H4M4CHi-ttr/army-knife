@@ -1,5 +1,5 @@
 import type { ToolGuide } from "./tool-guides";
-import type { Locale } from "./locales";
+import type { CoreLocale as Locale } from "./locales";
 
 /** Synthetic examples shared by the public static pages; no runtime input. */
 export const chmodGuide = {
