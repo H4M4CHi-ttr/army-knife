@@ -49,10 +49,9 @@ Those requests contain no cookies, query parameters or body. The static document
 remains the source of guide content and metadata. Direct loads and refreshes still
 receive that complete HTML. Browser history, keyboard activation, modified clicks
 and new tabs keep their normal behavior. Favorites and category filters use
-harmless home fragments. Switching tools discards unsaved tool inputs when the
-old tool unmounts. A language change keeps the active tool mounted and updates its
-language while any current inputs remain only in memory; they are never copied to
-a URL or persistent storage.
+harmless home fragments. Switching tools unmounts the old tool, and changing
+language remounts the tool for the new route; both actions clear unsaved inputs.
+Input values are never copied into a URL or persistent storage.
 
 Static guides list all tools, including optional or disabled tools. This public
 documentation does not enable a tool. The workbench checks existing preferences
