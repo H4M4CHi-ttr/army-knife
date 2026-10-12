@@ -189,9 +189,12 @@ describe("App integration with real local tools", () => {
       "tool-card-har",
       "tool-card-json-diff",
       "tool-card-logs",
+      "tool-card-magic",
+      "tool-card-set-cookie",
       "tool-card-shortcuts",
       "tool-card-unicode",
       "tool-card-url",
+      "tool-card-user-agent",
     ]);
     expect(wrapper.find(".tool-panel").exists()).toBe(false);
     expect(setFontLocale).toHaveBeenCalledWith("en");
