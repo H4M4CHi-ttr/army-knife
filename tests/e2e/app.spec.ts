@@ -657,10 +657,12 @@ test("large paste stays out of the live editor and the full text reaches local W
     void raw.scrollHeight;
     const nativeLayout128KiBMs = performance.now() - layoutStart;
     raw.remove();
-    const data = new DataTransfer();
-    data.setData("text/plain", content);
-    const event = new ClipboardEvent("paste", {
-      bubbles: true, cancelable: true, clipboardData: data,
+    // Firefox deliberately hides data placed on a synthetic ClipboardEvent.
+    // A cancelable Event with a stubbed clipboardData exercises the same Vue
+    // handler in both browsers without relying on synthetic clipboard access.
+    const event = new Event("paste", { bubbles: true, cancelable: true }) as ClipboardEvent;
+    Object.defineProperty(event, "clipboardData", {
+      value: { getData: (type: string) => (type === "text/plain" ? content : "") },
     });
     const started = performance.now();
     field.dispatchEvent(event);
@@ -699,11 +701,12 @@ test("multi-line 1 MiB paste is bounded while preserving all original lines", as
   const expectedLines = await page.locator("#logs-input").evaluate((node) => {
     const line = "INFO " + "x".repeat(64) + "\n";
     const repeats = Math.floor(1024 * 1024 / line.length);
-    const data = new DataTransfer();
-    data.setData("text/plain", line.repeat(repeats));
-    (node as HTMLTextAreaElement).dispatchEvent(
-      new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data }),
-    );
+    const content = line.repeat(repeats);
+    const event = new Event("paste", { bubbles: true, cancelable: true }) as ClipboardEvent;
+    Object.defineProperty(event, "clipboardData", {
+      value: { getData: (type: string) => (type === "text/plain" ? content : "") },
+    });
+    (node as HTMLTextAreaElement).dispatchEvent(event);
     return repeats;
   });
   await expect(page.getByTestId("large-input-summary")).toBeVisible();
@@ -717,10 +720,10 @@ test("multi-line 1 MiB paste is bounded while preserving all original lines", as
 test("oversized 20 MiB paste is rejected before DOM insertion", async ({ page }) => {
   await tool(page, "logs");
   const prevented = await page.locator("#logs-input").evaluate((node) => {
-    const data = new DataTransfer();
-    data.setData("text/plain", "X".repeat(20 * 1024 * 1024));
-    const event = new ClipboardEvent("paste", {
-      bubbles: true, cancelable: true, clipboardData: data,
+    const content = "X".repeat(20 * 1024 * 1024);
+    const event = new Event("paste", { bubbles: true, cancelable: true }) as ClipboardEvent;
+    Object.defineProperty(event, "clipboardData", {
+      value: { getData: (type: string) => (type === "text/plain" ? content : "") },
     });
     node.dispatchEvent(event);
     return event.defaultPrevented;
