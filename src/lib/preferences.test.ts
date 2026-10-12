@@ -113,11 +113,15 @@ describe("private browser preferences", () => {
       "env",
       "url",
       "explain",
+      "og-tags",
     ]);
     expect(migrated.enabledTools).not.toContain("cidr");
     expect(migrated.enabledTools).not.toContain("json-format");
     expect(migrated.enabledTools).not.toContain("contrast");
     expect(migrated.enabledTools).not.toContain("base64");
+    for (const id of ["timestamp", "jwt", "ids", "password"]) {
+      expect(migrated.enabledTools).not.toContain(id);
+    }
     expect(migrated.locale).toBe("ja");
     expect(migrated.theme).toBe("dark");
     expect(migrated.favorites).toEqual(["csv"]);
