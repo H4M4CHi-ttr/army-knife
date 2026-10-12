@@ -52,6 +52,15 @@ const ExplainTool = defineAsyncComponent(() => import("@/components/tools/Explai
 const ShortcutTool = defineAsyncComponent(() => import("@/components/tools/ShortcutTool.vue"));
 const ChmodTool = defineAsyncComponent(() => import("@/components/tools/ChmodTool.vue"));
 const Base64Tool = defineAsyncComponent(() => import("@/components/tools/Base64Tool.vue"));
+const TextCodecTool = defineAsyncComponent(() => import("@/components/tools/TextCodecTool.vue"));
+const DummyTextTool = defineAsyncComponent(() => import("@/components/tools/DummyTextTool.vue"));
+const SpecificityTool = defineAsyncComponent(() => import("@/components/tools/SpecificityTool.vue"));
+const FluidTypeTool = defineAsyncComponent(() => import("@/components/tools/FluidTypeTool.vue"));
+const BezierTool = defineAsyncComponent(() => import("@/components/tools/BezierTool.vue"));
+const GradientTool = defineAsyncComponent(() => import("@/components/tools/GradientTool.vue"));
+const PlaceholderTool = defineAsyncComponent(() => import("@/components/tools/PlaceholderTool.vue"));
+const PathBatchTool = defineAsyncComponent(() => import("@/components/tools/PathBatchTool.vue"));
+const PaletteTool = defineAsyncComponent(() => import("@/components/tools/PaletteTool.vue"));
 const QuickTool = defineAsyncComponent(() => import("@/components/tools/QuickTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
@@ -760,6 +769,18 @@ onBeforeUnmount(() => {
             <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ChmodTool v-else-if="selectedTool.id === 'chmod'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <Base64Tool v-else-if="selectedTool.id === 'base64'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <TextCodecTool
+              v-else-if="selectedTool.id === 'html-entities' || selectedTool.id === 'url-encode'"
+              :kind="selectedTool.id" :key="`${selectedTool.id}:${preferences.locale}`"
+            />
+            <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <FluidTypeTool v-else-if="selectedTool.id === 'fluid-type'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <BezierTool v-else-if="selectedTool.id === 'cubic-bezier'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <GradientTool v-else-if="selectedTool.id === 'css-gradient'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PlaceholderTool v-else-if="selectedTool.id === 'svg-placeholder'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PathBatchTool v-else-if="selectedTool.id === 'path-batch'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PaletteTool v-else-if="selectedTool.id === 'color-palette'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <QuickTool
               v-else-if="['data-units', 'css-units', 'unicode-normalize', 'slug', 'unicode-escape'].includes(selectedTool.id)"
               :id="selectedTool.id as QuickToolId"

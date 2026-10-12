@@ -13,6 +13,9 @@ import { expansionMessages } from "./expansion.ts";
 import { shortcutMessages } from "./shortcuts.ts";
 import { chmodMessages } from "./chmod.ts";
 import { base64Messages } from "./base64.ts";
+import { utilityMessages } from "./utility.ts";
+import { designToolMessages } from "./design-tool-messages.ts";
+import { designLabels } from "./design-labels.ts";
 import { quickMessages } from "./quick.ts";
 
 export const messages = {
@@ -24,6 +27,9 @@ export const messages = {
     ...shortcutMessages.en,
     ...chmodMessages.en,
     ...base64Messages.en,
+    ...utilityMessages.en,
+    ...designToolMessages.en,
+    ...designLabels.en,
     ...quickMessages["en"],
     ...toolMessagesEn,
     "contrast.largeHint":
@@ -37,6 +43,9 @@ export const messages = {
     ...shortcutMessages.ja,
     ...chmodMessages.ja,
     ...base64Messages.ja,
+    ...utilityMessages.ja,
+    ...designToolMessages.ja,
+    ...designLabels.ja,
     ...quickMessages["ja"],
     ...toolMessagesJa,
     "contrast.largeHint":
@@ -50,6 +59,9 @@ export const messages = {
     ...shortcutMessages["zh-CN"],
     ...chmodMessages["zh-CN"],
     ...base64Messages["zh-CN"],
+    ...utilityMessages["zh-CN"],
+    ...designToolMessages["zh-CN"],
+    ...designLabels["zh-CN"],
     ...quickMessages["zh-CN"],
     ...toolZhCN,
     "contrast.largeHint":
@@ -63,6 +75,9 @@ export const messages = {
     ...shortcutMessages["zh-TW"],
     ...chmodMessages["zh-TW"],
     ...base64Messages["zh-TW"],
+    ...utilityMessages["zh-TW"],
+    ...designToolMessages["zh-TW"],
+    ...designLabels["zh-TW"],
     ...quickMessages["zh-TW"],
     ...toolZhTW,
     "contrast.largeHint":
@@ -76,6 +91,9 @@ export const messages = {
     ...shortcutMessages.ko,
     ...chmodMessages.ko,
     ...base64Messages.ko,
+    ...utilityMessages.ko,
+    ...designToolMessages.ko,
+    ...designLabels.ko,
     ...quickMessages["ko"],
     ...toolKo,
     "contrast.largeHint":

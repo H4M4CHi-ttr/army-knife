@@ -14,6 +14,16 @@ export type ToolId =
   | "shortcuts"
   | "explain"
   | "base64"
+  | "html-entities"
+  | "url-encode"
+  | "dummy-text"
+  | "css-specificity"
+  | "fluid-type"
+  | "cubic-bezier"
+  | "css-gradient"
+  | "svg-placeholder"
+  | "path-batch"
+  | "color-palette"
   | "data-units"
   | "css-units"
   | "unicode-normalize"
@@ -30,6 +40,31 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "html-entities", category: "text", wasm: false, devtoys: true,
+    keywords: "html entities escape unescape unicode markup エンティティ エスケープ デコード 转义 實體 이스케이프",
+    color: "rose",
+  },
+  {
+    id: "url-encode", category: "network", wasm: false, devtoys: true,
+    keywords: "url percent encode decode uri component form path percent-encoding URL 文字列 エンコード 转码 編碼 퍼센트",
+    color: "blue",
+  },
+  {
+    id: "dummy-text", category: "text", wasm: false, devtoys: true,
+    keywords: "lorem ipsum dummy placeholder text generate seed paragraphs words ダミーテキスト 文章 生成 占位文本 더미 텍스트",
+    color: "purple",
+  },
+  {
+    id: "css-specificity", category: "design", wasm: false, devtoys: true,
+    keywords: "css specificity selectors pseudo :is :has :not :where セレクター 詳細度 选择器 特異性 특이성",
+    color: "orange",
+  },
+  {
+    id: "fluid-type", category: "design", wasm: false, devtoys: true,
+    keywords: "css clamp fluid typography responsive vw rem font size フォント レスポンシブ 流体字体 유동 글꼴",
+    color: "green",
+  },
   {
     id: "base64",
     category: "text",
@@ -154,6 +189,16 @@ export const tools: readonly ToolDefinition[] = [
     keywords: "color contrast wcag accessibility aa aaa 色 配色 コントラスト",
     color: "orange",
   },
+  { id: "cubic-bezier", category: "design", wasm: false, devtoys: true,
+    keywords: "css cubic bezier easing timing animation curve イージング 缓动 緩動 이징", color: "orange" },
+  { id: "css-gradient", category: "design", wasm: false, devtoys: true,
+    keywords: "css gradient linear radial color stops グラデーション 渐变 漸層 그라디언트", color: "rose" },
+  { id: "svg-placeholder", category: "design", wasm: false, devtoys: true,
+    keywords: "svg placeholder image png illustration svg プレースホルダー 占位图 佔位圖 자리표시자", color: "green" },
+  { id: "path-batch", category: "data", wasm: false, devtoys: true,
+    keywords: "batch filename path rename strings prefix suffix basename extension ファイル名 パス 批量路径 批次路徑 경로 이름", color: "blue" },
+  { id: "color-palette", category: "design", wasm: false, devtoys: true,
+    keywords: "palette color harmony analogous complementary triadic 色彩 配色 调和 色調 팔레트", color: "purple" },
   {
     id: "data-units",
     category: "data",
