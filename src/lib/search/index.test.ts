@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vite-plus/test";
 import { tools, type ToolId } from "../catalog";
 import { messages } from "../../i18n";
-import { createToolSearch, searchTools } from "./index";
+import { createToolSearch, searchLabel, searchTools } from "./index";
 import { searchIntents } from "./intents";
 
 type Case = readonly [language: keyof typeof searchIntents, query: string, expected: ToolId];
@@ -51,6 +51,15 @@ function oldSearch(query: string, language: Case[0]) {
 }
 
 describe("local multilingual intent search", () => {
+  it("indexes both flat and vue-i18n nested message keys", () => {
+    expect(searchLabel({ "tool.har.name": "Network Wizard" }, "tool.har.name")).toBe("Network Wizard");
+    expect(searchLabel({ tool: { har: { name: "Network Wizard" } } }, "tool.har.name")).toBe("Network Wizard");
+    const search = createToolSearch(tools, [{
+      language: "future", labels: { tool: { har: { name: "Network Wizard" } } }, intents: {},
+    }]);
+    expect(search("Network Wizard")[0]?.id).toBe("har");
+  });
+
   it("has a complete intent pack for every published UI locale and tool", () => {
     expect(Object.keys(searchIntents).sort()).toEqual(["en", "ja", "ko", "zh-CN", "zh-TW"]);
     for (const pack of Object.values(searchIntents)) {

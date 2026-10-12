@@ -63,5 +63,6 @@ jobs:
         with:
           name: multilingual-search-comparison
           path: scripts/search-compare/.out
+          include-hidden-files: true
           if-no-files-found: warn
           retention-days: 30
