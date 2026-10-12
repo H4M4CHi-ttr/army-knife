@@ -113,6 +113,12 @@ export function inspectSetCookie(input: string): CookieReport {
     const maxAge = attr.get("max-age") ?? "";
     const warnings: string[] = [];
     if (duplicates.length) warnings.push("DUPLICATE_ATTRIBUTE");
+    if (!secure) warnings.push("MISSING_SECURE");
+    if (!has("httponly")) warnings.push("MISSING_HTTPONLY");
+    if (!has("samesite")) warnings.push("MISSING_SAMESITE");
+    // A comma inside a raw cookie value may indicate illegally joined headers.
+    if (/,[ \t]*[!#$%&'*+.^_|~0-9A-Za-z-]+=/.test(pair.slice(equal + 1)))
+      warnings.push("JOINED_HEADERS_POSSIBLE");
     if (!["strict", "lax", "none"].includes(sameSite.toLowerCase()) && has("samesite"))
       warnings.push("INVALID_SAMESITE");
     if (sameSite.toLowerCase() === "none" && !secure) warnings.push("SAMESITE_NEEDS_SECURE");
