@@ -183,7 +183,9 @@ describe("App integration with real local tools", () => {
     expect(cards).toEqual([
       "tool-card-chmod",
       "tool-card-cidr",
+      "tool-card-css-units",
       "tool-card-csv",
+      "tool-card-data-units",
       "tool-card-env",
       "tool-card-explain",
       "tool-card-har",
@@ -192,7 +194,9 @@ describe("App integration with real local tools", () => {
       "tool-card-magic",
       "tool-card-set-cookie",
       "tool-card-shortcuts",
+      "tool-card-slug",
       "tool-card-unicode",
+      "tool-card-unicode-normalize",
       "tool-card-url",
       "tool-card-user-agent",
     ]);

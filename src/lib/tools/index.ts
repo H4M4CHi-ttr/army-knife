@@ -7,3 +7,9 @@ export * from "./text-codecs";
 export * from "./dummy-text";
 export * from "./css-specificity";
 export * from "./fluid-type";
+
+export * from "./bezier";
+export * from "./gradient";
+export * from "./placeholder";
+export * from "./path-batch";
+export * from "./palette";

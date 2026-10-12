@@ -19,7 +19,7 @@ describe("private browser preferences", () => {
     expect(defaults.enabledTools).toEqual(
       tools.filter((tool) => !tool.devtoys).map((tool) => tool.id),
     );
-    for (const id of ["sets", "json-format", "contrast", "base64", "sri", "encoding"])
+    for (const id of ["sets", "json-format", "contrast", "base64", "unicode-escape", "sri", "encoding"])
       expect(defaults.enabledTools).not.toContain(id);
     expect(defaults.enabledTools).toContain("csv");
     expect(defaults.favorites).toEqual([]);
@@ -116,6 +116,10 @@ describe("private browser preferences", () => {
       "env",
       "url",
       "explain",
+      "data-units",
+      "css-units",
+      "unicode-normalize",
+      "slug",
     ]);
     expect(migrated.enabledTools).not.toContain("cidr");
     expect(migrated.enabledTools).not.toContain("json-format");

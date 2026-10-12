@@ -15,6 +15,11 @@ import {
   Keyboard,
   FileLock2,
   Binary,
+  HardDrive,
+  Ruler,
+  Languages,
+  Tag,
+  FileCode2,
 } from "@lucide/vue";
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
@@ -39,6 +44,16 @@ const icons = {
   "dummy-text": ScanText,
   "css-specificity": Contrast,
   "fluid-type": TableProperties,
+  "cubic-bezier": Workflow,
+  "css-gradient": Contrast,
+  "svg-placeholder": Braces,
+  "path-batch": TableProperties,
+  "color-palette": Contrast,
+  "data-units": HardDrive,
+  "css-units": Ruler,
+  "unicode-normalize": Languages,
+  slug: Tag,
+  "unicode-escape": FileCode2,
   sri: FileLock2,
   encoding: Binary,
   magic: FileKey2,

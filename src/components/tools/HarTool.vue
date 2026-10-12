@@ -17,7 +17,7 @@ const input = ref("");
 const grouping = ref<"hosts" | "mimeTypes">("hosts");
 const { result, error, busy, control, apply, cancel, setAuto } = useToolExecution<HarResult>({
   source: input,
-  canRun: () => Boolean(input.value.trim()),
+  canRun: () => input.value.length > 0,
   execute: (signal) => runEngine({ operation: "har", text: input.value }, { signal }),
 });
 const output = computed(() => (result.value ? JSON.stringify(result.value, null, 2) : ""));

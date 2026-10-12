@@ -1,5 +1,10 @@
 # DevToys overlap policy
 
+## Design / filename tools (2026-10-12)
+
+Cubic-bezier easing, CSS gradient builder, SVG placeholder generator, batch path-string conversion and HSL palette generation are **all opt-in**. Their relationship to bundled DevToys versions and extensions has not been conclusively reverified, so the conservative DevToys-overlap policy is used; no absence claim is made. Each is client-only without added packages.
+
+
 This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool list](https://devtoys.app/) and the [default-tools repository](https://github.com/DevToys-app/DevToys.Tools). DevToys extensions are open-ended, so this is a comparison with the official bundled tools, with known older bundled tools treated conservatively. It is not a claim that no third-party DevToys extension offers a similar feature.
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
@@ -23,6 +28,11 @@ This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool l
 | JSON structural diff                   | On      | Compares the parsed JSON tree and reports JSON Pointer paths; ignores object-key order while preserving array order. It is distinct from the bundled text comparer and JSON formatter.                  |
 | List operations                        | Off     | Union, intersection, and differences overlap with the bundled List Comparer.                                                                                                                            |
 | JSON formatter                         | Off     | JSON formatting is a bundled DevToys feature.                                                                                                                                                           |
+| Data size and rate converter           | On      | Exact SI/IEC bit/byte conversions with a separate rate mode; no identical bundled tool found in the reviewed 2026-10-11 list. |
+| CSS px/rem/em/vw/vh converter           | On      | Computes CSS lengths with explicit root/element font sizes and viewport dimensions, rather than generic encoding. |
+| Unicode normalization comparator       | On      | Displays NFC/NFD/NFKC/NFKD differences and code point previews, distinct from the general character inspector. |
+| Slug / identifier maker                 | On      | Multi-line Unicode/ASCII slug creation with collision handling and explicit no-transliteration behavior. |
+| Unicode escape converter               | Off     | Conservative overlap with generic bundled text encoders; the user must enable it in Settings. |
 | WCAG contrast checker                  | Off     | Color Picker & Contrast shipped in DevToys 1.x. Even though it is absent from the current 2.0 list, treat it as overlap. See the [upstream report](https://github.com/DevToys-app/DevToys/issues/1483). |
 
 Cron parsing and JSONPath testing are explicitly present in the official bundled list; neither is implemented in the initial release. If added later, they must be **off by default**. The same applies to Base64, JSON/YAML conversion, date conversion, URL/HTML encoding, hashes, UUIDs, and other listed bundled features.
@@ -34,6 +44,18 @@ Tool visibility preferences belong in browser settings. Tool input contents must
 The reviewed upstream [UrlEncoderDecoderGuiTool.cs](https://github.com/DevToys-app/DevToys.Tools/blob/main/src/DevToys.Tools/Tools/EncodersDecoders/Url/UrlEncoderDecoderGuiTool.cs) exposes an encode/decode switch, an optional multiline switch, a text input, and a converted text output. Its conversion path calls `UrlHelper.EncodeOrDecode`; it does not expose a parsed component view or an ordered query-entry editor.
 
 Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-related fields, path, and fragment, and edits an ordered sequence of query keys and values. Repeated keys remain separate entries, and a bare flag is distinguished from an explicit empty value. Query decoding and encoding are necessary parts of that editing operation. The app does not expose a standalone text URL encoder/decoder mode. A future standalone mode would be an overlapping feature and must be off by default. This classification is specific to the reviewed bundled implementation and should be revisited when upstream adds relevant capabilities.
+
+## Lightweight converters and boundaries
+
+These converters use only browser-native APIs without adding dependencies, and never store, log, or transmit user input or output.
+
+- **Data units (#96):** SI (powers of 1000) and IEC (powers of 1024) are separate. Decimal inputs use exact BigInt rational arithmetic (maximum 96 characters / 24 fractional places). Repeating decimal outputs are truncated to 24 places with an ≈ warning. Rate mode is an explicitly separate unit family with bits or bytes per second.
+- **CSS units (#102):** root font, element font, viewport width, and viewport height are required in CSS px, strictly positive and at most 1,000,000. vw and vh scale with their respective dimensions. Output is rounded to six decimal places, warning with ≈ when not exact. Does not inspect live computed styles, percentages or containers.
+- **Unicode normalization (#106):** browser-native String.prototype.normalize supports NFC/NFD/NFKC/NFKD. The input is preserved. A preview reports up to the first 32 code points per normalization. Compatibility forms may be lossy; unpaired UTF-16 surrogates are warned about.
+- **Slug (#107):** NFKD, lowercase, ASCII combining-mark removal when ASCII is chosen, punctuation separators, and deterministic collision suffixes. Up to 100 non-empty lines. No language-specific transliteration; lines with no supported characters produce explicit errors.
+- **Unicode escapes (#109):** strict U+XXXX, JS \uXXXX (UTF-16 surrogate-aware), and JS \u{...} code point forms. Decoding does not evaluate code; rejects invalid input and unpaired surrogates. Output is complete, with a maximum of 64 point details previewed.
+
+All text inputs are limited to **16 KiB**. Small inputs apply immediately; after 2,048 UTF-16 code units the existing 800ms debounce/manual control applies.
 
 ## Five new local inspector tools
 

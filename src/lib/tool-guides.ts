@@ -3,6 +3,8 @@ import type { Locale } from "./preferences";
 import { chmodGuide } from "./chmod-guide.ts";
 import { base64Guide } from "./base64-guide.ts";
 import { utilityGuides } from "./utility-guides.ts";
+import { designGuides } from "./design-guides.ts";
+import { quickGuides } from "./quick-guides.ts";
 import { inspectorGuides } from "./inspector-guides.ts";
 
 /** Public documentation only. User input never becomes part of this data. */
@@ -141,9 +143,11 @@ function localized(
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
   ...utilityGuides,
+  ...designGuides,
   ...inspectorGuides,
   chmod: chmodGuide,
   base64: base64Guide,
+  ...quickGuides,
   csv: localized("name,score\nAda,98\nLinus,\nGrace,99", {
     ja: {
       introduction:
