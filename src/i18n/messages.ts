@@ -13,6 +13,7 @@ import { expansionMessages } from "./expansion.ts";
 import { shortcutMessages } from "./shortcuts.ts";
 import { chmodMessages } from "./chmod.ts";
 import { base64Messages } from "./base64.ts";
+import { fiveToolMessages } from "./five-tools.ts";
 import { utilityMessages } from "./utility.ts";
 
 export const messages = {
@@ -24,6 +25,7 @@ export const messages = {
     ...shortcutMessages.en,
     ...chmodMessages.en,
     ...base64Messages.en,
+    ...fiveToolMessages.en,
     ...utilityMessages.en,
     ...toolMessagesEn,
     "contrast.largeHint":
@@ -37,6 +39,7 @@ export const messages = {
     ...shortcutMessages.ja,
     ...chmodMessages.ja,
     ...base64Messages.ja,
+    ...fiveToolMessages.ja,
     ...utilityMessages.ja,
     ...toolMessagesJa,
     "contrast.largeHint":
@@ -50,6 +53,7 @@ export const messages = {
     ...shortcutMessages["zh-CN"],
     ...chmodMessages["zh-CN"],
     ...base64Messages["zh-CN"],
+    ...fiveToolMessages["zh-CN"],
     ...utilityMessages["zh-CN"],
     ...toolZhCN,
     "contrast.largeHint":
@@ -63,6 +67,7 @@ export const messages = {
     ...shortcutMessages["zh-TW"],
     ...chmodMessages["zh-TW"],
     ...base64Messages["zh-TW"],
+    ...fiveToolMessages["zh-TW"],
     ...utilityMessages["zh-TW"],
     ...toolZhTW,
     "contrast.largeHint":
@@ -76,6 +81,7 @@ export const messages = {
     ...shortcutMessages.ko,
     ...chmodMessages.ko,
     ...base64Messages.ko,
+    ...fiveToolMessages.ko,
     ...utilityMessages.ko,
     ...toolKo,
     "contrast.largeHint":
