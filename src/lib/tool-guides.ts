@@ -2,6 +2,7 @@ import type { ToolId } from "./catalog";
 import type { Locale } from "./preferences";
 import { chmodGuide } from "./chmod-guide.ts";
 import { base64Guide } from "./base64-guide.ts";
+import { utilityGuides } from "./utility-guides.ts";
 
 /** Public documentation only. User input never becomes part of this data. */
 export interface ToolGuide {
@@ -138,6 +139,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  ...utilityGuides,
   chmod: chmodGuide,
   base64: base64Guide,
   csv: localized("name,score\nAda,98\nLinus,\nGrace,99", {

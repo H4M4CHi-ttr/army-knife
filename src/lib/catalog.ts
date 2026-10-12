@@ -13,7 +13,12 @@ export type ToolId =
   | "url"
   | "shortcuts"
   | "explain"
-  | "base64";
+  | "base64"
+  | "html-entities"
+  | "url-encode"
+  | "dummy-text"
+  | "css-specificity"
+  | "fluid-type";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -25,6 +30,31 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "html-entities", category: "text", wasm: false, devtoys: true,
+    keywords: "html entities escape unescape unicode markup エンティティ エスケープ デコード 转义 實體 이스케이프",
+    color: "rose",
+  },
+  {
+    id: "url-encode", category: "network", wasm: false, devtoys: true,
+    keywords: "url percent encode decode uri component form path percent-encoding URL 文字列 エンコード 转码 編碼 퍼센트",
+    color: "blue",
+  },
+  {
+    id: "dummy-text", category: "text", wasm: false, devtoys: true,
+    keywords: "lorem ipsum dummy placeholder text generate seed paragraphs words ダミーテキスト 文章 生成 占位文本 더미 텍스트",
+    color: "purple",
+  },
+  {
+    id: "css-specificity", category: "design", wasm: false, devtoys: true,
+    keywords: "css specificity selectors pseudo :is :has :not :where セレクター 詳細度 选择器 特異性 특이성",
+    color: "orange",
+  },
+  {
+    id: "fluid-type", category: "design", wasm: false, devtoys: true,
+    keywords: "css clamp fluid typography responsive vw rem font size フォント レスポンシブ 流体字体 유동 글꼴",
+    color: "green",
+  },
   {
     id: "base64",
     category: "text",

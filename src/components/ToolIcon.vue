@@ -34,6 +34,11 @@ const icons = {
   "json-diff": GitCompareArrows,
   "json-format": Braces,
   contrast: Contrast,
+  "html-entities": Braces,
+  "url-encode": Link2,
+  "dummy-text": ScanText,
+  "css-specificity": Contrast,
+  "fluid-type": TableProperties,
 };
 </script>
 <template><component :is="icons[id]" aria-hidden="true" :stroke-width="1.7" /></template>
