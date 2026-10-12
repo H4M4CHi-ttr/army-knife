@@ -39,7 +39,7 @@ Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-relat
 
 SRI and BOM inspection default off conservatively under the overlap policy; the other three default on. No additional runtime package or CDN is required.
 
-- SRI: exact binary bytes, SHA-256/384/512 Web Crypto digests, Base64 integrity strings, HTML examples with placeholder local paths. Files up to **8 MiB**, hex input up to **64 Ki characters**. Does not fetch URLs or authenticate origins; does not modify the selected file.
+- SRI: exact binary bytes, SHA-256/384/512 Web Crypto digests, Base64 integrity strings, HTML examples with placeholder local paths. Unknown extensions and raw hex show both template tags with an explicit warning, not a guessed resource type. Files up to **8 MiB**, hex input up to **64 Ki characters**. Does not fetch URLs or authenticate origins; does not modify the selected file.
 - BOM: strict UTF-8/UTF-16LE/BE byte analysis, BOM and CRLF/LF/CR counts and proportions; supports deliberately requested BOM-free UTF-8 + chosen newline download only after valid strict decode. BOM-less UTF-16 inference is heuristic and clearly marked. Not an arbitrary charset detector. Files up to **8 MiB**.
 - Magic Bytes: file signatures and last 128 bytes for ZIP trailer hints; the full file is never parsed. Multiple formats, extension and untrusted declared MIME mismatches may be flagged. No trust/malware guarantee, filename MIME data is not authoritative. Files up to **8 MiB**.
 - User-Agent: text **8 KiB**, known-token classification only. Spoofed/frozen UA and missing Client Hints mean results are guesses, not a compatibility or security guarantee.
