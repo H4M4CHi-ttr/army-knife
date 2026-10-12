@@ -9,7 +9,7 @@ describe("reproducible local dummy text", () => {
     expect(first.split("\n\n")).toHaveLength(3);
     expect(generateDummyText({...args,seed:43})).not.toBe(first);
     expect(generateDummyText({...args,locale:"en"})).not.toBe(first);
-    expect(generateDummyText({...args,unit:"sentences",count:2}).match(/\./g)).toHaveLength(2);
+    expect(generateDummyText({...args,locale:"en",unit:"sentences",count:2}).match(/\./g)).toHaveLength(2);
   });
   it("supports zero and Unicode scalar character count without truncating surrogate pairs", () => {
     expect(generateDummyText({locale:"la",unit:"sentences",count:0,seed:0})).toBe("");
