@@ -45,6 +45,8 @@ function inputSelector(id: ToolId): string {
   if (id === "env") return "#env-left";
   if (id === "contrast") return ".color-controls";
   if (id === "shortcuts") return '[data-testid="shortcut-capture"]';
+  if (id === "sri") return "#sri-hex";
+  if (id === "encoding" || id === "magic") return '[data-testid="selected-file"]';
   return `#${id}-input`;
 }
 
