@@ -207,7 +207,7 @@ describe("App integration with real local tools", () => {
     expect(setFontLocale).toHaveBeenCalledWith("en");
   });
 
-  it.each(["sets", "json-format", "contrast"])(
+  it.each(["sets", "json-format", "contrast", "radix"])(
     "keeps the disabled %s tool URL and does not instantiate its component",
     async (id) => {
       const wrapper = await mountApp(`#/tool/${id}`);
@@ -275,6 +275,35 @@ describe("App integration with real local tools", () => {
     await flushPromises();
     expect(wrapper.find(".result-panel").exists()).toBe(false);
     expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+  });
+
+  it("defers large radix input and applies only the latest value on demand", async () => {
+    controlExecutionClock();
+    settings.preferences.enabledTools.push("radix");
+    settings.preferences.autoApply = false;
+    const wrapper = await mountApp("#/tool/radix");
+    await expectElement(wrapper, "#quick-input");
+    const control = () => wrapper.get('[data-testid="apply-control"]');
+    await wrapper.get("#quick-input").setValue("1".repeat(2_048));
+    await flushPromises();
+    expect(control().attributes("data-mode")).toBe("deferred");
+    expect(control().attributes("data-status")).toBe("manual");
+    expect(wrapper.find(".result-panel").exists()).toBe(false);
+
+    await advanceExecutionClock(1_600);
+    expect(wrapper.find(".result-panel").exists()).toBe(false);
+    await wrapper.get('[data-testid="apply-now"]').trigger("click");
+    await flushPromises();
+    expect(control().attributes("data-status")).toBe("applied");
+    expect(wrapper.findAll('[data-testid="quick-output-row"]')[2]!.get("td code").text()).toBe("1".repeat(2_048));
+
+    await wrapper.get("#quick-input").setValue("2".repeat(2_048));
+    await flushPromises();
+    expect(wrapper.find(".result-panel").exists()).toBe(false);
+    expect(control().attributes("data-status")).toBe("manual");
+    await wrapper.get('[data-testid="apply-now"]').trigger("click");
+    await flushPromises();
+    expect(wrapper.findAll('[data-testid="quick-output-row"]')[2]!.get("td code").text()).toBe("2".repeat(2_048));
   });
 
   it("debounces large JSON, switches to manual apply, and discards outdated results", async () => {

@@ -797,7 +797,7 @@ onBeforeUnmount(() => {
             <PathBatchTool v-else-if="selectedTool.id === 'path-batch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <PaletteTool v-else-if="selectedTool.id === 'color-palette'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <QuickTool
-              v-else-if="['data-units', 'css-units', 'unicode-normalize', 'slug', 'unicode-escape'].includes(selectedTool.id)"
+              v-else-if="['data-units', 'css-units', 'radix', 'unicode-normalize', 'slug', 'unicode-escape'].includes(selectedTool.id)"
               :id="selectedTool.id as QuickToolId"
               :key="`${selectedTool.id}:${preferences.locale}`"
             />

@@ -13,8 +13,51 @@ async function enableUnicodeEscape(page: Page) {
   await expect(page.locator("#quick-text")).toBeVisible();
 }
 
+async function enableRadix(page: Page) {
+  await expect(page.getByTestId("tool-disabled")).toBeVisible();
+  await page.getByTestId("disabled-settings").click();
+  const toggle = page.getByTestId("toggle-radix");
+  await expect(toggle).toHaveAttribute("aria-checked", "false");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-checked", "true");
+  await page.getByTestId("settings-close").click();
+  await expect(page.locator("#quick-input")).toBeVisible();
+}
+
 for (const locale of LOCALES) {
-  test("five private converters, i18n and opt-in in " + locale, async ({ page }) => {
+  test("private quick converters, i18n and opt-in in " + locale, async ({ page }, testInfo) => {
+    await page.goto("./" + locale + "/tools/radix/");
+    await enableRadix(page);
+    await page.locator("#quick-input").fill("9007199254740993");
+    const radixRows = page.getByTestId("quick-output-row");
+    await expect(radixRows).toHaveCount(5);
+    const expected = [
+      "100000000000000000000000000000000000000000000000000001",
+      "400000000000000001",
+      "9007199254740993",
+      "20000000000001",
+      "2GOSA7PA2GX",
+    ];
+    for (let index = 0; index < expected.length; index++)
+      await expect(radixRows.nth(index).locator("td code")).toHaveText(expected[index]!);
+    if (locale === "en" && testInfo.project.name === "chromium-desktop") {
+      await testInfo.attach("radix-light-desktop", {
+        body: await page.screenshot(), contentType: "image/png",
+      });
+      await page.getByTestId("settings-button").click();
+      await page.getByTestId("theme-dark").click();
+      await page.getByTestId("settings-close").click();
+      await testInfo.attach("radix-dark-desktop", {
+        body: await page.screenshot(), contentType: "image/png",
+      });
+    }
+    await page.getByTestId("quick-radix-base").selectOption("16");
+    await page.locator("#quick-input").fill("ff");
+    await expect(radixRows.nth(2).locator("td code")).toHaveText("255");
+    await page.locator("#quick-input").fill("G");
+    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.locator(".result-panel")).toHaveCount(0);
+
     await page.goto("./" + locale + "/tools/data-units/");
     await page.getByTestId("quick-input").fill("1");
     await expect(page.getByTestId("quick-output")).toContainText("B = 1,048,576");
@@ -55,9 +98,24 @@ for (const locale of LOCALES) {
   });
 }
 
-test("invalid values, copy, no secret persistence or network transmissions", async ({ page }) => {
-  const requests: string[] = [];
-  page.on("request", (request) => requests.push(request.url()));
+test("invalid values and input privacy", async ({ page }) => {
+  const requests: Array<{ url: string; method: string; body: string | null; headers: string }> = [];
+  page.on("request", (request) => requests.push({
+    url: request.url(), method: request.method(), body: request.postData(),
+    headers: JSON.stringify(request.headers()),
+  }));
+  await page.goto("./en/tools/radix/");
+  await enableRadix(page);
+  const radixSecret = "1234567890123456789012345678901234567890";
+  await page.locator("#quick-input").fill(radixSecret);
+  await expect(page.getByTestId("quick-output-row")).toHaveCount(5);
+  const radixState = await page.evaluate(() => ({
+    preferences: localStorage.getItem("army-knife:preferences:v1"),
+    session: Object.values(sessionStorage),
+    location: window.location.href,
+  }));
+  expect(JSON.stringify(radixState)).not.toContain(radixSecret);
+
   await page.goto("./en/tools/data-units/");
   await page.getByTestId("quick-input").fill("1e100");
   await expect(page.getByRole("alert")).toBeVisible();
@@ -75,9 +133,13 @@ test("invalid values, copy, no secret persistence or network transmissions", asy
   }));
   expect(JSON.stringify(values)).not.toContain(secret);
   for (const request of requests) {
-    const url = new URL(request);
+    const url = new URL(request.url);
     expect(url.search).toBe("");
-    expect(request).not.toContain(secret);
+    expect(request.url + (request.body ?? "")).not.toContain(secret);
+    expect(request.url + (request.body ?? "")).not.toContain(radixSecret);
+    expect(request.headers).not.toContain(secret);
+    expect(request.headers).not.toContain(radixSecret);
+    expect(request.method).toBe("GET");
     expect(url.origin).toBe("http://127.0.0.1:4173");
   }
 });

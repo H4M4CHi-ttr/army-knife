@@ -10,16 +10,19 @@ import EmptyResult from "@/components/EmptyResult.vue";
 import { useToolExecution } from "@/composables/useToolExecution";
 import {
   QUICK_LIMITS,
+  RADIX_BASES,
   SIZE_UNITS,
   CSS_UNITS,
   convertDataUnits,
   convertCssUnits,
+  convertRadixInteger,
   normalizeUnicode,
   createSlugs,
   convertUnicodeEscape,
   type QuickToolId,
   type UnicodeForm,
   type CssUnit,
+  type RadixBase,
   type CssContext,
   type SlugMode,
   type SlugSeparator,
@@ -31,6 +34,7 @@ const props = defineProps<{ id: QuickToolId }>();
 const { t } = useAppI18n();
 const input = ref("");
 const sizeUnit = ref("MiB");
+const radixBase = ref<RadixBase>(10);
 const rate = ref(false);
 const cssUnit = ref<CssUnit>("px");
 const cssContext = reactive<CssContext>({ root: "16", element: "16", width: "1440", height: "900" });
@@ -45,11 +49,11 @@ const cssFields: { key: keyof CssContext; label: string }[] = [
   { key: "width", label: "quick.width" },
   { key: "height", label: "quick.height" },
 ];
-const isNumber = props.id === "data-units" || props.id === "css-units";
+const isNumber = props.id === "data-units" || props.id === "css-units" || props.id === "radix";
 
 const { result, error, control, apply, cancel, setAuto } = useToolExecution<QuickResult>({
   source: () => [
-    input.value, props.id, sizeUnit.value, rate.value, cssUnit.value,
+    input.value, props.id, sizeUnit.value, rate.value, radixBase.value, cssUnit.value,
     cssContext.root, cssContext.element, cssContext.width, cssContext.height,
     form.value, slugMode.value, separator.value, notation.value, direction.value,
   ],
@@ -65,6 +69,8 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<Quic
         );
       case "css-units":
         return convertCssUnits(input.value, cssUnit.value, cssContext);
+      case "radix":
+        return convertRadixInteger(input.value, radixBase.value);
       case "unicode-normalize":
         return normalizeUnicode(input.value, form.value);
       case "slug":
@@ -79,6 +85,7 @@ function sample() {
   switch (props.id) {
     case "data-units": input.value = "1"; sizeUnit.value = "MiB"; rate.value = false; break;
     case "css-units": input.value = "16"; cssUnit.value = "px"; break;
+    case "radix": input.value = "9007199254740993"; radixBase.value = 10; break;
     case "unicode-normalize": input.value = "Cafe\u0301 ① 👩‍💻"; break;
     case "slug": input.value = "Café Déjà Vu\nCafé Déjà Vu"; break;
     case "unicode-escape":
@@ -110,6 +117,12 @@ function sample() {
         <option v-for="unit in SIZE_UNITS" :key="unit.symbol" :value="unit.symbol">
           {{ rate ? (unit.symbol.endsWith("B") ? unit.symbol + "/s" : unit.symbol + "ps") : unit.symbol }}
         </option>
+      </select>
+    </div>
+    <div v-else-if="id === 'radix'" class="quick-options">
+      <label class="field-label" for="quick-radix-base">{{ t("quick.radixBase") }}</label>
+      <select id="quick-radix-base" v-model.number="radixBase" class="native-select" data-testid="quick-radix-base">
+        <option v-for="base in RADIX_BASES" :key="base" :value="base">{{ t("quick.radix." + base) }}</option>
       </select>
     </div>
     <div v-else-if="id === 'css-units'" class="quick-options">
@@ -161,8 +174,8 @@ function sample() {
       </select>
     </div>
     <div v-if="isNumber" class="quick-number">
-      <label class="field-label" for="quick-input">{{ t("quick.amount") }}</label>
-      <Input id="quick-input" v-model="input" inputmode="decimal" maxlength="96"
+      <label class="field-label" for="quick-input">{{ t(id === 'radix' ? "quick.integer" : "quick.amount") }}</label>
+      <Input id="quick-input" v-model="input" :inputmode="id === 'radix' ? 'text' : 'decimal'" :maxlength="id === 'radix' ? QUICK_LIMITS.radixBytes : 96"
         data-testid="quick-input" spellcheck="false" />
     </div>
     <CodeInput v-else v-model="input" :label="t('labels.input')" input-id="quick-text"
@@ -186,8 +199,8 @@ function sample() {
           <tr><th>{{ t("labels.name") }}</th><th>{{ t("labels.value") }}</th></tr>
         </thead>
         <tbody>
-          <tr v-for="(row, index) in result.rows" :key="index">
-            <th class="quick-label"><code>{{ row.label }}</code></th>
+          <tr v-for="(row, index) in result.rows" :key="index" data-testid="quick-output-row">
+            <th class="quick-label"><code>{{ id === 'radix' ? t("quick.radix." + row.label) : row.label }}</code></th>
             <td class="quick-value"><code>{{ row.value }}</code></td>
           </tr>
         </tbody>

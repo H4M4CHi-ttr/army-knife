@@ -44,7 +44,7 @@ The App integration tests use `@vue/test-utils` and happy-dom to mount the actua
 
 ## Browser coverage
 
-The five lightweight converter engines have dedicated pure TypeScript regression tests in `src/lib/tools/quick-converters.test.ts` for SI/IEC precision, CSS font/viewport contexts, Unicode normalization, Slug collisions, and U+/JS escape parsing including invalid scalar values. `tests/e2e/quick.spec.ts` covers all five locales in Chromium and Firefox across desktop/small viewports, explicit opt-in, errors, and no secret persistence or network-parameter leakage.
+The lightweight converter engines have dedicated pure TypeScript regression tests in `src/lib/tools/quick-converters.test.ts` for SI/IEC precision, CSS font/viewport contexts, exact signed radix conversion, Unicode normalization, Slug collisions, and U+/JS escape parsing including invalid scalar values. `tests/e2e/quick.spec.ts` covers all five locales in Chromium and Firefox across desktop/small viewports, explicit opt-in, errors, and no secret persistence or network-parameter leakage. Radix coverage includes a value above JavaScript's safe-integer range and invalid base digits.
 
 Base64 text conversion includes RFC 4648, Unicode, BOM, invalid UTF-8, alphabet/padding and size-limit unit tests. `tests/e2e/base64.spec.ts` covers fresh-install opt-in, standard and URL-safe conversions in all five locales across Chromium/Firefox desktop/small, noncanonical/error handling, Worker execution, output download and privacy checks.
 

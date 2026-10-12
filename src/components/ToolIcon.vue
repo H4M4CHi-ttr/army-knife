@@ -35,6 +35,7 @@ defineProps<{ id: ToolId }>();
 const icons = {
   chmod: FileLock2,
   base64: Binary,
+  radix: Binary,
   shortcuts: Keyboard,
   har: Activity,
   env: FileKey2,
