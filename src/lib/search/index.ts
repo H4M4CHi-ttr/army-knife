@@ -8,7 +8,7 @@ import { searchIntents, type SearchIntentMap } from "./intents";
  */
 export interface SearchLanguagePack {
   language: string;
-  labels: Readonly<Record<string, string>>;
+  labels: Readonly<Record<string, unknown>>;
   intents: Partial<SearchIntentMap>;
 }
 
@@ -60,6 +60,18 @@ function terms(text: string): Set<string> {
   return result;
 }
 
+/** Look up vue-i18n flatJson keys before or after it nests the messages. */
+export function searchLabel(labels: Readonly<Record<string, unknown>>, key: string): string | undefined {
+  const flat = labels[key];
+  if (typeof flat === "string") return flat;
+  let current: unknown = labels;
+  for (const segment of key.split(".")) {
+    if (!current || typeof current !== "object" || Array.isArray(current)) return undefined;
+    current = (current as Record<string, unknown>)[segment];
+  }
+  return typeof current === "string" ? current : undefined;
+}
+
 function field(text: string, weight: number): SearchField | null {
   const normalized = normalize(text);
   if (!normalized) return null;
@@ -83,8 +95,8 @@ export function createToolSearch(
       field(tool.keywords, 0.85),
     ];
     for (const pack of packs) {
-      const title = pack.labels["tool." + tool.id + ".name"];
-      const description = pack.labels["tool." + tool.id + ".description"];
+      const title = searchLabel(pack.labels, "tool." + tool.id + ".name");
+      const description = searchLabel(pack.labels, "tool." + tool.id + ".description");
       if (title) fields.push(field(title, 3.1));
       if (description) fields.push(field(description, 0.9));
       for (const example of pack.intents[tool.id] ?? []) {
@@ -153,6 +165,6 @@ export const searchTools = createToolSearch(
   Object.entries(searchIntents).map(([language, intents]) => ({
     language,
     intents,
-    labels: messages[language as keyof typeof messages] as Readonly<Record<string, string>>,
+    labels: messages[language as keyof typeof messages] as Readonly<Record<string, unknown>>,
   })),
 );
