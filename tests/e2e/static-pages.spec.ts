@@ -234,7 +234,27 @@ test("disabled preferences keep the static explanation and prevent tool launch e
 
 test("normal-path SPA navigation keeps one document across repeat, history, category, and refresh", async ({
   page,
+  baseURL,
 }) => {
+  const credentialProbe = "spa-navigation-credential-probe";
+  const fetchRequests: {
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    body: string | null;
+  }[] = [];
+  page.on("request", (request: Request) => {
+    if (request.resourceType() !== "fetch") return;
+    fetchRequests.push({
+      url: request.url(),
+      method: request.method(),
+      headers: request.headers(),
+      body: request.postData(),
+    });
+  });
+  await page.context().addCookies([
+    { name: credentialProbe, value: "must-not-be-sent", url: new URL(baseURL as string).origin },
+  ]);
   let documentLoads = 0;
   page.on("load", () => documentLoads++);
   await page.goto(localeHomePath("en"));
@@ -289,6 +309,7 @@ test("normal-path SPA navigation keeps one document across repeat, history, cate
   expect(await currentDocumentToken()).toBe(documentToken);
 
   await page.locator("#cidr-input").fill("192.0.2.0/24");
+  await page.locator("#cidr-input").fill(PRIVATE_MARKER);
   await page.locator(".back-link").click();
   await expect(page).toHaveURL(new RegExp(localeHomePath("en") + "$"));
   await expect(page.locator("#page-guide")).toHaveAttribute("data-page", "home");
@@ -314,6 +335,23 @@ test("normal-path SPA navigation keeps one document across repeat, history, cate
   await expect(page.locator("#url-input")).toHaveValue("");
   expect(await currentDocumentToken()).toBe(documentToken);
   expect(documentLoads).toBe(1);
+  expect(fetchRequests.length).toBeGreaterThan(0);
+  const origin = new URL(baseURL as string).origin;
+  const staticRoutePaths = new Set([
+    localeHomePath("en"),
+    toolPath("en", "cidr"),
+    toolPath("en", "url"),
+  ]);
+  for (const request of fetchRequests) {
+    const url = new URL(request.url);
+    expect(url.origin, request.url).toBe(origin);
+    expect(staticRoutePaths.has(url.pathname), request.url).toBe(true);
+    expect(request.method, request.url).toBe("GET");
+    expect(url.search, request.url).toBe("");
+    expect(request.body, request.url).toBeNull();
+    expect(request.headers.cookie ?? "", request.url).not.toContain(credentialProbe);
+    expect(JSON.stringify(request)).not.toContain(PRIVATE_MARKER);
+  }
 
   await page.reload();
   await expect(page.locator("#url-input")).toHaveValue("");
