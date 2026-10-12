@@ -21,7 +21,7 @@ self.onmessage = async (event: MessageEvent<Request>) => {
       self.postMessage({ ok: true, result: await generateSri(view, algorithm, /\.css$/i.test(filename)) });
     } else if (action === "convert") {
       const converted = convertEncoding(view, lineEnding);
-      self.postMessage({ ok: true, result: converted.buffer }, [converted.buffer]);
+      self.postMessage({ ok: true, result: converted.buffer });
     } else {
       throw new ToolError("INVALID_REQUEST");
     }
