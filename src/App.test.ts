@@ -189,10 +189,14 @@ describe("App integration with real local tools", () => {
       "tool-card-har",
       "tool-card-json-diff",
       "tool-card-logs",
+      "tool-card-og-tags",
       "tool-card-shortcuts",
       "tool-card-unicode",
       "tool-card-url",
     ]);
+    for (const id of ["timestamp", "jwt", "ids", "password"]) {
+      expect(wrapper.find(`[data-testid="tool-card-${id}"]`).exists()).toBe(false);
+    }
     expect(wrapper.find(".tool-panel").exists()).toBe(false);
     expect(setFontLocale).toHaveBeenCalledWith("en");
   });
