@@ -17,20 +17,36 @@ async function load(): Promise<void> {
   if (!response.ok) throw new Error("Local classifier asset unavailable.");
   const declared = Number(response.headers.get("content-length") ?? "0");
   if (declared > MAX_GZIP_BYTES) throw new Error("Classifier exceeds compressed size limit.");
-  const compressed = await response.arrayBuffer();
-  if (compressed.byteLength > MAX_GZIP_BYTES) throw new Error("Classifier too large.");
-  if (typeof DecompressionStream !== "function") {
-    throw new Error("This browser does not support gzip decompression.");
+  // Some static hosts (including Vite preview) serve .json.gz with
+  // Content-Encoding: gzip. Fetch then transparently decompresses the body.
+  // Other hosts return the gzip file as-is. Never decompress twice.
+  const payload = await response.arrayBuffer();
+  const isGzip = payload.byteLength >= 2 &&
+    new Uint8Array(payload, 0, 2)[0] === 0x1f &&
+    new Uint8Array(payload, 0, 2)[1] === 0x8b;
+  if (isGzip && payload.byteLength > MAX_GZIP_BYTES) {
+    throw new Error("Classifier compressed data too large.");
   }
-  const body = new Response(compressed).body;
-  if (!body) throw new Error("Missing classifier data.");
+  if (!isGzip && payload.byteLength > MAX_JSON_CHARS * 2) {
+    throw new Error("Classifier decoded data too large.");
+  }
   const started = performance.now();
-  const json = await new Response(body.pipeThrough(new DecompressionStream("gzip"))).text();
+  let json: string;
+  if (isGzip) {
+    if (typeof DecompressionStream !== "function") {
+      throw new Error("This browser cannot decompress gzip data.");
+    }
+    const body = new Response(payload).body;
+    if (!body) throw new Error("Missing classifier data.");
+    json = await new Response(body.pipeThrough(new DecompressionStream("gzip"))).text();
+  } else {
+    json = new TextDecoder("utf-8", { fatal: true }).decode(payload);
+  }
   if (json.length > MAX_JSON_CHARS) throw new Error("Classifier JSON exceeds limit.");
   classifier = createBrowserClassifier(JSON.parse(json) as unknown);
   scope.postMessage({
     type: "ready",
-    bytes: compressed.byteLength,
+    bytes: declared || (isGzip ? payload.byteLength : 0),
     features: classifier.featureCount,
     weightBytes: classifier.weightBytes,
     loadingMs: performance.now() - started,
