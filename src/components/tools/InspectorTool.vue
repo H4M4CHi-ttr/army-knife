@@ -118,7 +118,7 @@ function preview(value: string): string {
       </select>
     </div>
     <div v-if="kind === 'string-literals'" class="control-row inspect-options">
-      <label for="inspect-format" class="field-label">{{ t("inspector.format") }}</label>
+      <label for="inspect-format" class="field-label">{{ t("inspector.literalFormat") }}</label>
       <select id="inspect-format" v-model="literalFormat" class="native-select" data-testid="inspect-format">
         <option v-for="format in ['json','js','c','xml','csv','sql'] as const" :key="format" :value="format">
           {{ t("inspector.format." + format) }}
