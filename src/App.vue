@@ -740,22 +740,22 @@ onBeforeUnmount(() => {
                 selectedTool.id === 'sets'
               "
               :id="selectedTool.id"
-              :key="selectedTool.id"
+              :key="`${selectedTool.id}:${preferences.locale}`"
             />
             <JsonTool
               v-else-if="selectedTool.id === 'json-diff' || selectedTool.id === 'json-format'"
               :id="selectedTool.id"
-              :key="selectedTool.id"
+              :key="`${selectedTool.id}:${preferences.locale}`"
             />
-            <CidrTool v-else-if="selectedTool.id === 'cidr'" />
-            <UnicodeTool v-else-if="selectedTool.id === 'unicode'" />
-            <ContrastTool v-else-if="selectedTool.id === 'contrast'" />
-            <HarTool v-else-if="selectedTool.id === 'har'" />
-            <EnvTool v-else-if="selectedTool.id === 'env'" />
-            <UrlTool v-else-if="selectedTool.id === 'url'" />
-            <ExplainTool v-else-if="selectedTool.id === 'explain'" />
-            <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" />
-            <ChmodTool v-else-if="selectedTool.id === 'chmod'" />
+            <CidrTool v-else-if="selectedTool.id === 'cidr'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <UnicodeTool v-else-if="selectedTool.id === 'unicode'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ContrastTool v-else-if="selectedTool.id === 'contrast'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <HarTool v-else-if="selectedTool.id === 'har'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <EnvTool v-else-if="selectedTool.id === 'env'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <UrlTool v-else-if="selectedTool.id === 'url'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ExplainTool v-else-if="selectedTool.id === 'explain'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ChmodTool v-else-if="selectedTool.id === 'chmod'" :key="`${selectedTool.id}:${preferences.locale}`" />
           </template>
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">
