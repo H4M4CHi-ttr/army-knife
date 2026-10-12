@@ -72,7 +72,7 @@ def report(result):
         "- Only the intent index is running in the deployed browser app; classifier and Model2Vec here use a GitHub Actions Linux CPU runner.",
         "",
         "| Approach | Recall@1 | Recall@3 | p50 query | p95 query | Model data |",
-        "|---|---:|---:|---:|---:|---:|",
+        "|---|---:|---:|---:|---:|---:|---:|",
     ]
     for key, label in labels.items():
         x = result["methods"].get(key)
@@ -87,7 +87,7 @@ def report(result):
         )
 
     lines += ["", "## Recall@1 by language", "",
-              "| Language | Old | Intent | Classifier | M2V best | M2V centroid |",
+              "| Language | Old | Intent | Classifier | Hybrid | M2V best | M2V centroid |",
               "|---|---:|---:|---:|---:|---:|"]
     for lang in result["languages"]:
         cells = []
