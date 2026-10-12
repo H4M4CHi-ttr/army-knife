@@ -1,5 +1,10 @@
 # DevToys overlap policy
 
+## Design / filename tools (2026-10-12)
+
+Cubic-bezier easing, CSS gradient builder, SVG placeholder generator, batch path-string conversion and HSL palette generation are **all opt-in**. Their relationship to bundled DevToys versions and extensions has not been conclusively reverified, so the conservative DevToys-overlap policy is used; no absence claim is made. Each is client-only without added packages.
+
+
 This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool list](https://devtoys.app/) and the [default-tools repository](https://github.com/DevToys-app/DevToys.Tools). DevToys extensions are open-ended, so this is a comparison with the official bundled tools, with known older bundled tools treated conservatively. It is not a claim that no third-party DevToys extension offers a similar feature.
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |

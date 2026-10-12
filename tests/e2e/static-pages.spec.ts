@@ -50,6 +50,10 @@ function inputSelector(id: ToolId): string {
   if (id === "ids") return '[data-testid="id-format"]';
   if (id === "password") return '[data-testid="secret-mode"]';
   if (id === "og-tags") return '[data-testid="og-title"]';
+  if (id === "cubic-bezier") return "#bezier-duration";
+  if (id === "css-gradient") return "#gradient-kind";
+  if (id === "svg-placeholder") return "#placeholder-width";
+  if (id === "color-palette") return "#palette-base";
   return `#${id}-input`;
 }
 

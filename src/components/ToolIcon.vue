@@ -49,6 +49,11 @@ const icons = {
   "dummy-text": ScanText,
   "css-specificity": Contrast,
   "fluid-type": TableProperties,
+  "cubic-bezier": Workflow,
+  "css-gradient": Contrast,
+  "svg-placeholder": Braces,
+  "path-batch": TableProperties,
+  "color-palette": Contrast,
 };
 </script>
 <template><component :is="icons[id]" aria-hidden="true" :stroke-width="1.7" /></template>

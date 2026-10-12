@@ -4,6 +4,7 @@ import { chmodGuide } from "./chmod-guide.ts";
 import { base64Guide } from "./base64-guide.ts";
 import { fiveToolGuides } from "./five-tool-guides.ts";
 import { utilityGuides } from "./utility-guides.ts";
+import { designGuides } from "./design-guides.ts";
 
 /** Public documentation only. User input never becomes part of this data. */
 export interface ToolGuide {
@@ -141,6 +142,7 @@ function localized(
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
   ...utilityGuides,
+  ...designGuides,
   chmod: chmodGuide,
   base64: base64Guide,
   ...fiveToolGuides,
