@@ -80,6 +80,11 @@ describe("magic bytes and extension hints (#88)", () => {
     expect(inspectMagic(ascii("SQLite format 3\u0000"), "data.db").candidates[0]?.format).toBe("SQLite 3");
     expect(inspectMagic(Uint8Array.from([0x89,0x50,0x4e]), "partial.png").warnings).toContain("UNKNOWN_SIGNATURE");
     expect(inspectMagic(new Uint8Array(), "").warnings).toContain("UNKNOWN_SIGNATURE");
+    const png = Uint8Array.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]);
+    expect(inspectMagic(png, "file.png", "application/pdf").warnings).toContain("MIME_MISMATCH");
+    expect(inspectMagic(png, "file.png", "image/png").warnings).not.toContain("MIME_MISMATCH");
+    expect(inspectMagic(png, "file.png", "application/octet-stream").warnings).not.toContain("MIME_MISMATCH");
+    expect(inspectMagic(png, "file.png", "").warnings).not.toContain("MIME_MISMATCH");
   });
   it("reports PDF plus ZIP trailer as a possible polyglot rather than safe content", () => {
     const binary = Uint8Array.from([...ascii("%PDF-1.5\n"), ...ascii("PK\u0005\u0006"), ...new Uint8Array(18)]);
