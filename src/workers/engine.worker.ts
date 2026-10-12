@@ -1,6 +1,7 @@
 import init, { run } from "../lib/wasm/pkg/army_knife_core.js";
 import wasmUrl from "../lib/wasm/pkg/army_knife_core_bg.wasm?url";
 import type { EngineEnvelope, WorkerRequest, WorkerResponse } from "../lib/wasm/types";
+import { findUtf8InputError } from "../lib/wasm/limits";
 
 // Avoid adding WebWorker globals to the entire application's DOM TypeScript scope.
 const scope = self as unknown as {
@@ -18,6 +19,13 @@ scope.onmessage = async (event) => {
     scope.postMessage({ id, response });
     scope.close();
   };
+
+  // Scan the exact UTF-8 sizes in the worker, not in the input event handler.
+  const sizeError = findUtf8InputError(request);
+  if (sizeError) {
+    finish({ ok: false, error: { code: sizeError, message: sizeError } });
+    return;
+  }
 
   try {
     // Vite resolves this asset under the deployment base, so the module is loaded
