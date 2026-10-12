@@ -67,6 +67,7 @@ const searchInput = ref<HTMLInputElement>();
 const heading = ref<HTMLElement>();
 const settingsButton = ref<InstanceType<typeof Button>>();
 let settingsTrigger: HTMLElement | null = null;
+let focusHeadingAfterSettingsClose = false;
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const logo = `${import.meta.env.BASE_URL}favicon.svg`;
 const languageNames = {
@@ -194,6 +195,11 @@ function openSettings(event?: Event) {
 }
 function restoreSettingsFocus(event: Event) {
   event.preventDefault();
+  if (focusHeadingAfterSettingsClose) {
+    focusHeadingAfterSettingsClose = false;
+    void nextTick(() => heading.value?.focus({ preventScroll: true }));
+    return;
+  }
   (settingsTrigger?.isConnected
     ? settingsTrigger
     : (settingsButton.value?.$el as HTMLElement)
@@ -331,6 +337,7 @@ async function navigateTo(
 
   if (pathChanged) {
     renderedPath = destination.pathname;
+    if (settingsOpen.value) focusHeadingAfterSettingsClose = true;
     settingsOpen.value = false;
     if (historyMode !== "pop")
       window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -733,22 +740,22 @@ onBeforeUnmount(() => {
                 selectedTool.id === 'sets'
               "
               :id="selectedTool.id"
-              :key="preferences.locale + ':' + selectedTool.id"
+              :key="selectedTool.id"
             />
             <JsonTool
               v-else-if="selectedTool.id === 'json-diff' || selectedTool.id === 'json-format'"
               :id="selectedTool.id"
-              :key="preferences.locale + ':' + selectedTool.id"
+              :key="selectedTool.id"
             />
-            <CidrTool v-else-if="selectedTool.id === 'cidr'" :key="preferences.locale" />
-            <UnicodeTool v-else-if="selectedTool.id === 'unicode'" :key="preferences.locale" />
-            <ContrastTool v-else-if="selectedTool.id === 'contrast'" :key="preferences.locale" />
-            <HarTool v-else-if="selectedTool.id === 'har'" :key="preferences.locale" />
-            <EnvTool v-else-if="selectedTool.id === 'env'" :key="preferences.locale" />
-            <UrlTool v-else-if="selectedTool.id === 'url'" :key="preferences.locale" />
-            <ExplainTool v-else-if="selectedTool.id === 'explain'" :key="preferences.locale" />
-            <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" :key="preferences.locale" />
-            <ChmodTool v-else-if="selectedTool.id === 'chmod'" :key="preferences.locale" />
+            <CidrTool v-else-if="selectedTool.id === 'cidr'" />
+            <UnicodeTool v-else-if="selectedTool.id === 'unicode'" />
+            <ContrastTool v-else-if="selectedTool.id === 'contrast'" />
+            <HarTool v-else-if="selectedTool.id === 'har'" />
+            <EnvTool v-else-if="selectedTool.id === 'env'" />
+            <UrlTool v-else-if="selectedTool.id === 'url'" />
+            <ExplainTool v-else-if="selectedTool.id === 'explain'" />
+            <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" />
+            <ChmodTool v-else-if="selectedTool.id === 'chmod'" />
           </template>
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">
