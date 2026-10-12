@@ -15,6 +15,11 @@ import {
   Keyboard,
   FileLock2,
   Binary,
+  CalendarClock,
+  Fingerprint,
+  KeyRound,
+  LockKeyhole,
+  Share2,
 } from "@lucide/vue";
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
@@ -34,6 +39,11 @@ const icons = {
   "json-diff": GitCompareArrows,
   "json-format": Braces,
   contrast: Contrast,
+  timestamp: CalendarClock,
+  jwt: KeyRound,
+  ids: Fingerprint,
+  password: LockKeyhole,
+  "og-tags": Share2,
   "html-entities": Braces,
   "url-encode": Link2,
   "dummy-text": ScanText,
