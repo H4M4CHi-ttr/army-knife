@@ -106,11 +106,12 @@ export interface MagicReport {
   trailerHex: string;
   candidates: SignatureCandidate[];
   extension: string;
+  declaredMime: string;
   warnings: string[];
 }
 
 /** Read-only fixed-signature hints, not a parser, antivirus scanner or authenticity proof. */
-export function inspectMagic(bytes: Uint8Array, filename = ""): MagicReport {
+export function inspectMagic(bytes: Uint8Array, filename = "", declaredMime = ""): MagicReport {
   checkSize(bytes);
   const candidates: SignatureCandidate[] = [];
   const add = (format: string, mime: string, extensions: string[]) =>
@@ -151,14 +152,26 @@ export function inspectMagic(bytes: Uint8Array, filename = ""): MagicReport {
     }
   }
   const extension = /\.([a-z0-9]+)$/i.exec(filename)?.[1]?.toLowerCase() ?? "";
+  // File.type is a user-controlled browser/OS hint, not a signature or trusted source.
+  const normalizedMime = declaredMime.toLowerCase().split(";")[0]?.trim() ?? "";
   const warnings: string[] = [];
   if (!candidates.length) warnings.push("UNKNOWN_SIGNATURE");
   if (candidates.length > 1) warnings.push("MULTIPLE_SIGNATURES");
   if (extension && candidates.length &&
       !candidates.some((item) => item.extensions.includes(extension)))
     warnings.push("EXTENSION_MISMATCH");
+  const zipContainerMime = /^(?:application\/(?:vnd\.openxmlformats-officedocument\.(?:wordprocessingml|spreadsheetml|presentationml)\.(?:document|sheet|presentation)|vnd\.android\.package-archive|java-archive|epub\+zip|x-zip-compressed))$/;
+  const mimeMatches = candidates.some((item) =>
+    item.mime === normalizedMime ||
+    (item.format === "ZIP" && zipContainerMime.test(normalizedMime)) ||
+    (item.format === "DOS/PE candidate" &&
+      ["application/vnd.microsoft.portable-executable", "application/x-msdos-program"].includes(normalizedMime)),
+  );
+  if (normalizedMime && normalizedMime !== "application/octet-stream" &&
+      candidates.length && !mimeMatches)
+    warnings.push("MIME_MISMATCH");
   return {
-    size: bytes.byteLength, extension,
+    size: bytes.byteLength, extension, declaredMime: normalizedMime,
     headerHex: hex(bytes.subarray(0, 32)),
     trailerHex: hex(trailer.subarray(Math.max(0, trailer.length - 16))),
     candidates, warnings,
