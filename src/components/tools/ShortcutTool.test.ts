@@ -243,7 +243,7 @@ describe("shortcut investigation through the real app", () => {
     );
   });
 
-  it("reacts to all five UI languages without resetting the selected sequence", async () => {
+  it("reacts to all five UI languages and clears input on locale navigation", async () => {
     const wrapper = await mountTool();
     await wrapper.get('[data-testid="shortcut-manual"]').setValue("g then i");
     await wrapper.get('[data-testid="shortcut-app"]').setValue("github");
@@ -253,6 +253,12 @@ describe("shortcut investigation through the real app", () => {
       settings.preferences.locale = locale;
       await nextTick();
       await flushPromises();
+      expect(capture(wrapper).value).toBe("");
+      expect(
+        (wrapper.get('[data-testid="shortcut-manual"]').element as HTMLInputElement).value,
+      ).toBe("");
+      await wrapper.get('[data-testid="shortcut-manual"]').setValue("g then i");
+      await wrapper.get('[data-testid="shortcut-app"]').setValue("github");
       expect(capture(wrapper).value).toBe("G then I");
       expect(results(wrapper).length).toBeGreaterThan(0);
       const count = wrapper.get('[data-testid="shortcut-result-count"]').text();
@@ -267,7 +273,7 @@ describe("shortcut investigation through the real app", () => {
         expect(candidate).not.toBe(englishCandidate);
       }
     }
-  });
+  });;
 
   it("preserves reported key, code, and numpad location without inferring a layout", async () => {
     const wrapper = await mountTool();
