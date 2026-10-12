@@ -60,6 +60,7 @@ def report(result):
         "old_substring": "Old locale-only substring",
         "lexical": "Current 5-language intent index",
         "classifier": "TF-IDF character 2-4gram + LinearSVC",
+        "hybrid": "RRF (intent index + classifier)",
         "model2vec_max": "Model2Vec int8, best prototype",
         "model2vec_centroid": "Model2Vec int8, per-tool centroid",
     }
@@ -101,6 +102,7 @@ def report(result):
         f"- Pinned Model2Vec model files: **{mb(result.get('model_files_bytes'))}** on disk, without its JS/WASM runtime.",
         "- LinearSVC settings: C=1, fixed character n-grams of lengths 2-4; all methods use the identical pre-existing corpus.",
         "- Model2Vec compares cosine similarity against individual prototypes, or an averaged prototype per tool; both variants are reported.",
+        "- Hybrid uses an untuned reciprocal rank fusion (k=15) of the existing intent ranker and the supervised classifier.",
         "- Query timing includes vectorization or embedding and ranking, but not first download, initialization or model index construction.",
         "- Timings are Python CPU versus JavaScript test-runner CPU, not matched browser executions.",
         "- Test prompts were authored for this evaluation, not collected from real users. This is a regression comparison, not a population accuracy estimate.",
@@ -175,6 +177,30 @@ def main():
     result["classifier_export_bytes"] = len(payload)
     result["methods"]["classifier"]["data_bytes"] = len(payload)
     (OUT / "classifier-portable.json.gz").write_bytes(payload)
+    # Exploration only: fixed, untuned reciprocal-rank fusion (k=15).
+    # A tool absent from lexical results receives no lexical contribution.
+    fused, fusion_times = [], []
+    for example, query in zip(rows, queries):
+        start = time.perf_counter_ns()
+        cls_scores = classifier.decision_function(vectorizer.transform([query]))[0]
+        cls_rank = [str(classifier.classes_[i]) for i in np.argsort(cls_scores)[::-1]]
+        lex_rank = example["lexical"]
+        cls_order = {label: i for i, label in enumerate(cls_rank)}
+        lex_order = {label: i for i, label in enumerate(lex_rank)}
+        combined = sorted(
+            TOOL_IDS,
+            key=lambda tool: (
+                1.0 / (15 + cls_order[tool])
+                + (1.0 / (15 + lex_order[tool]) if tool in lex_order else 0.0)
+            ),
+            reverse=True,
+        )
+        fused.append(combined)
+        fusion_times.append((time.perf_counter_ns() - start) / 1_000_000)
+    fused_score = evaluate(fused, expected, languages)
+    fused_score["latency"] = latency(fusion_times)
+    fused_score["data_bytes"] = len(payload)
+    result["methods"]["hybrid"] = fused_score
     result["classifier_process_rss_bytes"] = proc.memory_info().rss
 
     # Real Model2Vec inference on a pinned MIT-licensed multilingual model.
@@ -235,6 +261,7 @@ def main():
         "old_substring": [r["original"] for r in rows],
         "lexical": [r["lexical"] for r in rows],
         "classifier": predictions,
+        "hybrid": fused,
         "model2vec_max": m2v["model2vec_max"],
         "model2vec_centroid": m2v["model2vec_centroid"],
     }
