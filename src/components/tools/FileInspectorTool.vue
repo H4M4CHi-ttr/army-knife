@@ -23,6 +23,7 @@ interface Request {
   action: Kind | "convert";
   bytes: ArrayBuffer;
   filename?: string;
+  mime?: string;
   algorithm?: SriAlgorithm;
   lineEnding?: "lf" | "crlf";
 }
@@ -75,7 +76,7 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<Bina
     if (chosen && chosen.size > FILE_INSPECTOR_LIMITS.fileBytes) throw new ToolError("INPUT_TOO_LARGE");
     const buffer = chosen ? await chosen.arrayBuffer() : Uint8Array.from(parseHexBytes(hex.value)).buffer;
     if (signal.aborted) throw new ToolError("CANCELLED");
-    const options: Request = { action: props.kind, bytes: buffer, filename: chosen?.name ?? "", algorithm: algorithm.value };
+    const options: Request = { action: props.kind, bytes: buffer, filename: chosen?.name ?? "", mime: chosen?.type ?? "", algorithm: algorithm.value };
     if (props.kind === "sri")
       return { kind: "sri", data: await inWorker<SriReport>(options, signal) };
     if (props.kind === "encoding")
@@ -248,6 +249,7 @@ function sample() {
       <div class="metric-grid">
         <div class="metric"><span class="metric-label">{{ t("inspector.size") }}</span><strong class="metric-value">{{ magic.size.toLocaleString(locale) }}</strong></div>
         <div class="metric"><span class="metric-label">{{ t("inspector.extension") }}</span><strong class="metric-value">{{ magic.extension || t("inspector.none") }}</strong></div>
+        <div class="metric"><span class="metric-label">{{ t("inspector.declaredMime") }}</span><strong class="metric-value">{{ magic.declaredMime || t("inspector.none") }}</strong></div>
       </div>
       <h3 class="field-label">{{ t("inspector.candidates") }}</h3>
       <ul v-if="magic.candidates.length" class="inspector-list">
