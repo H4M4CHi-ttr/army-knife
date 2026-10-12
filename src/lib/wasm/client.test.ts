@@ -126,12 +126,17 @@ describe("WASM worker ownership and cancellation", () => {
     await expect(runEngine(csvRequest)).rejects.toMatchObject({ code: "WASM_UNAVAILABLE" });
   });
 
-  it("enforces UTF-8 input limits before copying into a worker", async () => {
+  it("defers full Unicode UTF-8 sizing to the worker instead of blocking the UI", async () => {
     const text = "あ".repeat(Math.floor(ENGINE_LIMITS.inputBytes / 3) + 1);
-    await expect(runEngine({ ...csvRequest, text })).rejects.toMatchObject({
-      code: "INPUT_TOO_LARGE",
+    const promise = runEngine({ ...csvRequest, text });
+    const worker = FakeWorker.instances[0]!;
+    expect(worker).toBeDefined();
+    worker.deliver({
+      ok: false,
+      error: { code: "INPUT_TOO_LARGE", message: "INPUT_TOO_LARGE" },
     });
-    expect(FakeWorker.instances).toHaveLength(0);
+    await expect(promise).rejects.toMatchObject({ code: "INPUT_TOO_LARGE" });
+    expect(worker.terminate).toHaveBeenCalledOnce();
   });
 
   it("applies the same combined size limit to both set inputs", async () => {
@@ -149,15 +154,18 @@ describe("WASM worker ownership and cancellation", () => {
     expect(FakeWorker.instances).toHaveLength(0);
   });
 
-  it("limits regex UTF-8 bytes before starting work", async () => {
-    await expect(
-      runEngine({
-        operation: "logs",
-        text: "log",
-        pattern: "あ".repeat(1_366),
-        caseInsensitive: false,
-      }),
-    ).rejects.toMatchObject({ code: "REGEX_TOO_LARGE" });
-    expect(FakeWorker.instances).toHaveLength(0);
+  it("defers multibyte regex limits to the worker", async () => {
+    const promise = runEngine({
+      operation: "logs",
+      text: "log",
+      pattern: "あ".repeat(1_366),
+      caseInsensitive: false,
+    });
+    const worker = FakeWorker.instances[0]!;
+    worker.deliver({
+      ok: false,
+      error: { code: "REGEX_TOO_LARGE", message: "REGEX_TOO_LARGE" },
+    });
+    await expect(promise).rejects.toMatchObject({ code: "REGEX_TOO_LARGE" });
   });
 });
