@@ -39,6 +39,11 @@ const icons = {
   "dummy-text": ScanText,
   "css-specificity": Contrast,
   "fluid-type": TableProperties,
+  sri: FileLock2,
+  encoding: Binary,
+  magic: FileKey2,
+  "user-agent": ScanText,
+  "set-cookie": Link2,
 };
 </script>
 <template><component :is="icons[id]" aria-hidden="true" :stroke-width="1.7" /></template>
