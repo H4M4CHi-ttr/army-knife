@@ -232,6 +232,139 @@ test("disabled preferences keep the static explanation and prevent tool launch e
   ).toEqual([]);
 });
 
+test("normal-path SPA navigation keeps one document across repeat, history, category, and refresh", async ({
+  page,
+  baseURL,
+}) => {
+  const credentialProbe = "spa-navigation-credential-probe";
+  const fetchRequests: {
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    body: string | null;
+  }[] = [];
+  page.on("request", (request: Request) => {
+    if (request.resourceType() !== "fetch") return;
+    fetchRequests.push({
+      url: request.url(),
+      method: request.method(),
+      headers: request.headers(),
+      body: request.postData(),
+    });
+  });
+  await page.context().addCookies([
+    { name: credentialProbe, value: "must-not-be-sent", url: new URL(baseURL as string).origin },
+  ]);
+  let documentLoads = 0;
+  page.on("load", () => documentLoads++);
+  await page.goto(localeHomePath("en"));
+  const documentToken = await page.evaluate(() => {
+    const token = crypto.randomUUID();
+    Object.defineProperty(window, "__spaNavigationDocumentToken", {
+      value: token,
+      configurable: true,
+    });
+    return token;
+  });
+  const currentDocumentToken = () =>
+    page.evaluate(
+      () =>
+        (window as typeof window & { __spaNavigationDocumentToken?: string })
+          .__spaNavigationDocumentToken,
+    );
+
+  const category = page.locator('a.category-item[href$="#category-network"]');
+  if (!(await category.isVisible())) await page.locator(".mobile-menu").click();
+  await category.click();
+  await expect(page).toHaveURL(new RegExp(localeHomePath("en") + "#category-network$"));
+  await expect(category).toHaveClass(/active/);
+  expect(await currentDocumentToken()).toBe(documentToken);
+  await page.goBack();
+  await expect(page).toHaveURL(new RegExp(localeHomePath("en") + "$"));
+  expect(await currentDocumentToken()).toBe(documentToken);
+
+  await page.evaluate(() => window.scrollTo({ top: 800, left: 0, behavior: "instant" }));
+  await page.getByTestId("tool-card-cidr").click();
+  await expect(page).toHaveURL(new RegExp(toolPath("en", "cidr") + "$"));
+  await expect(page.locator("#page-guide")).toHaveAttribute("data-tool", "cidr");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    SITE_ORIGIN + toolPath("en", "cidr"),
+  );
+  await expect(page.locator('link[rel="alternate"][hreflang="ja"]')).toHaveAttribute(
+    "href",
+    SITE_ORIGIN + toolPath("ja", "cidr"),
+  );
+  const guideDescription =
+    (await page.locator("#page-guide .guide-description").textContent())?.trim() ?? "";
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    guideDescription,
+  );
+  const guideTitle = (await page.locator("#page-guide h1").textContent())?.trim() ?? "";
+  expect(await page.title()).toBe(guideTitle + " — Army Knife");
+  await expect(page.locator(".workbench-title h2")).toBeFocused();
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  expect(await currentDocumentToken()).toBe(documentToken);
+
+  await page.locator("#cidr-input").fill("192.0.2.0/24");
+  await page.locator("#cidr-input").fill(PRIVATE_MARKER);
+  await page.locator(".back-link").click();
+  await expect(page).toHaveURL(new RegExp(localeHomePath("en") + "$"));
+  await expect(page.locator("#page-guide")).toHaveAttribute("data-page", "home");
+  expect(await currentDocumentToken()).toBe(documentToken);
+
+  await page.getByTestId("tool-card-url").click();
+  await expect(page).toHaveURL(new RegExp(toolPath("en", "url") + "$"));
+  await expect(page.locator("#page-guide")).toHaveAttribute("data-tool", "url");
+  expect(await currentDocumentToken()).toBe(documentToken);
+
+  await page.goBack();
+  await expect(page).toHaveURL(new RegExp(localeHomePath("en") + "$"));
+  await expect(page.locator("#page-guide")).toHaveAttribute("data-page", "home");
+  expect(await currentDocumentToken()).toBe(documentToken);
+  await page.goBack();
+  await expect(page).toHaveURL(new RegExp(toolPath("en", "cidr") + "$"));
+  await expect(page.locator("#cidr-input")).toHaveValue("");
+  expect(await currentDocumentToken()).toBe(documentToken);
+  await page.goForward();
+  await expect(page).toHaveURL(new RegExp(localeHomePath("en") + "$"));
+  await page.goForward();
+  await expect(page).toHaveURL(new RegExp(toolPath("en", "url") + "$"));
+  await expect(page.locator("#url-input")).toHaveValue("");
+  expect(await currentDocumentToken()).toBe(documentToken);
+  expect(documentLoads).toBe(1);
+  expect(fetchRequests.length).toBeGreaterThan(0);
+  const origin = new URL(baseURL as string).origin;
+  const staticRoutePaths = new Set([
+    localeHomePath("en"),
+    toolPath("en", "cidr"),
+    toolPath("en", "url"),
+  ]);
+  for (const request of fetchRequests) {
+    const url = new URL(request.url);
+    expect(url.origin, request.url).toBe(origin);
+    expect(staticRoutePaths.has(url.pathname), request.url).toBe(true);
+    expect(request.method, request.url).toBe("GET");
+    expect(url.search, request.url).toBe("");
+    expect(request.body, request.url).toBeNull();
+    expect(request.headers.cookie ?? "", request.url).toBe("");
+    expect(request.headers.cookie ?? "", request.url).not.toContain(credentialProbe);
+    expect(JSON.stringify(request)).not.toContain(PRIVATE_MARKER);
+  }
+
+  await page.reload();
+  await expect(page.locator("#url-input")).toHaveValue("");
+  await expect(page.locator("#page-guide")).toHaveAttribute("data-tool", "url");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    SITE_ORIGIN + toolPath("en", "url"),
+  );
+  expect(await currentDocumentToken()).toBeUndefined();
+  expect(documentLoads).toBe(2);
+});
+
 test("normal links support keyboard navigation, new tabs, reload, history and legacy hashes", async ({
   page,
   context,
@@ -282,10 +415,18 @@ test("normal links support keyboard navigation, new tabs, reload, history and le
   await expect(page.locator("#cidr-input")).toBeVisible();
 });
 
-test("changing language opens the same generated tool page and preserves only preferences", async ({
+test("changing language navigates the same tool page and preserves only preferences", async ({
   page,
 }) => {
   await page.goto(toolPath("en", "unicode"));
+  const documentToken = await page.evaluate(() => {
+    const token = crypto.randomUUID();
+    Object.defineProperty(window, "__localeNavigationDocumentToken", {
+      value: token,
+      configurable: true,
+    });
+    return token;
+  });
   await page.locator("#unicode-input").fill(`${PRIVATE_MARKER}\u200b`);
   await page.getByTestId("settings-button").click();
   await page.getByTestId("theme-dark").click();
@@ -294,10 +435,23 @@ test("changing language opens the same generated tool page and preserves only pr
   await expect(page.locator("html")).toHaveAttribute("lang", "ja");
   await expect(page.locator("html")).toHaveClass(/dark/);
   await expect(page.locator("#page-guide")).toHaveAttribute("data-locale", "ja");
+  await expect(page.locator('link[data-font-locale="ja"]')).toHaveAttribute("media", "all");
+  await expect(page.locator(".workbench-title h2")).toBeFocused();
+  expect(
+    await page.evaluate(
+      () =>
+        (window as typeof window & { __localeNavigationDocumentToken?: string })
+          .__localeNavigationDocumentToken,
+    ),
+  ).toBe(documentToken);
   await expect(page.locator("#unicode-input")).toHaveValue("");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    `${SITE_ORIGIN}${toolPath("ja", "unicode")}`,
+    SITE_ORIGIN + toolPath("ja", "unicode"),
+  );
+  await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
+    "href",
+    SITE_ORIGIN + toolPath("en", "unicode"),
   );
   const stored = await page.evaluate(() => ({
     local: { ...localStorage },

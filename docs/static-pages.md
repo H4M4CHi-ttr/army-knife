@@ -41,11 +41,17 @@ Console registration.
 
 ## Navigation and preferences
 
-Tool, home, back and language links have ordinary readable `href` paths. Normal
-document navigation preserves keyboard activation, browser history, reloads,
-modified clicks and opening a new tab. Favorites and category filters use harmless
-home fragments. Language changes load the matching document so its initial content
-and metadata stay aligned; unsaved tool inputs are discarded as on any reload.
+Tool, home, back and language links have ordinary readable `href` paths. An
+unmodified primary click fetches the matching generated static HTML from the same
+origin with a credential-free GET, then updates the Vue route, guide, title,
+description, canonical and hreflang links while keeping the current document.
+Those requests contain no cookies, query parameters or body. The static document
+remains the source of guide content and metadata. Direct loads and refreshes still
+receive that complete HTML. Browser history, keyboard activation, modified clicks
+and new tabs keep their normal behavior. Favorites and category filters use
+harmless home fragments. Switching tools unmounts the old tool, and changing
+language remounts the tool for the new route; both actions clear unsaved inputs.
+Input values are never copied into a URL or persistent storage.
 
 Static guides list all tools, including optional or disabled tools. This public
 documentation does not enable a tool. The workbench checks existing preferences

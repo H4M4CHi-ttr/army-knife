@@ -5,7 +5,7 @@ import App from "../../App.vue";
 import { i18n } from "../../i18n";
 import { chmodMessages } from "../../i18n/chmod";
 import { defaultPreferences, settings, STORAGE_KEY } from "../../lib/preferences";
-import { toolPath } from "../../lib/routes";
+import { resolvePageRoute, toolPath } from "../../lib/routes";
 
 vi.mock("../../lib/fonts", () => ({
   setFontLocale: vi.fn(async (locale: string) => {
@@ -14,6 +14,25 @@ vi.mock("../../lib/fonts", () => ({
 }));
 
 let app: VueWrapper | undefined;
+
+function staticPageResponse(pathname: string): Response {
+  const route = resolvePageRoute(pathname, "/army-knife/");
+  if (route.kind === "unknown") return new Response("", { status: 404 });
+  const guide =
+    route.kind === "tool" ? 'data-tool="' + route.toolId + '"' : 'data-page="home"';
+  const html =
+    '<!doctype html><html lang="' +
+    route.locale +
+    '"><head><title>Static test guide</title><meta name="description" content="Static description" />' +
+    '<link rel="canonical" href="https://h4m4chi-ttr.github.io' +
+    pathname +
+    '" /></head><body><article id="page-guide" data-locale="' +
+    route.locale +
+    '" ' +
+    guide +
+    '><h1>Static test guide</h1></article></body></html>';
+  return new Response(html, { headers: { "content-type": "text/html" } });
+}
 
 beforeEach(() => {
   vi.stubEnv("BASE_URL", "/army-knife/");
@@ -24,6 +43,13 @@ beforeEach(() => {
   i18n.global.locale.value = "en";
   localStorage.clear();
   sessionStorage.clear();
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async (input: string | URL) => {
+      const pathname = new URL(input.toString(), window.location.origin).pathname;
+      return staticPageResponse(pathname);
+    }),
+  );
 });
 
 afterEach(async () => {
@@ -31,6 +57,7 @@ afterEach(async () => {
   app = undefined;
   await flushPromises();
   document.body.replaceChildren();
+  vi.unstubAllGlobals();
   vi.unstubAllEnvs();
 });
 
@@ -234,7 +261,7 @@ describe("chmod and umask through the real app", () => {
     expect(wrapper.text()).not.toContain("PRIVATE_CLIPBOARD_MESSAGE");
   });
 
-  it("updates all five languages and themes without resetting values", async () => {
+  it("updates all five languages and themes and clears inputs on locale navigation", async () => {
     const wrapper = await mountTool();
     await wrapper.get('[data-testid="chmod-mode"]').setValue("1777");
     await wrapper.get('[data-testid="chmod-expression"]').setValue("o-t");
@@ -243,6 +270,18 @@ describe("chmod and umask through the real app", () => {
       settings.preferences.locale = locale;
       await nextTick();
       await flushPromises();
+      expect((wrapper.get('[data-testid="chmod-mode"]').element as HTMLInputElement).value).toBe(
+        "",
+      );
+      expect(
+        (wrapper.get('[data-testid="chmod-expression"]').element as HTMLInputElement).value,
+      ).toBe("");
+      expect((wrapper.get('[data-testid="chmod-umask"]').element as HTMLInputElement).value).toBe(
+        "",
+      );
+      await wrapper.get('[data-testid="chmod-mode"]').setValue("1777");
+      await wrapper.get('[data-testid="chmod-expression"]').setValue("o-t");
+      await wrapper.get('[data-testid="chmod-umask"]').setValue("077");
       expect(wrapper.get('label[for="chmod-mode"]').text()).toBe(
         chmodMessages[locale]["chmod.octalInput"],
       );

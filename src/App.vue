@@ -37,7 +37,7 @@ import SettingsDialog from "@/components/SettingsDialog.vue";
 import { getTool, tools, type Category, type ToolId } from "@/lib/catalog";
 import { settings } from "@/lib/preferences";
 import { setFontLocale } from "@/lib/fonts";
-import { legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
+import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
 const JsonTool = defineAsyncComponent(() => import("@/components/tools/JsonTool.vue"));
@@ -59,11 +59,15 @@ const mobileOpen = ref(false);
 const settingsOpen = ref(false);
 const fontError = ref(false);
 const pageRoute = ref(resolvePageRoute(window.location.pathname, import.meta.env.BASE_URL));
+let renderedPath = window.location.pathname;
+let navigationSequence = 0;
+const pageDocumentCache = new Map<string, Promise<Document | null>>();
 if (pageRoute.value.kind !== "unknown") preferences.locale = pageRoute.value.locale;
 const searchInput = ref<HTMLInputElement>();
 const heading = ref<HTMLElement>();
 const settingsButton = ref<InstanceType<typeof Button>>();
 let settingsTrigger: HTMLElement | null = null;
+let focusHeadingAfterSettingsClose = false;
 const systemTheme = window.matchMedia("(prefers-color-scheme: dark)");
 const logo = `${import.meta.env.BASE_URL}favicon.svg`;
 const languageNames = {
@@ -85,11 +89,14 @@ const selectedTool = computed(() =>
     : null,
 );
 const homeHref = computed(() => localeHomePath(preferences.locale, import.meta.env.BASE_URL));
-const guideHasHeading = computed(() =>
-  requestedTool.value
-    ? document.getElementById("page-guide")?.dataset.tool === requestedTool.value.id
-    : document.getElementById("page-guide")?.dataset.page === "home",
-);
+const guideHasHeading = computed(() => {
+  const route = pageRoute.value;
+  const guide = document.getElementById("page-guide");
+  if (!guide || route.kind === "unknown" || guide.dataset.locale !== route.locale) return false;
+  return route.kind === "tool"
+    ? guide.dataset.tool === route.toolId
+    : guide.dataset.page === "home";
+});
 const pageStates = {
   ja: {
     disabled: "このツールは設定で無効になっています",
@@ -166,9 +173,9 @@ function applyCollectionHash() {
 }
 applyCollectionHash();
 function chooseTool(id: ToolId) {
-  window.location.assign(toolHref(id));
   query.value = "";
   mobileOpen.value = false;
+  void navigateTo(new URL(toolHref(id), window.location.origin));
 }
 function favorite(id: ToolId) {
   preferences.favorites = preferences.favorites.includes(id)
@@ -188,6 +195,11 @@ function openSettings(event?: Event) {
 }
 function restoreSettingsFocus(event: Event) {
   event.preventDefault();
+  if (focusHeadingAfterSettingsClose) {
+    focusHeadingAfterSettingsClose = false;
+    void nextTick(() => heading.value?.focus({ preventScroll: true }));
+    return;
+  }
   (settingsTrigger?.isConnected
     ? settingsTrigger
     : (settingsButton.value?.$el as HTMLElement)
@@ -205,21 +217,190 @@ function applyTheme() {
 function toggleTheme() {
   preferences.theme = document.documentElement.classList.contains("dark") ? "light" : "dark";
 }
+function pageDocumentMatches(
+  page: Document,
+  route: ReturnType<typeof resolvePageRoute>,
+): boolean {
+  const guide = page.getElementById("page-guide");
+  if (
+    route.kind === "unknown" ||
+    !guide ||
+    guide.dataset.locale !== route.locale ||
+    !page.head.querySelector('link[rel="canonical"]') ||
+    !page.head.querySelector('meta[name="description"]')
+  )
+    return false;
+  return route.kind === "home"
+    ? guide.dataset.page === "home"
+    : guide.dataset.tool === route.toolId;
+}
+
+async function loadPageDocument(path: string): Promise<Document | null> {
+  let pending = pageDocumentCache.get(path);
+  if (!pending) {
+    pending = fetch(path, { credentials: "omit" })
+      .then(async (response) => {
+        if (!response.ok || !response.headers.get("content-type")?.includes("text/html"))
+          return null;
+        return new DOMParser().parseFromString(await response.text(), "text/html");
+      })
+      .catch(() => null);
+    pageDocumentCache.set(path, pending);
+  }
+  const page = await pending;
+  if (!page) pageDocumentCache.delete(path);
+  return page;
+}
+
+function applyPageDocument(page: Document): boolean {
+  const guide = page.getElementById("page-guide");
+  const description = page.head.querySelector<HTMLMetaElement>('meta[name="description"]');
+  const canonical = page.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+  if (!guide || !description || !canonical) return false;
+
+  const currentGuide = document.getElementById("page-guide");
+  if (currentGuide) currentGuide.replaceWith(guide.cloneNode(true));
+  else document.body.append(guide.cloneNode(true));
+
+  document.documentElement.lang = page.documentElement.lang;
+  document.title = page.title;
+
+  const currentDescription = document.head.querySelector<HTMLMetaElement>(
+    'meta[name="description"]',
+  );
+  if (currentDescription) currentDescription.content = description.content;
+  else document.head.append(description.cloneNode(true));
+
+  const currentCanonical = document.head.querySelector<HTMLLinkElement>(
+    'link[rel="canonical"]',
+  );
+  if (currentCanonical) currentCanonical.href = canonical.href;
+  else document.head.append(canonical.cloneNode(true));
+
+  document.head
+    .querySelectorAll('link[rel="alternate"][hreflang]')
+    .forEach((link) => link.remove());
+  page.head
+    .querySelectorAll<HTMLLinkElement>('link[rel="alternate"][hreflang]')
+    .forEach((link) => document.head.append(link.cloneNode(true)));
+  return true;
+}
+
+type NavigationHistoryMode = "push" | "replace" | "pop";
+
+async function navigateTo(
+  destination: URL,
+  historyMode: NavigationHistoryMode = "push",
+): Promise<void> {
+  if (destination.origin !== window.location.origin || destination.search) return;
+
+  const legacy = legacyToolRedirect(
+    destination.hash,
+    preferences.locale,
+    import.meta.env.BASE_URL,
+  );
+  if (legacy) {
+    const normalPath = new URL(legacy, window.location.origin);
+    await navigateTo(normalPath, historyMode === "pop" ? "replace" : historyMode);
+    return;
+  }
+
+  const route = resolvePageRoute(destination.pathname, import.meta.env.BASE_URL);
+  if (route.kind === "unknown") return;
+  if (historyMode === "push" && destination.href === window.location.href) {
+    navigationSequence += 1;
+    return;
+  }
+
+  const pathChanged = destination.pathname !== renderedPath;
+  const sequence = ++navigationSequence;
+  let page: Document | null = null;
+  if (pathChanged) {
+    page = await loadPageDocument(destination.pathname);
+    if (sequence !== navigationSequence) return;
+    if (!page || !pageDocumentMatches(page, route)) {
+      pageDocumentCache.delete(destination.pathname);
+      if (historyMode === "pop") window.location.reload();
+      else window.location.assign(destination.href);
+      return;
+    }
+  }
+  if (sequence !== navigationSequence) return;
+
+  if (historyMode === "push") window.history.pushState(null, "", destination.href);
+  else if (historyMode === "replace") window.history.replaceState(null, "", destination.href);
+  if (pathChanged && page && !applyPageDocument(page)) {
+    if (historyMode === "pop") window.location.reload();
+    else window.location.assign(destination.href);
+    return;
+  }
+
+  if (pathChanged) {
+    renderedPath = destination.pathname;
+    if (settingsOpen.value) focusHeadingAfterSettingsClose = true;
+    settingsOpen.value = false;
+    if (historyMode !== "pop")
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }
+  pageRoute.value = route;
+  preferences.locale = route.locale;
+  query.value = "";
+  mobileOpen.value = false;
+  applyCollectionHash();
+}
+
+function onInternalLinkClick(event: MouseEvent) {
+  if (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  )
+    return;
+  if (!(event.target instanceof Element)) return;
+  const link = event.target.closest<HTMLAnchorElement>("a[href]");
+  if (!link || link.hasAttribute("download") || (link.target && link.target !== "_self")) return;
+
+  const destination = new URL(link.href);
+  if (destination.origin !== window.location.origin || destination.search) return;
+  const samePath = destination.pathname === window.location.pathname;
+  const collectionHash =
+    destination.hash === "#favorites" || destination.hash.startsWith("#category-");
+  const legacyHash = legacyHashTool(destination.hash);
+  if (samePath && destination.hash && !collectionHash && !legacyHash) return;
+  if (
+    resolvePageRoute(destination.pathname, import.meta.env.BASE_URL).kind === "unknown" &&
+    !legacyHash
+  )
+    return;
+
+  event.preventDefault();
+  void navigateTo(destination);
+}
+
 function onHash() {
   const destination = legacyToolRedirect(
     window.location.hash,
     preferences.locale,
     import.meta.env.BASE_URL,
   );
-  if (destination) window.location.replace(destination);
+  if (destination) void navigateTo(new URL(destination, window.location.origin), "replace");
   else applyCollectionHash();
 }
+
 function onLocation() {
-  pageRoute.value = resolvePageRoute(window.location.pathname, import.meta.env.BASE_URL);
-  if (pageRoute.value.kind !== "unknown") preferences.locale = pageRoute.value.locale;
-  query.value = "";
-  mobileOpen.value = false;
-  applyCollectionHash();
+  const destination = new URL(window.location.href);
+  const legacy = legacyToolRedirect(
+    destination.hash,
+    preferences.locale,
+    import.meta.env.BASE_URL,
+  );
+  void navigateTo(
+    legacy ? new URL(legacy, window.location.origin) : destination,
+    legacy ? "replace" : "pop",
+  );
 }
 function skipToContent() {
   document.getElementById("main-content")?.focus();
@@ -246,7 +427,8 @@ watch(
     if (previous && previous !== value && pageRoute.value.kind !== "unknown") {
       const destination =
         pageRoute.value.kind === "tool" ? toolHref(pageRoute.value.toolId) : homeHref.value;
-      if (window.location.pathname !== destination) window.location.assign(destination);
+      if (window.location.pathname !== destination)
+        void navigateTo(new URL(destination, window.location.origin));
     }
   },
   { immediate: true },
@@ -260,17 +442,19 @@ watch(
   },
   { immediate: true },
 );
-watch(requestedTool, async () => {
+watch([requestedTool, locale], async () => {
   await nextTick();
   heading.value?.focus({ preventScroll: true });
 });
 onMounted(() => {
+  document.addEventListener("click", onInternalLinkClick);
   window.addEventListener("hashchange", onHash);
   window.addEventListener("popstate", onLocation);
   window.addEventListener("keydown", onKey);
   systemTheme.addEventListener("change", applyTheme);
 });
 onBeforeUnmount(() => {
+  document.removeEventListener("click", onInternalLinkClick);
   window.removeEventListener("hashchange", onHash);
   window.removeEventListener("popstate", onLocation);
   window.removeEventListener("keydown", onKey);
@@ -556,22 +740,22 @@ onBeforeUnmount(() => {
                 selectedTool.id === 'sets'
               "
               :id="selectedTool.id"
-              :key="selectedTool.id"
+              :key="`${selectedTool.id}:${preferences.locale}`"
             />
             <JsonTool
               v-else-if="selectedTool.id === 'json-diff' || selectedTool.id === 'json-format'"
               :id="selectedTool.id"
-              :key="selectedTool.id"
+              :key="`${selectedTool.id}:${preferences.locale}`"
             />
-            <CidrTool v-else-if="selectedTool.id === 'cidr'" key="cidr" />
-            <UnicodeTool v-else-if="selectedTool.id === 'unicode'" key="unicode" />
-            <ContrastTool v-else-if="selectedTool.id === 'contrast'" key="contrast" />
-            <HarTool v-else-if="selectedTool.id === 'har'" key="har" />
-            <EnvTool v-else-if="selectedTool.id === 'env'" key="env" />
-            <UrlTool v-else-if="selectedTool.id === 'url'" key="url" />
-            <ExplainTool v-else-if="selectedTool.id === 'explain'" key="explain" />
-            <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" key="shortcuts" />
-              <ChmodTool v-else-if="selectedTool.id === 'chmod'" key="chmod" />
+            <CidrTool v-else-if="selectedTool.id === 'cidr'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <UnicodeTool v-else-if="selectedTool.id === 'unicode'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ContrastTool v-else-if="selectedTool.id === 'contrast'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <HarTool v-else-if="selectedTool.id === 'har'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <EnvTool v-else-if="selectedTool.id === 'env'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <UrlTool v-else-if="selectedTool.id === 'url'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ExplainTool v-else-if="selectedTool.id === 'explain'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ShortcutTool v-else-if="selectedTool.id === 'shortcuts'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ChmodTool v-else-if="selectedTool.id === 'chmod'" :key="`${selectedTool.id}:${preferences.locale}`" />
           </template>
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">
