@@ -704,7 +704,7 @@ test("multi-line 1 MiB paste is bounded while preserving all original lines", as
   await expect(page.getByTestId("large-input-loading")).toHaveCount(0);
   await page.getByTestId("apply-now").click();
   const report = JSON.parse(await downloadResult(page));
-  expect(report.totalLines).toBe(expectedLines + 1); // trailing newline is a final empty line
+  expect(report.totalLines).toBe(expectedLines); // Rust str::lines omits a final empty line
   expect(report.matchedLines).toBe(expectedLines);
 });
 
