@@ -19,7 +19,9 @@ self.onmessage = async (event: MessageEvent<Request>) => {
     } else if (action === "magic") {
       self.postMessage({ ok: true, result: inspectMagic(view, filename, mime) });
     } else if (action === "sri") {
-      self.postMessage({ ok: true, result: await generateSri(view, algorithm, /\.css$/i.test(filename)) });
+      const resourceKind = /\.css$/i.test(filename) ? "stylesheet" :
+        /\.(?:js|mjs|cjs)$/i.test(filename) ? "script" : "unknown";
+      self.postMessage({ ok: true, result: await generateSri(view, algorithm, resourceKind) });
     } else if (action === "convert") {
       const converted = convertEncoding(view, lineEnding);
       self.postMessage({ ok: true, result: converted.buffer });
