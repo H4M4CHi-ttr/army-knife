@@ -45,6 +45,8 @@ function inputSelector(id: ToolId): string {
   if (id === "env") return "#env-left";
   if (id === "contrast") return ".color-controls";
   if (id === "shortcuts") return '[data-testid="shortcut-capture"]';
+  if (id === "data-units" || id === "css-units") return "#quick-input";
+  if (id === "unicode-normalize" || id === "slug" || id === "unicode-escape") return "#quick-text";
   return `#${id}-input`;
 }
 
