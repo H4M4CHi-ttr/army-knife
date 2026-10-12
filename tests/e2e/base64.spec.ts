@@ -54,14 +54,14 @@ test("strict errors, large-worker processing, export and privacy", async ({ page
   const downloadEvent = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download", exact: true }).click();
   const download = await downloadEvent;
-  const location = await download.path();
-  expect(location).not.toBeNull();
-  expect(await readFile(location as string, "utf8")).toBe(expected);
+  const downloadPath = await download.path();
+  expect(downloadPath).not.toBeNull();
+  expect(await readFile(downloadPath as string, "utf8")).toBe(expected);
 
   const stored = await page.evaluate(() => ({
     preferences: localStorage.getItem("army-knife:preferences:v1"),
     session: Object.values(sessionStorage),
-    url: location.href,
+    url: window.location.href,
   }));
   expect(JSON.stringify(stored)).not.toContain("PRIVATE_INPUT_M4RKR_7261");
   for (const request of requests) {
