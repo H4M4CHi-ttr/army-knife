@@ -188,3 +188,34 @@ Pages 用のベースパスは `/army-knife/` です。各ツールは `/army-kn
 - [第三者ソフトウェアとフォントの帰属](THIRD_PARTY_NOTICES.md)
 
 本プロジェクトは DevToys の独立した補完ツールで、DevToys の公式配布物ではありません。
+
+
+### Large text and paste safety
+
+CSV, logs, sets, HAR and other text tools share a bounded input component.
+Below 128 Ki UTF-16 code units, input behaves as an ordinary editable textarea.
+At 128 Ki or more, the full string remains **in memory for analysis**, but the
+textarea becomes a **read-only 2,048-character preview**. Use **Replace text**
+to paste another input, or download the full original text to edit it externally
+before reimporting. Nothing is sent to a remote service.
+
+Large pastes are intercepted *before* the browser inserts megabytes into a
+textarea; files and exact UTF-8 byte checks are handled in a same-origin Worker.
+WASM requests also perform the expensive byte-size check in their Worker,
+before loading WASM. The UI thread only checks the cheap character-count lower
+bound. Values above the per-tool input cap are refused, and the 800 ms delayed /
+manual execution controls still apply. Worker jobs are aborted on navigation
+and when newer input supersedes them.
+
+**Trade-off:** For text above the preview threshold, full inline editing is
+intentionally unavailable. Use a local editor and reimport the file. The app
+keeps the full data in a reactive reference, so this is **not** a streaming
+parser or an unlimited-file mode. The 16 MiB WASM cap and smaller tool-specific
+caps remain in effect. Large result downloads are intentionally user-initiated.
+
+```
+pnpm test:e2e        # includes native textarea vs bounded paste timing attachments
+pnpm test            # includes local worker limit and cancellation tests
+```
+The browser timing artifact is a diagnostic measurement rather than a fixed
+pass/fail latency threshold because browsers and CI runners vary.

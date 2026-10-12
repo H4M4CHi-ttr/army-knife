@@ -632,3 +632,121 @@ test("Vapor output reacts to language and color changes while VDOM settings stay
   await assertNoOverflow(page);
   await screenshot(page, testInfo, "contrast-vapor-ja");
 });
+
+
+test("large paste stays out of the live editor and the full text reaches local WASM", async ({
+  page,
+}, testInfo) => {
+  await tool(page, "logs");
+  await page.getByTestId("auto-apply-toggle").uncheck();
+  const metrics = await page.locator("#logs-input").evaluate((node) => {
+    const field = node as HTMLTextAreaElement;
+    const content = "INFO " + "x".repeat(5 * 1024 * 1024 - 5);
+    // Isolate native textarea DOM layout, then measure the new paste path.
+    const raw = document.createElement("textarea");
+    raw.className = field.className;
+    raw.style.width = "500px";
+    document.body.append(raw);
+    const before = performance.now();
+    raw.value = content;
+    void raw.scrollHeight;
+    const nativeMs = performance.now() - before;
+    raw.remove();
+    const data = new DataTransfer();
+    data.setData("text/plain", content);
+    const event = new ClipboardEvent("paste", {
+      bubbles: true, cancelable: true, clipboardData: data,
+    });
+    const started = performance.now();
+    field.dispatchEvent(event);
+    return {
+      characters: content.length,
+      nativeTextareaSetAndLayoutMs: nativeMs,
+      interceptedPasteDispatchMs: performance.now() - started,
+      preventedDomInsertion: event.defaultPrevented,
+    };
+  });
+  expect(metrics.preventedDomInsertion).toBe(true);
+  await expect(page.getByTestId("large-input-summary")).toBeVisible();
+  await expect(page.getByTestId("large-input-loading")).toHaveCount(0);
+  const chars = await page.locator("#logs-input").evaluate((node) =>
+    (node as HTMLTextAreaElement).value.length,
+  );
+  expect(chars).toBeLessThanOrEqual(2_048);
+  await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "manual");
+  await page.getByTestId("apply-now").click();
+  const report = JSON.parse(await downloadResult(page));
+  expect(report.totalLines).toBe(1);
+  expect(report.topLines[0].text).toContain("INFO");
+  await testInfo.attach("large-text-5mib-timing.json", {
+    body: JSON.stringify({ ...metrics, previewCharacters: chars }, null, 2),
+    contentType: "application/json",
+  });
+  await page.getByRole("button", { name: "Replace text" }).click();
+  await expect(page.getByTestId("large-input-summary")).toHaveCount(0);
+  await expect(page.locator("#logs-input")).toHaveValue("");
+});
+
+test("multi-line 1 MiB paste is bounded while preserving all original lines", async ({ page }) => {
+  await tool(page, "logs");
+  await page.getByTestId("auto-apply-toggle").uncheck();
+  const expectedLines = await page.locator("#logs-input").evaluate((node) => {
+    const line = "INFO " + "x".repeat(64) + "\n";
+    const repeats = Math.floor(1024 * 1024 / line.length);
+    const data = new DataTransfer();
+    data.setData("text/plain", line.repeat(repeats));
+    (node as HTMLTextAreaElement).dispatchEvent(
+      new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data }),
+    );
+    return repeats;
+  });
+  await expect(page.getByTestId("large-input-summary")).toBeVisible();
+  await expect(page.getByTestId("large-input-loading")).toHaveCount(0);
+  await page.getByTestId("apply-now").click();
+  const report = JSON.parse(await downloadResult(page));
+  expect(report.totalLines).toBe(expectedLines + 1); // trailing newline is a final empty line
+  expect(report.matchedLines).toBe(expectedLines);
+});
+
+test("oversized 20 MiB paste is rejected before DOM insertion", async ({ page }) => {
+  await tool(page, "logs");
+  const prevented = await page.locator("#logs-input").evaluate((node) => {
+    const data = new DataTransfer();
+    data.setData("text/plain", "X".repeat(20 * 1024 * 1024));
+    const event = new ClipboardEvent("paste", {
+      bubbles: true, cancelable: true, clipboardData: data,
+    });
+    node.dispatchEvent(event);
+    return event.defaultPrevented;
+  });
+  expect(prevented).toBe(true);
+  await expect(page.locator("#logs-input")).toHaveValue("");
+  await expect(page.getByRole("alert")).toContainText("size limit");
+  await expect(page.getByTestId("large-input-summary")).toHaveCount(0);
+});
+
+test("large UTF-8 files decode in a local worker and malformed files are rejected", async ({
+  page,
+}) => {
+  await tool(page, "logs");
+  await page.getByTestId("auto-apply-toggle").uncheck();
+  const input = page.locator("#logs-input-file");
+  await input.setInputFiles({
+    name: "large.log",
+    mimeType: "text/plain",
+    buffer: Buffer.from("INFO " + "a".repeat(1024 * 1024)),
+  });
+  await expect(page.getByTestId("large-input-summary")).toBeVisible();
+  await expect(page.getByTestId("large-input-loading")).toHaveCount(0);
+  await page.getByTestId("apply-now").click();
+  expect(JSON.parse(await downloadResult(page)).totalLines).toBe(1);
+  await input.setInputFiles({
+    name: "invalid.log",
+    mimeType: "text/plain",
+    buffer: Buffer.alloc(256 * 1024, 0xff),
+  });
+  await expect(page.getByTestId("large-input-loading")).toHaveCount(0);
+  await expect(page.getByRole("alert")).toContainText("UTF-8");
+  // A failed file import must not overwrite the last valid document.
+  await expect(page.getByTestId("large-input-summary")).toBeVisible();
+});
