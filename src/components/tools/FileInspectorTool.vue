@@ -73,7 +73,7 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<Bina
   execute: async (signal) => {
     const chosen = file.value;
     if (chosen && chosen.size > FILE_INSPECTOR_LIMITS.fileBytes) throw new ToolError("INPUT_TOO_LARGE");
-    const buffer = chosen ? await chosen.arrayBuffer() : parseHexBytes(hex.value).buffer;
+    const buffer = chosen ? await chosen.arrayBuffer() : Uint8Array.from(parseHexBytes(hex.value)).buffer;
     if (signal.aborted) throw new ToolError("CANCELLED");
     const options: Request = { action: props.kind, bytes: buffer, filename: chosen?.name ?? "", algorithm: algorithm.value };
     if (props.kind === "sri")
