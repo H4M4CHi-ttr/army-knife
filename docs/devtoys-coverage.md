@@ -147,3 +147,11 @@ no corresponding bundled tool was found. This does not cover every extension.
 ## Vite+ references
 
 The project uses VoidZero's **Vite+**, not only Vite. Its [local CLI documentation](https://viteplus.dev/guide/local-cli) supports project-pinned `vite-plus` installations; [test APIs](https://viteplus.dev/guide/test) are imported from `vite-plus/test` and configured in `vite.config.ts`. [Package management](https://viteplus.dev/guide/install) supports `vp install --frozen-lockfile`. The [CI guide](https://viteplus.dev/guide/ci) recommends the official `voidzero-dev/setup-vp` action with an exact release or commit SHA; the moving `v1` tag is no longer updated.
+
+## New inspector classifications (Issues #29, #30, #66, #76, #97)
+
+- **Text statistics/case & string escaping: Off.** These overlap with general DevToys text-encoding/utility functionality. Explicit opt-in is required.
+- **HEX/RGB/HSL/HSV conversion: Off.** DevToys offers color picking/conversion. Keep the new overlapping tool disabled by default.
+- **HTTP status/MIME offline reference: On.** A curated, local reference for response semantics and media types, distinct from sending or diagnosing live requests.
+- **Git merge/diff3 conflict inspector: On.** Passive parsing and independent copying; never applies a patch, resolves a conflict or performs Git operations.
+- These conservative decisions use the documented bundled DevToys snapshot above, without claiming absence of third-party extensions. Inputs are memory-only; preferences are the only persistent app data.

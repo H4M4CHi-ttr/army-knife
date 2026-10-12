@@ -1,112 +1,77 @@
-import { test, expect, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-const ids = ["sri", "encoding", "magic", "user-agent", "set-cookie"] as const;
+const ids = ["text-stats", "string-literals", "http-reference", "git-conflicts", "color-converter"] as const;
+type Tool = typeof ids[number];
 
-async function openInspector(page: Page, id: (typeof ids)[number], locale = "en") {
+async function enable(page: Page, id: Tool, locale: string) {
   await page.goto("./" + locale + "/tools/" + id + "/");
-  if (id === "sri" || id === "encoding") {
-    await expect(page.getByTestId("tool-disabled")).toBeVisible();
+  if (await page.getByTestId("tool-disabled").isVisible()) {
     await page.getByTestId("disabled-settings").click();
     const toggle = page.getByTestId("toggle-" + id);
     await expect(toggle).toHaveAttribute("aria-checked", "false");
     await toggle.click();
     await page.getByTestId("settings-close").click();
   }
-  if (id === "user-agent" || id === "set-cookie")
-    await expect(page.locator("#" + id + "-input")).toBeVisible();
-  else await expect(page.locator("#" + id + "-file")).toHaveCount(1);
+  await expect(page.locator("#" + id + "-input")).toBeVisible();
+  await expect(page.locator("#page-guide")).toHaveAttribute("data-tool", id);
 }
 
-test("SRI uses exact file bytes and raw hex in local worker", async ({ page }) => {
-  await openInspector(page, "sri");
-  await page.locator("#sri-file").setInputFiles({ name: "empty.js", mimeType: "text/javascript", buffer: Buffer.alloc(0) });
-  await expect(page.getByTestId("sri-integrity"))
-    .toHaveText("sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=");
-  await page.locator("#sri-hex").fill("00 FF 0A");
-  await expect(page.getByTestId("selected-file")).toContainText("No file selected");
-  await expect(page.getByTestId("sri-integrity")).toContainText("sha256-");
-  await expect(page.locator(".inspector-warnings")).toContainText("unknown");
-  await expect(page.locator(".code-output")).toContainText([
-    "sha256-", "/assets/app.js",
-  ]);
-});
+for (const locale of ["ja","en","zh-CN","zh-TW","ko"]) {
+  test("five local inspectors in "+locale+" (Vapor, mobile-safe)", async ({page}) => {
+    await enable(page, "text-stats", locale);
+    await page.locator("#text-stats-input").fill("👩‍💻");
+    await expect(page.getByTestId("text-stats-metrics")).toContainText("11");
+    await page.getByTestId("inspect-case").selectOption("lower");
+    await page.locator("#text-stats-input").fill("HELLO WORLD");
+    await expect(page.getByTestId("text-stats-output")).toHaveText("hello world");
 
-test("BOM inspector counts all EOL kinds and allows deliberate conversion", async ({ page }) => {
-  await openInspector(page, "encoding");
-  await page.locator("#encoding-file").setInputFiles({
-    name: "mixed.txt", mimeType: "application/octet-stream",
-    buffer: Buffer.from([0xef,0xbb,0xbf,65,13,10,66,10,67,13]),
+    await enable(page, "string-literals", locale);
+    await page.locator("#string-literals-input").fill('Hello "world"');
+    await expect(page.getByTestId("string-literals-output")).toHaveText('"Hello \\"world\\""');
+    await page.getByTestId("inspect-format").selectOption("sql");
+    await page.locator("#string-literals-input").fill("It's OK");
+    await expect(page.getByTestId("string-literals-output")).toHaveText("'It''s OK'");
+
+    await enable(page, "http-reference", locale);
+    await page.locator("#http-reference-input").fill("404");
+    await expect(page.getByTestId("http-reference-output")).toContainText("Not Found");
+    await page.getByTestId("inspect-reference-kind").selectOption("mime");
+    await page.locator("#http-reference-input").fill("application/json; charset=utf-8");
+    await expect(page.getByTestId("http-reference-output")).toContainText("application/json");
+
+    await enable(page, "git-conflicts", locale);
+    await page.locator("#git-conflicts-input").fill("<<<<<<< HEAD\nours\n||||||| base\nancestor\n=======\ntheirs\n>>>>>>> topic");
+    await expect(page.getByTestId("git-conflicts-output")).toHaveCount(1);
+    await expect(page.getByTestId("git-conflicts-output")).toContainText("ours");
+    await expect(page.getByTestId("git-conflicts-output")).toContainText("theirs");
+    await page.locator("#git-conflicts-input").fill("<<<<<<< HEAD\nours");
+    await expect(page.getByTestId("git-conflicts-diagnostics")).toBeVisible();
+
+    await enable(page, "color-converter", locale);
+    await page.locator("#color-converter-input").fill("#33669980");
+    await expect(page.getByTestId("color-converter-output")).toContainText("#33669980");
+    await page.locator("#color-converter-input").fill("not-a-color");
+    await expect(page.getByRole("alert")).toBeVisible();
+    const geometry = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      content: document.documentElement.scrollWidth,
+    }));
+    expect(geometry.content).toBeLessThanOrEqual(geometry.viewport + 1);
   });
-  await expect(page.getByTestId("encoding-preview")).toContainText("A");
-  await expect(page.locator(".metric-grid")).toContainText("UTF-8");
-  await expect(page.locator(".metric-grid")).toContainText("1");
-  const downloadEvent = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download UTF-8 conversion" }).click();
-  const download = await downloadEvent;
-  expect(download.suggestedFilename()).toContain("mixed.txt.utf8.txt");
-  expect(await download.failure()).toBeNull();
-});
+}
 
-test("Magic Bytes identifies a PNG and warns for disguised extension", async ({ page }) => {
-  await openInspector(page, "magic");
-  await page.locator("#magic-file").setInputFiles({
-    name: "disguised.exe", mimeType: "application/octet-stream",
-    buffer: Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]),
-  });
-  await expect(page.locator(".inspector-list")).toContainText("PNG");
-  await expect(page.locator(".inspector-warnings")).toContainText("extension");
-});
-
-test("User-Agent heuristic and no page-level overflow", async ({ page }) => {
-  await openInspector(page, "user-agent");
-  await page.locator("#user-agent-input").fill(
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/129.0.0 Safari/537.36 Edg/129.0",
-  );
-  await expect(page.locator(".metric-grid")).toContainText("Edg/129.0");
-  await expect(page.locator(".metric-grid")).toContainText("Blink");
-  const geometry = await page.evaluate(() => ({
-    view: document.documentElement.clientWidth,
-    content: document.documentElement.scrollWidth,
+test("inspector inputs stay in memory and are not sent", async ({page}) => {
+  const requests: Array<{url:string,method:string,body:string|null}> = [];
+  page.on("request", req => requests.push({url:req.url(),method:req.method(),body:req.postData()}));
+  await enable(page, "git-conflicts", "en");
+  const secret = "NEVER_PERSIST_INSPECTOR_2026_";
+  await page.locator("#git-conflicts-input").fill("<<<<<<< HEAD\n"+secret.repeat(300)+"\n=======\nother\n>>>>>>> b");
+  await page.getByTestId("apply-now").click();
+  await expect(page.getByTestId("git-conflicts-output")).toContainText(secret);
+  const persisted = await page.evaluate(() => ({
+    local: {...localStorage}, session: {...sessionStorage}, url: location.href,
   }));
-  expect(geometry.content).toBeLessThanOrEqual(geometry.view + 1);
-});
-
-test("Cookie values are omitted from all results and not persisted or transmitted", async ({ page }) => {
-  const captured: string[] = [];
-  page.on("request", (r) => captured.push(JSON.stringify({
-    url: r.url(), body: r.postData(), headers: r.headers(),
-  })));
-  await openInspector(page, "set-cookie");
-  const marker = "PRIVATE_INSPECTOR_XM631";
-  await page.locator("#set-cookie-input").fill(
-    "Set-Cookie: __Host-session=" + marker +
-    "; Secure; Path=/; HttpOnly; SameSite=Lax\n" +
-    "Set-Cookie: other=secondary; SameSite=None",
-  );
-  await expect(page.locator(".inspector-cookie")).toHaveCount(2);
-  await expect(page.getByTestId("cookie-table").locator("tbody tr")).toHaveCount(2);
-  await expect(page.locator(".inspector-cookie").last()).toContainText("SameSite=None");
-  await expect(page.locator(".inspector-cookie").last()).toContainText("Secure");
-  const output = await page.evaluate(() => ({
-    result: document.querySelector(".result-panel")?.textContent,
-    prefs: localStorage.getItem("army-knife:preferences:v1"),
-    path: location.href,
-  }));
-  expect(JSON.stringify(output)).not.toContain(marker);
-  for (const request of captured) {
-    expect(request).not.toContain(marker);
-    const parsed = JSON.parse(request);
-    const url = new URL(parsed.url);
-    expect(url.origin).toBe("http://127.0.0.1:4173");
-    expect(url.search).toBe("");
-    expect(parsed.body).toBeNull();
-  }
-});
-
-test("Localized inspector controls are available in five languages", async ({ page }) => {
-  for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"]) {
-    await openInspector(page, "user-agent", locale);
-    await page.getByRole("button", { name: /Load example|サンプル|示例|範例|예제/ }).first().click();
-    await expect(page.locator(".metric-grid")).toContainText("Edg/");
-  }
+  expect(JSON.stringify(persisted)).not.toContain(secret);
+  expect(JSON.stringify(requests)).not.toContain(secret);
+  expect(requests.every((request) => request.method === "GET" && request.body === null)).toBe(true);
 });

@@ -13,11 +13,13 @@ import { expansionMessages } from "./expansion.ts";
 import { shortcutMessages } from "./shortcuts.ts";
 import { chmodMessages } from "./chmod.ts";
 import { base64Messages } from "./base64.ts";
+import { fiveToolMessages } from "./five-tools.ts";
 import { utilityMessages } from "./utility.ts";
+import { inspectorMessages } from "./inspectors.ts";
+import { fileHttpInspectorMessages } from "./file-http-inspectors.ts";
 import { designToolMessages } from "./design-tool-messages.ts";
 import { designLabels } from "./design-labels.ts";
 import { quickMessages } from "./quick.ts";
-import { inspectorMessages } from "./inspectors.ts";
 
 export const messages = {
   en: {
@@ -28,11 +30,13 @@ export const messages = {
     ...shortcutMessages.en,
     ...chmodMessages.en,
     ...base64Messages.en,
+    ...fiveToolMessages.en,
     ...utilityMessages.en,
+    ...inspectorMessages.en,
+    ...fileHttpInspectorMessages.en,
     ...designToolMessages.en,
     ...designLabels.en,
     ...quickMessages["en"],
-    ...inspectorMessages.en,
     ...toolMessagesEn,
     "contrast.largeHint":
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
@@ -45,11 +49,13 @@ export const messages = {
     ...shortcutMessages.ja,
     ...chmodMessages.ja,
     ...base64Messages.ja,
+    ...fiveToolMessages.ja,
     ...utilityMessages.ja,
+    ...inspectorMessages.ja,
+    ...fileHttpInspectorMessages.ja,
     ...designToolMessages.ja,
     ...designLabels.ja,
     ...quickMessages["ja"],
-    ...inspectorMessages.ja,
     ...toolMessagesJa,
     "contrast.largeHint":
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
@@ -62,11 +68,13 @@ export const messages = {
     ...shortcutMessages["zh-CN"],
     ...chmodMessages["zh-CN"],
     ...base64Messages["zh-CN"],
+    ...fiveToolMessages["zh-CN"],
     ...utilityMessages["zh-CN"],
+    ...inspectorMessages["zh-CN"],
+    ...fileHttpInspectorMessages["zh-CN"],
     ...designToolMessages["zh-CN"],
     ...designLabels["zh-CN"],
     ...quickMessages["zh-CN"],
-    ...inspectorMessages["zh-CN"],
     ...toolZhCN,
     "contrast.largeHint":
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
@@ -79,11 +87,13 @@ export const messages = {
     ...shortcutMessages["zh-TW"],
     ...chmodMessages["zh-TW"],
     ...base64Messages["zh-TW"],
+    ...fiveToolMessages["zh-TW"],
     ...utilityMessages["zh-TW"],
+    ...inspectorMessages["zh-TW"],
+    ...fileHttpInspectorMessages["zh-TW"],
     ...designToolMessages["zh-TW"],
     ...designLabels["zh-TW"],
     ...quickMessages["zh-TW"],
-    ...inspectorMessages["zh-TW"],
     ...toolZhTW,
     "contrast.largeHint":
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
@@ -96,11 +106,13 @@ export const messages = {
     ...shortcutMessages.ko,
     ...chmodMessages.ko,
     ...base64Messages.ko,
+    ...fiveToolMessages.ko,
     ...utilityMessages.ko,
+    ...inspectorMessages.ko,
+    ...fileHttpInspectorMessages.ko,
     ...designToolMessages.ko,
     ...designLabels.ko,
     ...quickMessages["ko"],
-    ...inspectorMessages.ko,
     ...toolKo,
     "contrast.largeHint":
       "큰 텍스트는 18pt(24 CSS px) 이상, 굵은 글씨는 14pt(약 18.7 CSS px) 이상입니다. 판정에는 반올림 전 비율을 사용합니다.",
