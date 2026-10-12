@@ -5,18 +5,19 @@ interface Request {
   action: "encoding" | "magic" | "sri" | "convert";
   bytes: ArrayBuffer;
   filename?: string;
+  mime?: string;
   algorithm?: SriAlgorithm;
   lineEnding?: "lf" | "crlf";
 }
 
 self.onmessage = async (event: MessageEvent<Request>) => {
   try {
-    const { action, bytes, filename = "", algorithm = "SHA-256", lineEnding = "lf" } = event.data;
+    const { action, bytes, filename = "", mime = "", algorithm = "SHA-256", lineEnding = "lf" } = event.data;
     const view = new Uint8Array(bytes);
     if (action === "encoding") {
       self.postMessage({ ok: true, result: inspectEncoding(view) });
     } else if (action === "magic") {
-      self.postMessage({ ok: true, result: inspectMagic(view, filename) });
+      self.postMessage({ ok: true, result: inspectMagic(view, filename, mime) });
     } else if (action === "sri") {
       self.postMessage({ ok: true, result: await generateSri(view, algorithm, /\.css$/i.test(filename)) });
     } else if (action === "convert") {
