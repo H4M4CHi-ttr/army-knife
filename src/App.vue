@@ -55,6 +55,11 @@ const TextCodecTool = defineAsyncComponent(() => import("@/components/tools/Text
 const DummyTextTool = defineAsyncComponent(() => import("@/components/tools/DummyTextTool.vue"));
 const SpecificityTool = defineAsyncComponent(() => import("@/components/tools/SpecificityTool.vue"));
 const FluidTypeTool = defineAsyncComponent(() => import("@/components/tools/FluidTypeTool.vue"));
+const BezierTool = defineAsyncComponent(() => import("@/components/tools/BezierTool.vue"));
+const GradientTool = defineAsyncComponent(() => import("@/components/tools/GradientTool.vue"));
+const PlaceholderTool = defineAsyncComponent(() => import("@/components/tools/PlaceholderTool.vue"));
+const PathBatchTool = defineAsyncComponent(() => import("@/components/tools/PathBatchTool.vue"));
+const PaletteTool = defineAsyncComponent(() => import("@/components/tools/PaletteTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
@@ -769,6 +774,11 @@ onBeforeUnmount(() => {
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <FluidTypeTool v-else-if="selectedTool.id === 'fluid-type'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <BezierTool v-else-if="selectedTool.id === 'cubic-bezier'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <GradientTool v-else-if="selectedTool.id === 'css-gradient'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PlaceholderTool v-else-if="selectedTool.id === 'svg-placeholder'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PathBatchTool v-else-if="selectedTool.id === 'path-batch'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PaletteTool v-else-if="selectedTool.id === 'color-palette'" :key="`${selectedTool.id}:${preferences.locale}`" />
           </template>
         </template>
         <section v-else class="library-empty" data-testid="page-not-found">

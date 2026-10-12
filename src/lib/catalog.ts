@@ -18,7 +18,12 @@ export type ToolId =
   | "url-encode"
   | "dummy-text"
   | "css-specificity"
-  | "fluid-type";
+  | "fluid-type"
+  | "cubic-bezier"
+  | "css-gradient"
+  | "svg-placeholder"
+  | "path-batch"
+  | "color-palette";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -179,6 +184,16 @@ export const tools: readonly ToolDefinition[] = [
     keywords: "color contrast wcag accessibility aa aaa 色 配色 コントラスト",
     color: "orange",
   },
+  { id: "cubic-bezier", category: "design", wasm: false, devtoys: true,
+    keywords: "css cubic bezier easing timing animation curve イージング 缓动 緩動 이징", color: "orange" },
+  { id: "css-gradient", category: "design", wasm: false, devtoys: true,
+    keywords: "css gradient linear radial color stops グラデーション 渐变 漸層 그라디언트", color: "rose" },
+  { id: "svg-placeholder", category: "design", wasm: false, devtoys: true,
+    keywords: "svg placeholder image png illustration svg プレースホルダー 占位图 佔位圖 자리표시자", color: "green" },
+  { id: "path-batch", category: "data", wasm: false, devtoys: true,
+    keywords: "batch filename path rename strings prefix suffix basename extension ファイル名 パス 批量路径 批次路徑 경로 이름", color: "blue" },
+  { id: "color-palette", category: "design", wasm: false, devtoys: true,
+    keywords: "palette color harmony analogous complementary triadic 色彩 配色 调和 色調 팔레트", color: "purple" },
 ] as const;
 
 export function isToolId(value: unknown): value is ToolId {
