@@ -3,6 +3,7 @@ import type { Locale } from "./preferences";
 import { chmodGuide } from "./chmod-guide.ts";
 import { base64Guide } from "./base64-guide.ts";
 import { utilityGuides } from "./utility-guides.ts";
+import { inspectorGuides } from "./inspector-guides.ts";
 import { designGuides } from "./design-guides.ts";
 import { quickGuides } from "./quick-guides.ts";
 
@@ -142,6 +143,7 @@ function localized(
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
   ...utilityGuides,
+  ...inspectorGuides,
   ...designGuides,
   chmod: chmodGuide,
   base64: base64Guide,

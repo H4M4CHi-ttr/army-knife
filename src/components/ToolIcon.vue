@@ -20,6 +20,10 @@ import {
   Languages,
   Tag,
   FileCode2,
+  BookOpen,
+  CaseSensitive,
+  GitMerge,
+  Paintbrush,
 } from "@lucide/vue";
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
@@ -54,6 +58,11 @@ const icons = {
   "unicode-normalize": Languages,
   slug: Tag,
   "unicode-escape": FileCode2,
+  "text-stats": CaseSensitive,
+  "string-literals": FileCode2,
+  "http-reference": BookOpen,
+  "git-conflicts": GitMerge,
+  "color-converter": Paintbrush,
 };
 </script>
 <template><component :is="icons[id]" aria-hidden="true" :stroke-width="1.7" /></template>

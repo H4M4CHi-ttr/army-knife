@@ -56,6 +56,7 @@ const TextCodecTool = defineAsyncComponent(() => import("@/components/tools/Text
 const DummyTextTool = defineAsyncComponent(() => import("@/components/tools/DummyTextTool.vue"));
 const SpecificityTool = defineAsyncComponent(() => import("@/components/tools/SpecificityTool.vue"));
 const FluidTypeTool = defineAsyncComponent(() => import("@/components/tools/FluidTypeTool.vue"));
+const InspectorTool = defineAsyncComponent(() => import("@/components/tools/InspectorTool.vue"));
 const BezierTool = defineAsyncComponent(() => import("@/components/tools/BezierTool.vue"));
 const GradientTool = defineAsyncComponent(() => import("@/components/tools/GradientTool.vue"));
 const PlaceholderTool = defineAsyncComponent(() => import("@/components/tools/PlaceholderTool.vue"));
@@ -776,6 +777,10 @@ onBeforeUnmount(() => {
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <FluidTypeTool v-else-if="selectedTool.id === 'fluid-type'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <InspectorTool
+              v-else-if="selectedTool.id === 'text-stats' || selectedTool.id === 'string-literals' || selectedTool.id === 'http-reference' || selectedTool.id === 'git-conflicts' || selectedTool.id === 'color-converter'"
+              :kind="selectedTool.id" :key="`${selectedTool.id}:${preferences.locale}`"
+            />
             <BezierTool v-else-if="selectedTool.id === 'cubic-bezier'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GradientTool v-else-if="selectedTool.id === 'css-gradient'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <PlaceholderTool v-else-if="selectedTool.id === 'svg-placeholder'" :key="`${selectedTool.id}:${preferences.locale}`" />

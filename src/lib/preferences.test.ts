@@ -117,6 +117,8 @@ describe("private browser preferences", () => {
       "css-units",
       "unicode-normalize",
       "slug",
+      "http-reference",
+      "git-conflicts",
     ]);
     expect(migrated.enabledTools).not.toContain("cidr");
     expect(migrated.enabledTools).not.toContain("json-format");
