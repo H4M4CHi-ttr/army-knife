@@ -1,7 +1,7 @@
 import type { Locale } from "./locales";
 import type { ToolGuide } from "./tool-guides";
 import type { QuickToolId } from "./tools/quick-converters";
-import { quickMessages } from "../i18n/quick";
+import { quickMessages } from "../i18n/quick.ts";
 
 const examples: Record<QuickToolId, { input: string; result: string }> = {
   "data-units": {
