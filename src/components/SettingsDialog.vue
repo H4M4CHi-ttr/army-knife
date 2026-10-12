@@ -88,6 +88,20 @@ function toggleTool(id: ToolId, enabled: boolean) {
         <p v-if="fontError" class="notice" role="status">{{ t("settings.fontError") }}</p>
       </section>
       <section class="settings-section">
+        <label for="search-mode-select" class="field-label">{{ t("settings.searchMode") }}</label>
+        <select
+          id="search-mode-select"
+          v-model="preferences.searchMode"
+          class="native-select language-select"
+          data-testid="search-mode-select"
+        >
+          <option v-for="mode in ['lexical', 'classifier', 'hybrid']" :key="mode" :value="mode">
+            {{ t(`search.mode.${mode}`) }}
+          </option>
+        </select>
+        <p class="hint">{{ t("search.mode.note") }}</p>
+      </section>
+      <section class="settings-section">
         <h3>{{ t("settings.tools") }}</h3>
         <p class="hint">{{ t("settings.devtoysHint") }}</p>
         <div class="tool-toggles">
