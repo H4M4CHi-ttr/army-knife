@@ -84,6 +84,22 @@ function warningText(code: string): string {
         <div class="metric"><span class="metric-label">{{ t("inspector.skipped") }}</span>
           <strong class="metric-value">{{ cookies.skipped.toLocaleString(locale) }}</strong></div>
       </div>
+      <div class="inspector-table-scroll">
+        <table class="inspector-summary-table" data-testid="cookie-table">
+          <thead><tr>
+            <th scope="col">{{ t("inspector.name") }}</th>
+            <th scope="col">{{ t("inspector.sameSite") }}</th>
+            <th scope="col">{{ t("inspector.flags") }}</th>
+            <th scope="col">{{ t("inspector.warnings") }}</th>
+          </tr></thead>
+          <tbody><tr v-for="(cookie, index) in cookies.cookies" :key="index">
+            <th scope="row">{{ cookie.name }}</th>
+            <td>{{ cookie.sameSite }}</td>
+            <td>{{ [cookie.secure && 'Secure', cookie.httpOnly && 'HttpOnly', cookie.partitioned && 'Partitioned'].filter(Boolean).join(', ') || t("inspector.none") }}</td>
+            <td>{{ cookie.warnings.length }}</td>
+          </tr></tbody>
+        </table>
+      </div>
       <div v-for="(cookie, index) in cookies.cookies" :key="index" class="inspector-cookie">
         <h3 class="inspector-wrap">{{ cookie.name }}</h3>
         <dl class="cookie-details">
@@ -106,6 +122,9 @@ function warningText(code: string): string {
 </template>
 
 <style scoped>
+.inspector-table-scroll { overflow-x:auto; max-width:100%; margin:1rem 0; }
+.inspector-summary-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+.inspector-summary-table th, .inspector-summary-table td { border-bottom:1px solid var(--border); padding:0.55rem; text-align:left; min-width:5rem; overflow-wrap:anywhere; }
 .inspector-cookie { border-top:1px solid var(--border); padding:1rem 0; }
 .inspector-wrap { overflow-wrap:anywhere; }
 .inspector-list { padding-left:1.5rem; margin:0.5rem 0 1rem; overflow-wrap:anywhere; }
