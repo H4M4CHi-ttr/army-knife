@@ -261,7 +261,7 @@ describe("chmod and umask through the real app", () => {
     expect(wrapper.text()).not.toContain("PRIVATE_CLIPBOARD_MESSAGE");
   });
 
-  it("updates all five languages and themes without resetting values", async () => {
+  it("updates all five languages and themes and clears inputs on locale navigation", async () => {
     const wrapper = await mountTool();
     await wrapper.get('[data-testid="chmod-mode"]').setValue("1777");
     await wrapper.get('[data-testid="chmod-expression"]').setValue("o-t");
@@ -270,6 +270,18 @@ describe("chmod and umask through the real app", () => {
       settings.preferences.locale = locale;
       await nextTick();
       await flushPromises();
+      expect((wrapper.get('[data-testid="chmod-mode"]').element as HTMLInputElement).value).toBe(
+        "",
+      );
+      expect(
+        (wrapper.get('[data-testid="chmod-expression"]').element as HTMLInputElement).value,
+      ).toBe("");
+      expect((wrapper.get('[data-testid="chmod-umask"]').element as HTMLInputElement).value).toBe(
+        "",
+      );
+      await wrapper.get('[data-testid="chmod-mode"]').setValue("1777");
+      await wrapper.get('[data-testid="chmod-expression"]').setValue("o-t");
+      await wrapper.get('[data-testid="chmod-umask"]').setValue("077");
       expect(wrapper.get('label[for="chmod-mode"]').text()).toBe(
         chmodMessages[locale]["chmod.octalInput"],
       );
