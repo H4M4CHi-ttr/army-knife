@@ -415,7 +415,7 @@ test("normal links support keyboard navigation, new tabs, reload, history and le
   await expect(page.locator("#cidr-input")).toBeVisible();
 });
 
-test("changing language opens the same generated tool page and preserves only preferences", async ({
+test("changing language navigates the same tool page and preserves only preferences", async ({
   page,
 }) => {
   await page.goto(toolPath("en", "unicode"));
@@ -444,7 +444,7 @@ test("changing language opens the same generated tool page and preserves only pr
           .__localeNavigationDocumentToken,
     ),
   ).toBe(documentToken);
-  await expect(page.locator("#unicode-input")).toHaveValue(`${PRIVATE_MARKER}\u200b`);
+  await expect(page.locator("#unicode-input")).toHaveValue("");
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     SITE_ORIGIN + toolPath("ja", "unicode"),
