@@ -20,7 +20,12 @@ describe("User-Agent static hints (#65)", () => {
     expect(inspectUserAgent("MyUnknownAgent").browser).toBe("Unknown");
   });
   it("enforces an exact input cap", () => {
-    expect(() => inspectUserAgent("a".repeat(TEXT_INSPECTOR_LIMITS.userAgentBytes + 1))).toThrowError("INPUT_TOO_LARGE");
+    try {
+      inspectUserAgent("a".repeat(TEXT_INSPECTOR_LIMITS.userAgentBytes + 1));
+      throw new Error("Expected input validation");
+    } catch (error) {
+      expect(error).toHaveProperty("code", "INPUT_TOO_LARGE");
+    }
   });
 });
 
