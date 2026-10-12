@@ -15,7 +15,7 @@ describe("data size / transfer rate conversion (#96)", () => {
   it("distinguishes SI from IEC and 1 byte from 8 bits", () => {
     const result = convertDataUnits("1", "MiB");
     expect(row(result, "B")).toBe("1,048,576");
-    expect(row(result, "MB")).toBe("≈ 1.048576");
+    expect(row(result, "MB")).toBe("1.048576");
     expect(row(result, "b")).toBe("8,388,608");
     expect(convertDataUnits("1000", "kB").rows.find((r) => r.label === "MB")?.value)
       .toBe("1");
@@ -27,7 +27,7 @@ describe("data size / transfer rate conversion (#96)", () => {
     const rate = convertDataUnits("1", "MB/s", true);
     expect(row(rate, "Mbps")).toBe("8");
     expect(row(rate, "kB/s")).toBe("1,000");
-    expect(row(rate, "MiB/s")).toBe("≈ 0.95367431640625");
+    expect(row(rate, "MiB/s")).toBe("0.95367431640625");
     expect(() => convertDataUnits("1", "MB/s")).toThrowError();
   });
 
