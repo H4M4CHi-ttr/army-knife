@@ -349,6 +349,7 @@ test("normal-path SPA navigation keeps one document across repeat, history, cate
     expect(request.method, request.url).toBe("GET");
     expect(url.search, request.url).toBe("");
     expect(request.body, request.url).toBeNull();
+    expect(request.headers.cookie ?? "", request.url).toBe("");
     expect(request.headers.cookie ?? "", request.url).not.toContain(credentialProbe);
     expect(JSON.stringify(request)).not.toContain(PRIVATE_MARKER);
   }
