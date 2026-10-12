@@ -37,7 +37,8 @@ test("BOM inspector counts all EOL kinds and allows deliberate conversion", asyn
     buffer: Buffer.from([0xef,0xbb,0xbf,65,13,10,66,10,67,13]),
   });
   await expect(page.getByTestId("encoding-preview")).toContainText("A");
-  await expect(page.locator(".metric-grid")).toContainText(["UTF-8", "1"]);
+  await expect(page.locator(".metric-grid")).toContainText("UTF-8");
+  await expect(page.locator(".metric-grid")).toContainText("1");
   const downloadEvent = page.waitForEvent("download");
   await page.getByRole("button", { name: "Download UTF-8 conversion" }).click();
   const download = await downloadEvent;
