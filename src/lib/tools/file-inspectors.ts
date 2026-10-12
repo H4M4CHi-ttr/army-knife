@@ -188,20 +188,29 @@ export function parseHexBytes(input: string): Uint8Array {
 }
 
 export type SriAlgorithm = "SHA-256" | "SHA-384" | "SHA-512";
+export type SriResourceKind = "script" | "stylesheet" | "unknown";
 export interface SriReport {
   integrity: string;
   html: string;
   bytes: number;
   algorithm: SriAlgorithm;
+  warnings: string[];
 }
-export async function generateSri(bytes: Uint8Array, algorithm: SriAlgorithm, css = false): Promise<SriReport> {
+export async function generateSri(
+  bytes: Uint8Array, algorithm: SriAlgorithm, resourceKind: SriResourceKind = "unknown",
+): Promise<SriReport> {
   checkSize(bytes);
   if (!["SHA-256", "SHA-384", "SHA-512"].includes(algorithm)) throw new ToolError("INVALID_REQUEST");
   const digest = new Uint8Array(await crypto.subtle.digest(algorithm, Uint8Array.from(bytes)));
   const base64 = btoa(String.fromCharCode(...digest));
   const integrity = algorithm.toLowerCase().replace("-", "") + "-" + base64;
-  const html = css
-    ? '<link rel="stylesheet" href="/assets/style.css" integrity="' + integrity + '" crossorigin="anonymous">'
-    : '<script src="/assets/app.js" integrity="' + integrity + '" crossorigin="anonymous"></script>';
-  return { integrity, html, bytes: bytes.byteLength, algorithm };
+  const script = '<script src="/assets/app.js" integrity="' + integrity + '" crossorigin="anonymous"></script>';
+  const stylesheet = '<link rel="stylesheet" href="/assets/style.css" integrity="' + integrity + '" crossorigin="anonymous">';
+  if (!["script", "stylesheet", "unknown"].includes(resourceKind)) throw new ToolError("INVALID_REQUEST");
+  const html = resourceKind === "script" ? script :
+    resourceKind === "stylesheet" ? stylesheet : script + "\n" + stylesheet;
+  return {
+    integrity, html, bytes: bytes.byteLength, algorithm,
+    warnings: resourceKind === "unknown" ? ["UNKNOWN_RESOURCE_KIND"] : [],
+  };
 }
