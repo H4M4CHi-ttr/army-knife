@@ -5,11 +5,11 @@ import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Window } from 'happy-dom';
 import { babelParse } from 'vue/compiler-sfc';
+import { LOCALES, localeFontPacks } from '../src/lib/locales.ts';
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 export const BASE_PATH = '/army-knife/';
 export const SITE_ORIGIN = 'https://h4m4chi-ttr.github.io';
-const LOCALES = ['en', 'ja', 'zh-CN', 'zh-TW', 'ko'];
 
 function decodeCss(value) {
   return value.replace(/\\(?:\r\n|[\r\n\f])|\\([0-9a-f]{1,6})(?:\r\n|[\t\n\f\r ])?|\\([^\r\n\f])/gi, (_, hex, character) => {
@@ -365,9 +365,11 @@ export function verifyDist(directory = join(PROJECT_ROOT, 'dist')) {
     }
     for (const locale of LOCALES) {
       attempt(`Font locale ${locale}`, () => {
-        const expected = lock.locales[locale];
-        check(isDeepStrictEqual(manifest.locales?.[locale], expected), `Missing or incorrect font locale mapping: ${locale}`);
-        const file = join(fontRoot, `${locale}.css`);
+        const pack = localeFontPacks[locale];
+        const expected = lock.locales[pack];
+        check(Boolean(expected), `Missing font source pack for locale: ${locale}`);
+        check(isDeepStrictEqual(manifest.locales?.[pack], expected), `Missing or incorrect font locale mapping: ${locale}`);
+        const file = join(fontRoot, `${pack}.css`);
         const css = readFileSync(file, 'utf8');
         const paths = cssReferences(css).map((reference) => asset(reference.url, file, reference.kind)).filter(Boolean).map((path) => relative(fontRoot, path).split(sep).join('/'));
         check(paths.some((path) => path.startsWith(`noto/${expected.ui}/files/`) && path.endsWith('.woff2')), `Locale ${locale} does not load its regional Noto Sans.`);

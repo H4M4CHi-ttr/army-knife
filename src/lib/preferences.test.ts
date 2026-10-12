@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { tools } from "./catalog";
+import { ADDED_LOCALES } from "./locales";
 import {
   createPreferences,
   defaultPreferences,
@@ -36,11 +37,37 @@ describe("private browser preferences", () => {
     [["zh-Hans"], "zh-CN"],
     [["zh-CN"], "zh-CN"],
     [["EN-US"], "en"],
-    [["fr-FR", "ja-JP"], "ja"],
-    [["fr-FR"], "en"],
+    [["fr-FR", "ja-JP"], "fr"],
+    [["fr-CA"], "fr"],
+    [["de-AT"], "de"],
+    [["es-MX"], "es"],
+    [["pt-BR"], "pt-BR"],
+    [["pt-PT"], "pt-BR"],
+    [["pt"], "pt-BR"],
+    [["id-ID"], "id"],
+    [["in-ID"], "id"],
+    [["vi-VN"], "vi"],
+    [["zh-Hans-HK"], "zh-CN"],
+    [["zh-Hant-CN"], "zh-TW"],
+    [["es-ES-u-nu-latn"], "es"],
+    [["ar", "de-DE", "en-US"], "de"],
+    [["en-US", "es-ES"], "en"],
+    [["english", "jargon", "koala", "es_XX", "../de", "", "vi-VN"], "vi"],
+    [["ar"], "en"],
     [[], "en"],
   ] as const)("detects language preferences %j", (languages, expected) => {
     expect(detectLocale(languages)).toBe(expected);
+  });
+
+  it.each(ADDED_LOCALES)("restores %s without resetting existing preferences", (locale) => {
+    const original = {
+      ...defaultPreferences(locale),
+      theme: "dark" as const,
+      enabledTools: ["csv"],
+      favorites: ["csv"],
+      autoApply: false,
+    };
+    expect(parsePreferences(JSON.stringify(original), "ja")).toEqual(original);
   });
 
   it.each([null, "", "{", "null", "[]", "true", '{"version":2,"enabledTools":["contrast"]}'])(

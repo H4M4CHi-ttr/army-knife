@@ -1,4 +1,4 @@
-import type { Locale } from "../lib/locales.ts";
+import type { CoreLocale as Locale } from "../lib/locales.ts";
 const keys=["tool.cubic-bezier.name","tool.cubic-bezier.description","tool.cubic-bezier.hint","tool.css-gradient.name","tool.css-gradient.description","tool.css-gradient.hint","tool.svg-placeholder.name","tool.svg-placeholder.description","tool.svg-placeholder.hint","tool.path-batch.name","tool.path-batch.description","tool.path-batch.hint","tool.color-palette.name","tool.color-palette.description","tool.color-palette.hint","errors.DESIGN_INVALID_OPTIONS","errors.DESIGN_INVALID_COLOR","errors.DESIGN_INVALID_LABEL","errors.PATH_INVALID_VALUE","errors.PNG_EXPORT_FAILED"] as const;
 const translations:Record<Locale,readonly string[]>={
   "en": [

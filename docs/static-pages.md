@@ -8,6 +8,12 @@ Every registered tool has a real directory document in each supported language:
 - `/army-knife/zh-CN/tools/cidr/`
 - `/army-knife/zh-TW/tools/cidr/`
 - `/army-knife/ko/tools/cidr/`
+- `/army-knife/es/tools/cidr/`
+- `/army-knife/fr/tools/cidr/`
+- `/army-knife/de/tools/cidr/`
+- `/army-knife/pt-BR/tools/cidr/`
+- `/army-knife/id/tools/cidr/`
+- `/army-knife/vi/tools/cidr/`
 
 Language homes use `/army-knife/{locale}/`. The historic root has a Japanese
 directory document and canonical `/army-knife/ja/`; JavaScript honors an explicitly
@@ -21,14 +27,14 @@ The Vite build first produces the existing Vue/Vapor application assets.
 `scripts/static-pages.ts` then writes HTML from the transformed entry shell.
 Each document retains the existing CSP and compiled same-origin asset URLs. Its
 title and description come from the existing i18n messages; its heading, usage,
-synthetic example, interpretation and limitations come from `src/lib/tool-guides.ts`.
+synthetic example, interpretation and limitations come from the complete registry in `src/lib/tool-guides.ts`, which combines feature-grouped core guides and per-language additions in `src/lib/guides/`.
 The guide stays outside the Vue mount point, so it remains readable with JavaScript
 disabled and after the interactive workbench mounts on the same page.
 
 The generator iterates `tools` from the existing catalog and `LOCALES` from the
 shared locale module. There is no second page registry. Add a tool to the catalog
 and provide its typed guide and UI translations; add a language to the locale list
-and provide its translations and guides. Type checking and output verification
+and provide its translations, guides, native name and font-pack mapping (see [i18n](i18n.md)). Type checking and output verification
 require complete coverage. Public slugs are existing stable tool IDs and exact
 language tags, independent of translated display names.
 

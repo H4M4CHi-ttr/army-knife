@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import { ADDED_LOCALES } from "./locales";
 
 describe("local font stylesheet selection", () => {
   let links: HTMLLinkElement[];
@@ -71,5 +72,20 @@ describe("local font stylesheet selection", () => {
       "Unsupported font locale",
     );
     expect(links).toHaveLength(0);
+  });
+
+  it("shares one font request across Latin languages while preserving the document language", async () => {
+    const first = fonts.setFontLocale("es");
+    links[0]!.dispatchEvent(new Event("load"));
+    await first;
+    for (const locale of ADDED_LOCALES) {
+      await fonts.setFontLocale(locale);
+      expect(document.documentElement.lang).toBe(locale);
+      expect(fonts.fontStylesheetHref(locale)).toMatch(/\/fonts\/en\.css$/);
+      expect(links[0]!.media).toBe("all");
+    }
+    await fonts.setFontLocale("en");
+    expect(document.documentElement.lang).toBe("en");
+    expect(links).toHaveLength(1);
   });
 });

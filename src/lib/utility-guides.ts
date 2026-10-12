@@ -1,4 +1,4 @@
-import type { Locale } from "./locales.ts";
+import type { CoreLocale as Locale } from "./locales.ts";
 import type { ToolGuide } from "./tool-guides.ts";
 
 /** Static, localized public guides. Examples never contain user data. */

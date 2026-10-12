@@ -1,4 +1,4 @@
-import type { Locale } from "../lib/locales.ts";
+import type { CoreLocale as Locale } from "../lib/locales.ts";
 const keys=["design.controls","design.duration","design.curve","design.preview","design.bezierNote","design.addStop","design.remove","design.gradientKind","design.linear","design.radial","design.angle","design.stop","design.position","design.color","design.gradientNote","design.width","design.height","design.alignment","design.top","design.center","design.bottom","design.label","design.savePng","design.placeholderNote","design.paths","design.prefix","design.suffix","design.case","design.keep","design.lower","design.upper","design.separator","design.start","design.pad","design.numbering","design.nfc","design.pathSummary","design.before","design.after","design.stem","design.ext","design.warning","design.duplicate","design.unsafe","design.pathTruncated","design.baseColor","design.count","design.harmony","design.analogous","design.complementary","design.triadic","design.hueOffset","design.paletteNote"] as const;
 const translations:Record<Locale,readonly string[]>={
   "en": [

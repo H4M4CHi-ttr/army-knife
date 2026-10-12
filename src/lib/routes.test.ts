@@ -83,7 +83,7 @@ describe("public static page routes", () => {
 
   it.each([
     "/army-knife/en/tools/missing/",
-    "/army-knife/fr/tools/cidr/",
+    "/army-knife/ar/tools/cidr/",
     "/army-knife/zh-cn/tools/cidr/",
     "/army-knife/en/tools/cidr/extra/",
     "/army-knife/en//tools/cidr/",
