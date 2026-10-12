@@ -106,7 +106,7 @@ test("Cookie values are omitted from all results and not persisted or transmitte
 test("Localized inspector controls are available in five languages", async ({ page }) => {
   for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"]) {
     await openInspector(page, "user-agent", locale);
-    await page.getByRole("button", { name: /Sample|サンプル|示例|範例|예제/ }).first().click();
+    await page.getByRole("button", { name: /Load example|サンプル|示例|範例|예제/ }).first().click();
     await expect(page.locator(".metric-grid")).toContainText("Edg/");
   }
 });
