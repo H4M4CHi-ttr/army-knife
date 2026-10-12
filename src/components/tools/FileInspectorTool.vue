@@ -88,6 +88,10 @@ const sri = computed(() => result.value?.kind === "sri" ? result.value.data : nu
 const encoding = computed(() => result.value?.kind === "encoding" ? result.value.data : null);
 const magic = computed(() => result.value?.kind === "magic" ? result.value.data : null);
 const warnings = computed(() => result.value?.data && "warnings" in result.value.data ? result.value.data.warnings : []);
+function eolRatio(count: number, report: EncodingReport): string {
+  const total = report.crlf + report.lf + report.cr;
+  return total ? (100 * count / total).toFixed(1) + "%" : "—";
+}
 const copy = computed(() => sri.value
   ? sri.value.integrity + "\n" + sri.value.html
   : result.value ? JSON.stringify(result.value.data, null, 2) : "");
@@ -227,7 +231,9 @@ function sample() {
         <div v-for="row in [
           ['encoding', encoding.encoding], ['bom', encoding.bom],
           ['valid', encoding.valid ? t('inspector.yes') : t('inspector.no')],
-          ['crlf', String(encoding.crlf)], ['lf', String(encoding.lf)], ['cr', String(encoding.cr)]
+          ['crlf', encoding.crlf + " (" + eolRatio(encoding.crlf, encoding) + ")"],
+          ['lf', encoding.lf + " (" + eolRatio(encoding.lf, encoding) + ")"],
+          ['cr', encoding.cr + " (" + eolRatio(encoding.cr, encoding) + ")"]
         ]" :key="row[0]" class="metric">
           <span class="metric-label">{{ t("inspector." + row[0]) }}</span><strong class="metric-value">{{ row[1] }}</strong>
         </div>
