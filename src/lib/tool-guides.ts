@@ -3,6 +3,7 @@ import type { Locale } from "./preferences";
 import { chmodGuide } from "./chmod-guide.ts";
 import { base64Guide } from "./base64-guide.ts";
 import { utilityGuides } from "./utility-guides.ts";
+import { inspectorGuides } from "./inspector-guides.ts";
 
 /** Public documentation only. User input never becomes part of this data. */
 export interface ToolGuide {
@@ -140,6 +141,7 @@ function localized(
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
   ...utilityGuides,
+  ...inspectorGuides,
   chmod: chmodGuide,
   base64: base64Guide,
   csv: localized("name,score\nAda,98\nLinus,\nGrace,99", {
