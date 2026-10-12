@@ -12,7 +12,7 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 | ----------------------- | --------------------------------------------------------------------------- | ------------------- | -------- |
 | SRI integrity生成       | ローカルJS/CSSの生バイト列からSHA-256/384/512 integrity属性・HTML例を生成       | Web Crypto / Worker | オフ     |
 | BOM・改行コード検査     | UTF-8/UTF-16とBOM、CRLF/LF/CRを厳密に解析し、任意でUTF-8へ変換              | TypeScript / Worker | オフ     |
-| Magic Bytes検査        | バイナリ先頭・末尾の既知署名と拡張子の不一致を調査                            | TypeScript / Worker | オン     |
+| Magic Bytes検査        | バイナリ先頭・末尾の既知署名と拡張子・宣言MIMEの不一致を調査                            | TypeScript / Worker | オン     |
 | User-Agent解析         | UAからブラウザ・エンジン・OS・デバイス・Bot候補をヒューリスティックに表示     | TypeScript          | オン     |
 | Set-Cookie属性解析      | SameSite/Secure/HttpOnly/Partitionedと接頭辞の条件・不整合を確認             | TypeScript          | オン     |
 | Linux 権限計算          | 八進数・rwx・特殊ビットを相互変換し、symbolic chmod と作成時 umask を確認   | TypeScript          | オン     |
@@ -58,7 +58,7 @@ DevToys と重なる機能は **設定から明示的に有効にするまで表
 
 - **SRI integrity**: ネットワーク取得は行わず、ローカルファイル（空ファイルも可）または厳密な16進バイト列から SHA-256/384/512 の Base64 ダイジェストとHTMLの利用例を生成。バイト列の違い（改行を含む）は出力に反映。HTML内のリソースURLはダミーなので手動置換が必要です。重複を保守的に見て既定オフ。
 - **BOM・改行コード**: UTF-8/UTF-16LE/UTF-16BEを厳密にデコードし、BOMと CRLF/LF/CR を個別に数えます。BOMなしUTF-16は一部のNUL配置パターンのみ推定（その旨警告）。不明な旧文字コードは推測変換しません。変換を明示操作した場合だけ、BOMなしUTF-8と指定改行へダウンロードします。既定オフ。
-- **Magic Bytes**: PNG/JPEG/GIF/PDF/ZIP/GZIP/7z/RAR/SQLite/ELF/MZ/WebP/WAVEとZIP終端候補を静的検査。拡張子と照合します。署名は完全なパーサーや安全性検査ではなく、Polyglotや偽装・不完全なファイルを見逃す可能性があります。
+- **Magic Bytes**: PNG/JPEG/GIF/PDF/ZIP/GZIP/7z/RAR/SQLite/ELF/MZ/WebP/WAVEとZIP終端候補を静的検査。拡張子・ファイルが宣言するMIME（参考値）と照合します。署名は完全なパーサーや安全性検査ではなく、Polyglotや偽装・不完全なファイルを見逃す可能性があります。
 - **User-Agent**: 既知の部分文字列から端末・エンジン・ブラウザ・OS・botを推定します。UA偽装、Windowsの凍結UA、Client Hints未取得などにより真の環境は確定できません。
 - **Set-Cookie**: 1行ごとのヘッダーをローカル静的解析。Expiresの日付中のカンマを分割せず、SameSite=None/PartitionedのSecure条件、__Host- / __Secure-接頭辞を確認します。Cookie値は直ちに破棄して一覧・JSONコピーに含めません。Cookieは保存・送信しません。
 
