@@ -183,7 +183,9 @@ describe("App integration with real local tools", () => {
     expect(cards).toEqual([
       "tool-card-chmod",
       "tool-card-cidr",
+      "tool-card-css-units",
       "tool-card-csv",
+      "tool-card-data-units",
       "tool-card-env",
       "tool-card-explain",
       "tool-card-har",
@@ -191,12 +193,11 @@ describe("App integration with real local tools", () => {
       "tool-card-logs",
       "tool-card-og-tags",
       "tool-card-shortcuts",
+      "tool-card-slug",
       "tool-card-unicode",
+      "tool-card-unicode-normalize",
       "tool-card-url",
     ]);
-    for (const id of ["timestamp", "jwt", "ids", "password"]) {
-      expect(wrapper.find(`[data-testid="tool-card-${id}"]`).exists()).toBe(false);
-    }
     expect(wrapper.find(".tool-panel").exists()).toBe(false);
     expect(setFontLocale).toHaveBeenCalledWith("en");
   });

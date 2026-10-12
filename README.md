@@ -35,6 +35,11 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 | SVG プレースホルダー | 安全な静的 SVG / PNG を生成・保存 | TypeScript | オフ |
 | ファイル名・パス一括変換 | パス文字列の接頭辞・連番・大文字小文字の変換と重複警告 | TypeScript | オフ |
 | 調和配色パレット | HSL 類似色・補色・三色配色と CSS 変数 | TypeScript | オフ |
+| データ容量・速度換算    | SI/IEC のbit/Byte単位を正確な分数で換算し、容量/転送速度を切り替え            | TypeScript / BigInt | オン     |
+| CSS 単位換算           | px / rem / em / vw / vh を条件付きで換算                                     | TypeScript          | オン     |
+| Unicode 正規化比較     | NFC / NFD / NFKC / NFKD とコードポイント差をプレビュー                        | TypeScript          | オン     |
+| Slug・識別子生成       | Unicode/ASCII slugを作成、重複は連番で解消                                    | TypeScript          | オン     |
+| Unicode エスケープ変換 | U+、JS Unicode escape、UTF-16の厳密なエンコード・デコード                     | TypeScript          | オフ     |
 | 日時・Unixタイムスタンプ変換 | ISO 8601/RFC 3339とUnix秒・ミリ秒の相互変換、地域別表示 | TypeScript | オフ |
 | JWTインスペクター | ヘッダー・claimsの非検証デコード、exp・nbf・iat日時表示 | TypeScript | オフ |
 | UUID・ULID生成と検査 | UUID v4/v7・ULIDを暗号学的乱数で生成、時刻情報検査 | TypeScript | オフ |
@@ -91,6 +96,7 @@ Linux 権限計算は入力に即時反映します。八進モードと権限�
 | ----------------------------------- | ------------------------------------------------------------------ |
 | Linux 権限・CIDR・URL・コントラスト | 入力に即時反映                                                     |
 | JSON・Unicode・.env・EXPLAIN・Base64 | 入力合計 8,192 UTF-16 コード単位以下は即時、それを超えると遅延適用 |
+| データ容量・CSS・正規化・Slug・Unicode escape | 入力 2,048 UTF-16 コード単位未満は即時、それ以上は800ms遅延・手動選択 |
 | CSV・ログ・集合演算・HAR            | Worker 起動を含むため遅延適用                                      |
 
 遅延適用は、入力や処理オプションの変更が止まってから **800ms 後**に実行します。「今すぐ適用」ボタンのバーと残り秒数で待ち時間が分かり、ボタンを押せば待たずに処理します。「自動適用」をオフにすると遅延処理は手動のみになります。この設定は画面共通でブラウザに保存します。即時反映の軽い処理には影響しません。
@@ -111,6 +117,10 @@ VueUse 15 の `useDebounceFn` と `useIntervalFn` を [共通実行処理](src/c
 - Unicode は最大 **512 KiB**。全入力を集計し、検出行は最大 1,000 件、可視化プレビューは最大 20,000 文字です。検出された文字は言語や絵文字に必要な場合があり、自動削除はしません。
 - コントラスト判定は `#RGB` / `#RRGGBB` を受け付け、丸める前の比率で判定します。
 - Base64 は UTF-8 テキストに限定した RFC 4648 変換で、入力上限 **256 KiB**。標準形式と URL-safe 形式のアルファベットを区別し、不正な UTF-8 や孤立した UTF-16 サロゲートを拒否します。長い入力は専用 Worker で処理します。
+
+- データ容量換算はSI（1000倍）とIEC（1024倍）を区別し、整数／小数をBigInt分数として計算します。入力は最大96文字・小数部24桁。出力は小数24桁で打ち切り、非終端の端数は **≈** を表示します。bit/ByteとSI/IEC、転送速度を区別します。
+- CSS単位換算はroot/要素フォントサイズとviewport幅/高さを明示し、すべてCSS pxを基準に計算します。数値の絶対値は最大1,000,000、フォント/画面寸法は正数。表示は小数6桁に丸め、近似には **≈** を付けます。%、コンテナクエリ・自動解決は非対応です。
+- Unicode正規化・Slug・エスケープ変換は入力最大 **16 KiB**、正規化のコードポイント表は各方式32点、エスケープ表は64点までです。Slugは非空100行まで。ASCII Slugは言語別の翻字辞書を持たず、復元可能とも保証しません。エスケープのデコードは指定形式の完全な表記のみを受け付け、不正値・孤立サロゲートを拒否します。
 
 詳細な数値の意味、切り詰め条件、対応しない入力は [計算仕様](docs/devtoys-coverage.md#calculation-semantics-and-limits) と実装内の型定義を参照してください。ログの正規表現には Rust の `regex` 構文を使い、先読み・後読み・後方参照は対応しません。
 
@@ -241,3 +251,34 @@ Pages 用のベースパスは `/army-knife/` です。各ツールは `/army-kn
 - [第三者ソフトウェアとフォントの帰属](THIRD_PARTY_NOTICES.md)
 
 本プロジェクトは DevToys の独立した補完ツールで、DevToys の公式配布物ではありません。
+
+
+### Large text and paste safety
+
+CSV, logs, sets, HAR and other text tools share a bounded input component.
+Below 128 Ki UTF-16 code units, input behaves as an ordinary editable textarea.
+At 128 Ki or more, the full string remains **in memory for analysis**, but the
+textarea becomes a **read-only 2,048-character preview**. Use **Replace text**
+to paste another input, or download the full original text to edit it externally
+before reimporting. Nothing is sent to a remote service.
+
+Large pastes are intercepted *before* the browser inserts megabytes into a
+textarea; files and exact UTF-8 byte checks are handled in a same-origin Worker.
+WASM requests also perform the expensive byte-size check in their Worker,
+before loading WASM. The UI thread only checks the cheap character-count lower
+bound. Values above the per-tool input cap are refused, and the 800 ms delayed /
+manual execution controls still apply. Worker jobs are aborted on navigation
+and when newer input supersedes them.
+
+**Trade-off:** For text above the preview threshold, full inline editing is
+intentionally unavailable. Use a local editor and reimport the file. The app
+keeps the full data in a reactive reference, so this is **not** a streaming
+parser or an unlimited-file mode. The 16 MiB WASM cap and smaller tool-specific
+caps remain in effect. Large result downloads are intentionally user-initiated.
+
+```
+pnpm test:e2e        # includes native textarea vs bounded paste timing attachments
+pnpm test            # includes local worker limit and cancellation tests
+```
+The browser timing artifact is a diagnostic measurement rather than a fixed
+pass/fail latency threshold because browsers and CI runners vary.

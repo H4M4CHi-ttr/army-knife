@@ -27,17 +27,10 @@ function validateInputSize(request: EngineRequest): void {
   if (values.reduce((sum, value) => sum + value.length, 0) > ENGINE_LIMITS.inputBytes) {
     throw new EngineError("INPUT_TOO_LARGE");
   }
-  const encoder = new TextEncoder();
-  if (
-    values.reduce((sum, value) => sum + encoder.encode(value).byteLength, 0) >
-    ENGINE_LIMITS.inputBytes
-  ) {
-    throw new EngineError("INPUT_TOO_LARGE");
-  }
-  if (
-    request.operation === "logs" &&
-    encoder.encode(request.pattern).byteLength > ENGINE_LIMITS.regexBytes
-  ) {
+  // Only a constant-time UTF-16 lower bound is checked here. Encoding a
+  // 16 MiB Unicode string was a long main-thread task on slow devices.
+  // The worker checks exact UTF-8 byte counts before loading WASM.
+  if (request.operation === "logs" && request.pattern.length > ENGINE_LIMITS.regexBytes) {
     throw new EngineError("REGEX_TOO_LARGE");
   }
 }

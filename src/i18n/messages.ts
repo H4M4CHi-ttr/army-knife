@@ -17,6 +17,7 @@ import { fiveToolMessages } from "./five-tools.ts";
 import { utilityMessages } from "./utility.ts";
 import { designToolMessages } from "./design-tool-messages.ts";
 import { designLabels } from "./design-labels.ts";
+import { quickMessages } from "./quick.ts";
 
 export const messages = {
   en: {
@@ -31,6 +32,7 @@ export const messages = {
     ...utilityMessages.en,
     ...designToolMessages.en,
     ...designLabels.en,
+    ...quickMessages["en"],
     ...toolMessagesEn,
     "contrast.largeHint":
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
@@ -47,6 +49,7 @@ export const messages = {
     ...utilityMessages.ja,
     ...designToolMessages.ja,
     ...designLabels.ja,
+    ...quickMessages["ja"],
     ...toolMessagesJa,
     "contrast.largeHint":
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
@@ -63,6 +66,7 @@ export const messages = {
     ...utilityMessages["zh-CN"],
     ...designToolMessages["zh-CN"],
     ...designLabels["zh-CN"],
+    ...quickMessages["zh-CN"],
     ...toolZhCN,
     "contrast.largeHint":
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
@@ -79,6 +83,7 @@ export const messages = {
     ...utilityMessages["zh-TW"],
     ...designToolMessages["zh-TW"],
     ...designLabels["zh-TW"],
+    ...quickMessages["zh-TW"],
     ...toolZhTW,
     "contrast.largeHint":
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
@@ -95,6 +100,7 @@ export const messages = {
     ...utilityMessages.ko,
     ...designToolMessages.ko,
     ...designLabels.ko,
+    ...quickMessages["ko"],
     ...toolKo,
     "contrast.largeHint":
       "큰 텍스트는 18pt(24 CSS px) 이상, 굵은 글씨는 14pt(약 18.7 CSS px) 이상입니다. 판정에는 반올림 전 비율을 사용합니다.",

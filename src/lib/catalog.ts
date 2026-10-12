@@ -24,6 +24,11 @@ export type ToolId =
   | "svg-placeholder"
   | "path-batch"
   | "color-palette"
+  | "data-units"
+  | "css-units"
+  | "unicode-normalize"
+  | "slug"
+  | "unicode-escape"
   | "timestamp"
   | "jwt"
   | "ids"
@@ -199,6 +204,46 @@ export const tools: readonly ToolDefinition[] = [
     keywords: "batch filename path rename strings prefix suffix basename extension ファイル名 パス 批量路径 批次路徑 경로 이름", color: "blue" },
   { id: "color-palette", category: "design", wasm: false, devtoys: true,
     keywords: "palette color harmony analogous complementary triadic 色彩 配色 调和 色調 팔레트", color: "purple" },
+  {
+    id: "data-units",
+    category: "data",
+    wasm: false,
+    devtoys: false,
+    keywords: "bits bytes kibibytes mebibytes GB GiB SI IEC precision size transfer rate データ容量 単位 换算 單位換算 비트 바이트",
+    color: "green",
+  },
+  {
+    id: "css-units",
+    category: "design",
+    wasm: false,
+    devtoys: false,
+    keywords: "css px rem em vw vh viewport root font size convert CSS 单位 單位 단위 ピクセル",
+    color: "blue",
+  },
+  {
+    id: "unicode-normalize",
+    category: "text",
+    wasm: false,
+    devtoys: false,
+    keywords: "unicode nfc nfd nfkc nfkd normalization canonical compatibility 正規化 规范化 正規化 정규화",
+    color: "rose",
+  },
+  {
+    id: "slug",
+    category: "text",
+    wasm: false,
+    devtoys: false,
+    keywords: "slug URL identifier permalink ascii unicode kebab snake naming 識別子 スラッグ 别名 識別碼 슬러그",
+    color: "orange",
+  },
+  {
+    id: "unicode-escape",
+    category: "text",
+    wasm: false,
+    devtoys: true,
+    keywords: "unicode escape codepoint U+ js UTF-16 conversion エスケープ 字符转义 字元跳脫 유니코드 이스케이프",
+    color: "purple",
+  },
   {
     id: "timestamp",
     category: "data",
