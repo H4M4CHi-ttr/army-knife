@@ -15,6 +15,7 @@ import { chmodMessages } from "./chmod.ts";
 import { base64Messages } from "./base64.ts";
 import { fiveToolMessages } from "./five-tools.ts";
 import { utilityMessages } from "./utility.ts";
+import { inspectorMessages } from "./inspectors.ts";
 import { designToolMessages } from "./design-tool-messages.ts";
 import { designLabels } from "./design-labels.ts";
 import { quickMessages } from "./quick.ts";
@@ -30,6 +31,7 @@ export const messages = {
     ...base64Messages.en,
     ...fiveToolMessages.en,
     ...utilityMessages.en,
+    ...inspectorMessages.en,
     ...designToolMessages.en,
     ...designLabels.en,
     ...quickMessages["en"],
@@ -47,6 +49,7 @@ export const messages = {
     ...base64Messages.ja,
     ...fiveToolMessages.ja,
     ...utilityMessages.ja,
+    ...inspectorMessages.ja,
     ...designToolMessages.ja,
     ...designLabels.ja,
     ...quickMessages["ja"],
@@ -64,6 +67,7 @@ export const messages = {
     ...base64Messages["zh-CN"],
     ...fiveToolMessages["zh-CN"],
     ...utilityMessages["zh-CN"],
+    ...inspectorMessages["zh-CN"],
     ...designToolMessages["zh-CN"],
     ...designLabels["zh-CN"],
     ...quickMessages["zh-CN"],
@@ -81,6 +85,7 @@ export const messages = {
     ...base64Messages["zh-TW"],
     ...fiveToolMessages["zh-TW"],
     ...utilityMessages["zh-TW"],
+    ...inspectorMessages["zh-TW"],
     ...designToolMessages["zh-TW"],
     ...designLabels["zh-TW"],
     ...quickMessages["zh-TW"],
@@ -98,6 +103,7 @@ export const messages = {
     ...base64Messages.ko,
     ...fiveToolMessages.ko,
     ...utilityMessages.ko,
+    ...inspectorMessages.ko,
     ...designToolMessages.ko,
     ...designLabels.ko,
     ...quickMessages["ko"],
