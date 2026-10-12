@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vite-plus/test";
 import { TEXT_CODEC_LIMITS, transformHtmlEntities as html, transformPercentEncoding as percent } from "./text-codecs";
 
+function expectInputTooLarge(operation: () => unknown) {
+  try {
+    operation();
+    throw new Error("Expected size validation to fail");
+  } catch (error) {
+    expect(error).toHaveProperty("code", "INPUT_TOO_LARGE");
+  }
+}
+
 describe("HTML entity conversion (no DOM parsing)", () => {
   it("escapes dangerous markup as plain text, minimally and fully", () => {
     expect(html('<script a="x">&\'</script>', "encode")).toBe("&lt;script a=&quot;x&quot;&gt;&amp;&#39;&lt;/script&gt;");
@@ -16,7 +25,7 @@ describe("HTML entity conversion (no DOM parsing)", () => {
   });
   it("bounds input and rejects lone UTF-16 surrogates", () => {
     expect(() => html("\ud800", "encode")).toThrowError("CODEC_INVALID_TEXT");
-    expect(() => html("a".repeat(TEXT_CODEC_LIMITS.inputBytes + 1), "decode")).toThrowError("INPUT_TOO_LARGE");
+    expectInputTooLarge(() => html("a".repeat(TEXT_CODEC_LIMITS.inputBytes + 1), "decode"));
   });
 });
 
@@ -34,6 +43,6 @@ describe("URL percent encoding modes", () => {
       expect(() => percent(value, "decode", "component"), value).toThrowError("CODEC_INVALID_TEXT");
     }
     expect(() => percent("\ud800", "encode", "component")).toThrowError("CODEC_INVALID_TEXT");
-    expect(() => percent("a".repeat(TEXT_CODEC_LIMITS.inputBytes + 1), "encode", "path")).toThrowError("INPUT_TOO_LARGE");
+    expectInputTooLarge(() => percent("a".repeat(TEXT_CODEC_LIMITS.inputBytes + 1), "encode", "path"));
   });
 });
