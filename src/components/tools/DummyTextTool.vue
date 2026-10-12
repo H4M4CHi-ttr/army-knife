@@ -12,6 +12,7 @@ const language = ref<DummyLocale>("la");
 const unit = ref<DummyUnit>("paragraphs");
 const count = ref(3);
 const seed = ref(42);
+function reset() { language.value = "la"; unit.value = "paragraphs"; count.value = 3; seed.value = 42; }
 const { result, error, control, apply, cancel, setAuto } = useToolExecution<string>({
   source: () => [language.value,unit.value,count.value,seed.value],
   canRun: () => true,
@@ -24,7 +25,7 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<stri
   <div class="tool-panel">
     <div class="tool-toolbar">
       <div class="toolbar-label"><span class="step-number">01</span>{{ t("dummy.options") }}</div>
-      <div class="control-row"><Button variant="outline" size="sm" @click="[language,unit,count,seed] = ['la','paragraphs',3,42]">{{ t("actions.reset") }}</Button></div>
+      <div class="control-row"><Button variant="outline" size="sm" @click="reset">{{ t("actions.reset") }}</Button></div>
     </div>
     <div class="dummy-controls">
       <label class="field-label" for="dummy-language">{{ t("dummy.language") }}
