@@ -48,18 +48,31 @@ const content: Record<Locale, Record<InspectorId, { steps: string[]; result: str
   },
 };
 
-export const inspectorGuides = Object.fromEntries(
-  (Object.keys(examples) as InspectorId[]).map((id) => [id, Object.fromEntries(
-    (Object.keys(content) as Locale[]).map((locale) => {
-      const name = ("tool." + id + ".description") as keyof typeof inspectorMessages.en;
-      const hint = ("tool." + id + ".hint") as keyof typeof inspectorMessages.en;
-      return [locale, {
-        introduction: inspectorMessages[locale][name],
-        steps: content[locale][id].steps,
-        exampleInput: examples[id],
-        exampleResult: content[locale][id].result,
-        limitations: [inspectorMessages[locale][hint]],
-      }];
-    }),
-  )]),
-) as Record<InspectorId, Record<Locale, ToolGuide>>;
+function forLocale(id: InspectorId, locale: Locale): ToolGuide {
+  const name = ("tool." + id + ".description") as keyof typeof inspectorMessages.en;
+  const hint = ("tool." + id + ".hint") as keyof typeof inspectorMessages.en;
+  return {
+    introduction: inspectorMessages[locale][name],
+    steps: content[locale][id].steps,
+    exampleInput: examples[id],
+    exampleResult: content[locale][id].result,
+    limitations: [inspectorMessages[locale][hint]],
+  };
+}
+function createGuide(id: InspectorId): Record<Locale, ToolGuide> {
+  return {
+    en: forLocale(id, "en"),
+    ja: forLocale(id, "ja"),
+    "zh-CN": forLocale(id, "zh-CN"),
+    "zh-TW": forLocale(id, "zh-TW"),
+    ko: forLocale(id, "ko"),
+  };
+}
+
+export const inspectorGuides = {
+  sri: createGuide("sri"),
+  encoding: createGuide("encoding"),
+  magic: createGuide("magic"),
+  "user-agent": createGuide("user-agent"),
+  "set-cookie": createGuide("set-cookie"),
+} satisfies Record<InspectorId, Record<Locale, ToolGuide>>;
