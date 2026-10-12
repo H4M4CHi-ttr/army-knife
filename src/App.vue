@@ -52,6 +52,8 @@ const ExplainTool = defineAsyncComponent(() => import("@/components/tools/Explai
 const ShortcutTool = defineAsyncComponent(() => import("@/components/tools/ShortcutTool.vue"));
 const ChmodTool = defineAsyncComponent(() => import("@/components/tools/ChmodTool.vue"));
 const Base64Tool = defineAsyncComponent(() => import("@/components/tools/Base64Tool.vue"));
+const FiveTools = defineAsyncComponent(() => import("@/components/tools/FiveTools.vue"));
+const OgTagsTool = defineAsyncComponent(() => import("@/components/tools/OgTagsTool.vue"));
 const TextCodecTool = defineAsyncComponent(() => import("@/components/tools/TextCodecTool.vue"));
 const DummyTextTool = defineAsyncComponent(() => import("@/components/tools/DummyTextTool.vue"));
 const SpecificityTool = defineAsyncComponent(() => import("@/components/tools/SpecificityTool.vue"));
@@ -780,6 +782,12 @@ onBeforeUnmount(() => {
             <InspectorTool
               v-else-if="selectedTool.id === 'text-stats' || selectedTool.id === 'string-literals' || selectedTool.id === 'http-reference' || selectedTool.id === 'git-conflicts' || selectedTool.id === 'color-converter'"
               :kind="selectedTool.id" :key="`${selectedTool.id}:${preferences.locale}`"
+            />
+            <OgTagsTool v-else-if="selectedTool.id === 'og-tags'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <FiveTools
+              v-else-if="selectedTool.id === 'timestamp' || selectedTool.id === 'jwt' || selectedTool.id === 'ids' || selectedTool.id === 'password'"
+              :id="selectedTool.id"
+              :key="selectedTool.id + ':' + preferences.locale"
             />
             <BezierTool v-else-if="selectedTool.id === 'cubic-bezier'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GradientTool v-else-if="selectedTool.id === 'css-gradient'" :key="`${selectedTool.id}:${preferences.locale}`" />

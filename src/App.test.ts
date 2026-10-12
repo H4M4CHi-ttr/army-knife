@@ -193,6 +193,7 @@ describe("App integration with real local tools", () => {
       "tool-card-http-reference",
       "tool-card-json-diff",
       "tool-card-logs",
+      "tool-card-og-tags",
       "tool-card-shortcuts",
       "tool-card-slug",
       "tool-card-unicode",

@@ -45,6 +45,11 @@ function inputSelector(id: ToolId): string {
   if (id === "env") return "#env-left";
   if (id === "contrast") return ".color-controls";
   if (id === "shortcuts") return '[data-testid="shortcut-capture"]';
+  if (id === "timestamp") return '[data-testid="date-input"]';
+  if (id === "jwt") return '[data-testid="jwt-input"]';
+  if (id === "ids") return '[data-testid="id-format"]';
+  if (id === "password") return '[data-testid="secret-mode"]';
+  if (id === "og-tags") return '[data-testid="og-title"]';
   if (id === "cubic-bezier") return "#bezier-duration";
   if (id === "css-gradient") return "#gradient-kind";
   if (id === "svg-placeholder") return "#placeholder-width";

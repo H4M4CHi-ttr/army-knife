@@ -2,6 +2,7 @@ import type { ToolId } from "./catalog";
 import type { Locale } from "./preferences";
 import { chmodGuide } from "./chmod-guide.ts";
 import { base64Guide } from "./base64-guide.ts";
+import { fiveToolGuides } from "./five-tool-guides.ts";
 import { utilityGuides } from "./utility-guides.ts";
 import { inspectorGuides } from "./inspector-guides.ts";
 import { designGuides } from "./design-guides.ts";
@@ -147,6 +148,7 @@ export const toolGuides = {
   ...designGuides,
   chmod: chmodGuide,
   base64: base64Guide,
+  ...fiveToolGuides,
   ...quickGuides,
   csv: localized("name,score\nAda,98\nLinus,\nGrace,99", {
     ja: {
