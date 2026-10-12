@@ -3,6 +3,7 @@ import { assertInputSize, ToolError } from "./errors";
 export type QuickToolId =
   | "data-units"
   | "css-units"
+  | "radix"
   | "unicode-normalize"
   | "slug"
   | "unicode-escape";
@@ -19,10 +20,40 @@ export interface QuickResult {
 }
 export const QUICK_LIMITS = {
   inputBytes: 16 * 1024,
+  radixBytes: 4 * 1024,
   maxSlugLines: 100,
   previewPoints: 32,
   shownPoints: 64,
 } as const;
+
+export const RADIX_BASES = [2, 8, 10, 16, 36] as const;
+export type RadixBase = (typeof RADIX_BASES)[number];
+
+/** Exact signed integer conversion; prefixes, grouping, whitespace and fractions are intentionally unsupported. */
+export function convertRadixInteger(text: string, from: number): QuickResult {
+  assertInputSize(text, QUICK_LIMITS.radixBytes);
+  if (!RADIX_BASES.includes(from as RadixBase)) throw new ToolError("QUICK_INVALID_UNIT");
+  const sign = text[0] === "-" || text[0] === "+" ? text[0] : "";
+  const digits = sign ? text.slice(1) : text;
+  if (!digits || !/^[0-9A-Za-z]+$/.test(digits))
+    throw new ToolError("QUICK_INVALID_RADIX_INTEGER");
+
+  const radix = BigInt(from);
+  let value = 0n;
+  for (const character of digits) {
+    const code = character.charCodeAt(0);
+    const digit = code >= 48 && code <= 57 ? code - 48 :
+      code >= 65 && code <= 90 ? code - 55 : code - 87;
+    if (digit >= from) throw new ToolError("QUICK_INVALID_RADIX_INTEGER");
+    value = value * radix + BigInt(digit);
+  }
+  if (sign === "-") value = -value;
+  const rows = RADIX_BASES.map((base) => ({
+    label: String(base),
+    value: value.toString(base).toUpperCase(),
+  }));
+  return { output: rows.map((row) => `${row.label}: ${row.value}`).join("\n"), rows };
+}
 
 interface Unit {
   symbol: string;

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vite-plus/test";
 import {
   convertDataUnits,
   convertCssUnits,
+  convertRadixInteger,
   convertUnicodeEscape,
   createSlugs,
   normalizeUnicode,
@@ -80,6 +81,42 @@ describe("CSS relative lengths (#102)", () => {
   it("rejects very large values and unsupported units", () => {
     expect(() => convertCssUnits("1000001", "px", ctx)).toThrowError();
     expect(() => convertCssUnits("10", "pt" as never, ctx)).toThrowError();
+  });
+});
+
+describe("signed integer radix conversion (#4)", () => {
+  it("converts beyond JavaScript's safe integer range without losing digits", () => {
+    const result = convertRadixInteger("9007199254740993", 10);
+    expect(result.rows.map((item) => item.value)).toEqual([
+      "100000000000000000000000000000000000000000000000000001",
+      "400000000000000001",
+      "9007199254740993",
+      "20000000000001",
+      "2GOSA7PA2GX",
+    ]);
+  });
+
+  it("accepts signs, leading zeros and case-insensitive digits, then normalizes output", () => {
+    expect(convertRadixInteger("+0002a", 16).rows.map((item) => item.value))
+      .toEqual(["101010", "52", "42", "2A", "16"]);
+    expect(convertRadixInteger("-00a", 36).rows.map((item) => item.value))
+      .toEqual(["-1010", "-12", "-10", "-A", "-A"]);
+    expect(convertRadixInteger("-000", 2).rows.every((item) => item.value === "0")).toBe(true);
+  });
+
+  it.each([
+    ["2", 2], ["8", 8], ["G", 16], ["0x10", 16], ["1_000", 10],
+    ["1.5", 10], ["+", 10], [" 10", 10], ["10 ", 10], ["１", 10],
+  ] as const)("rejects unsupported integer syntax %j in base %i", (input, base) => {
+    expect(() => convertRadixInteger(input, base)).toThrowError();
+  });
+
+  it("bounds valid input and rejects unsupported bases", () => {
+    expect(convertRadixInteger("1".repeat(QUICK_LIMITS.radixBytes), 10).rows[2]?.value)
+      .toBe("1".repeat(QUICK_LIMITS.radixBytes));
+    expect(() => convertRadixInteger("1".repeat(QUICK_LIMITS.radixBytes + 1), 10))
+      .toThrowError();
+    expect(() => convertRadixInteger("10", 3)).toThrowError();
   });
 });
 

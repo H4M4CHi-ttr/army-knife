@@ -26,6 +26,7 @@ export type ToolId =
   | "color-palette"
   | "data-units"
   | "css-units"
+  | "radix"
   | "unicode-normalize"
   | "slug"
   | "unicode-escape"
@@ -246,6 +247,14 @@ export const tools: readonly ToolDefinition[] = [
     devtoys: false,
     keywords: "bits bytes kibibytes mebibytes GB GiB SI IEC precision size transfer rate データ容量 単位 换算 單位換算 비트 바이트",
     color: "green",
+  },
+  {
+    id: "radix",
+    category: "data",
+    wasm: false,
+    devtoys: true,
+    keywords: "radix base integer binary octal decimal hexadecimal base36 BigInt 任意基数 进制 進位 진수 정수",
+    color: "purple",
   },
   {
     id: "css-units",
