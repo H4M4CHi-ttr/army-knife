@@ -14,7 +14,7 @@ interface Example {
 }
 
 const fixture = JSON.parse(
-  readFileSync(new URL("../../../scripts/search-compare/heldout.json", import.meta.url), "utf8"),
+  readFileSync(resolve(process.cwd(), "scripts/search-compare/heldout.json"), "utf8"),
 ) as { items: Example[] };
 
 function originalSubstringSearch(query: string, language: Example["language"]): string[] {
