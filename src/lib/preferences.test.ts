@@ -110,6 +110,7 @@ describe("private browser preferences", () => {
       "magic",
       "user-agent",
       "set-cookie",
+      "html-accessibility",
       "chmod",
       "shortcuts",
       "har",

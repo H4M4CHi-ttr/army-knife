@@ -5,7 +5,7 @@
 Cubic-bezier easing, CSS gradient builder, SVG placeholder generator, batch path-string conversion and HSL palette generation are **all opt-in**. Their relationship to bundled DevToys versions and extensions has not been conclusively reverified, so the conservative DevToys-overlap policy is used; no absence claim is made. Each is client-only without added packages.
 
 
-This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool list](https://devtoys.app/) and the [default-tools repository](https://github.com/DevToys-app/DevToys.Tools). DevToys extensions are open-ended, so this is a comparison with the official bundled tools, with known older bundled tools treated conservatively. It is not a claim that no third-party DevToys extension offers a similar feature.
+This is a **2026-10-14 snapshot**, reviewed against the [official DevToys tool list](https://devtoys.app/) and the [default-tools repository](https://github.com/DevToys-app/DevToys.Tools). DevToys extensions are open-ended, so this is a comparison with the official bundled tools, with known older bundled tools treated conservatively. It is not a claim that no third-party DevToys extension offers a similar feature.
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
 | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -29,12 +29,13 @@ This is a **2026-10-11 snapshot**, reviewed against the [official DevToys tool l
 | JSON structural diff                   | On      | Compares the parsed JSON tree and reports JSON Pointer paths; ignores object-key order while preserving array order. It is distinct from the bundled text comparer and JSON formatter.                  |
 | List operations                        | Off     | Union, intersection, and differences overlap with the bundled List Comparer.                                                                                                                            |
 | JSON formatter                         | Off     | JSON formatting is a bundled DevToys feature.                                                                                                                                                           |
-| Data size and rate converter           | On      | Exact SI/IEC bit/byte conversions with a separate rate mode; no identical bundled tool found in the reviewed 2026-10-11 list. |
+| Data size and rate converter           | On      | Exact SI/IEC bit/byte conversions with a separate rate mode; no identical bundled tool found in the reviewed 2026-10-14 list. |
 | CSS px/rem/em/vw/vh converter           | On      | Computes CSS lengths with explicit root/element font sizes and viewport dimensions, rather than generic encoding. |
 | Unicode normalization comparator       | On      | Displays NFC/NFD/NFKC/NFKD differences and code point previews, distinct from the general character inspector. |
 | Slug / identifier maker                 | On      | Multi-line Unicode/ASCII slug creation with collision handling and explicit no-transliteration behavior. |
 | Unicode escape converter               | Off     | Conservative overlap with generic bundled text encoders; the user must enable it in Settings. |
 | WCAG contrast checker                  | Off     | Color Picker & Contrast shipped in DevToys 1.x. Even though it is absent from the current 2.0 list, treat it as overlap. See the [upstream report](https://github.com/DevToys-app/DevToys/issues/1483). |
+| HTML accessibility checker             | On      | Static checks for HTML alt text, names, labels, heading order, and duplicate IDs. The reviewed official list includes an HTML encoder/decoder, but no markup accessibility checker; this comparison does not cover community extensions. |
 
 Cron parsing and JSONPath testing are explicitly present in the official bundled list; neither is implemented in the initial release. If added later, they must be **off by default**. The same applies to Base64, JSON/YAML conversion, date conversion, URL/HTML encoding, hashes, UUIDs, and other listed bundled features.
 
@@ -49,6 +50,8 @@ Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-relat
 ## Lightweight converters and boundaries
 
 These converters use only browser-native APIs without adding dependencies, and never store, log, or transmit user input or output.
+
+- **HTML accessibility checker (#124):** parses up to 64 KiB as inert template contents and checks explicit document language, image alternatives, form/control names, button/link names, iframe titles, duplicate non-empty IDs, and skipped native heading levels. It scans at most 10,000 elements and displays at most 500 findings; either cap is shown as incomplete. It yields between scan batches so the shared cancel control can stop a long scan. This is not a WCAG conformance result: computed accessible names, computed visibility, external CSS, pseudo-elements, and generated content are outside scope. No scripts run, resources load, input persists, or network requests are made.
 
 - **Data units (#96):** SI (powers of 1000) and IEC (powers of 1024) are separate. Decimal inputs use exact BigInt rational arithmetic (maximum 96 characters / 24 fractional places). Repeating decimal outputs are truncated to 24 places with an ≈ warning. Rate mode is an explicitly separate unit family with bits or bytes per second.
 - **CSS units (#102):** root font, element font, viewport width, and viewport height are required in CSS px, strictly positive and at most 1,000,000. vw and vh scale with their respective dimensions. Output is rounded to six decimal places, warning with ≈ when not exact. Does not inspect live computed styles, percentages or containers.
