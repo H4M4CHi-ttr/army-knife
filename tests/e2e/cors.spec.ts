@@ -112,9 +112,9 @@ test("CORS reports export only on request and leave inputs out of URLs, storage 
 });
 
 test("long header blocks defer, cancel, apply manually and discard stale output", async ({ page }) => {
+  await page.clock.install();
   await page.goto("./en/tools/cors/");
   await page.getByTestId("cors-sample").click();
-  await page.clock.install();
   const source = "Access-Control-Allow-Origin: https://app.example\nAccess-Control-Allow-Credentials: true\nX-Padding: " + "x".repeat(2100);
   await page.locator("#cors-actual").fill(source);
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "pending");
