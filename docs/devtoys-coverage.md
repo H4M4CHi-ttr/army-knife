@@ -9,6 +9,7 @@ This is a **2026-10-14 snapshot**, reviewed against the [official DevToys tool l
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
 | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CORS response condition checker | On | Compares recorded actual/preflight response conditions with an explicit cross-origin Fetch scenario. No CORS checker appears in the official bundled list reviewed on 2026-10-14; extensions are outside this comparison. |
 | SRI integrity generator                  | Off     | Hashing overlaps with bundled hash generators; SRI-specific HTML is additional, but conservatively requires opt-in. No third-party dependency. |
 | BOM & line-ending inspector              | Off     | Text encoding and conversion overlap some bundled tools, so conservative opt-in is used. |
 | Magic bytes inspector                    | On      | Local fixed binary signatures with extension comparison, not a generic bundled DevToys format converter. |
@@ -46,6 +47,16 @@ Tool visibility preferences belong in browser settings. Tool input contents must
 The reviewed upstream [UrlEncoderDecoderGuiTool.cs](https://github.com/DevToys-app/DevToys.Tools/blob/main/src/DevToys.Tools/Tools/EncodersDecoders/Url/UrlEncoderDecoderGuiTool.cs) exposes an encode/decode switch, an optional multiline switch, a text input, and a converted text output. Its conversion path calls `UrlHelper.EncodeOrDecode`; it does not expose a parsed component view or an ordered query-entry editor.
 
 Army Knife's URL tool accepts an absolute URL, shows its scheme, authority-related fields, path, and fragment, and edits an ordered sequence of query keys and values. Repeated keys remain separate entries, and a bare flag is distinguished from an explicit empty value. Query decoding and encoding are necessary parts of that editing operation. The app does not expose a standalone text URL encoder/decoder mode. A future standalone mode would be an overlapping feature and must be off by default. This classification is specific to the reviewed bundled implementation and should be revisited when upstream adds relevant capabilities.
+
+## CORS response conditions
+
+The [bounded CORS specification](cors.md) defines request-origin serialization,
+method normalization, credentials/wildcard handling, explicit unsafe request-header
+names and separate actual/OPTIONS response conditions. This is a static possibility
+check, not a browser test or an authorization guarantee. It sends no requests.
+Each response is at most 16 KiB / 100 physical lines. Oversized and malformed input
+is rejected instead of returning a partial success. Long inputs use the shared
+800ms/manual/cancel controls. No new dependency or font distribution is introduced.
 
 ## Lightweight converters and boundaries
 

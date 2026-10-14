@@ -22,8 +22,11 @@ import { designLabels } from "./design-labels.ts";
 import { quickMessages } from "./quick.ts";
 import { htmlAccessibilityMessages } from "./html-accessibility.ts";
 
+import { corsMessages } from "./cors.ts";
+
 export const messages = {
   en: {
+    ...corsMessages["en"],
     ...en,
     ...executionMessages.en,
     ...harMessages.en,
@@ -44,6 +47,7 @@ export const messages = {
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
   },
   ja: {
+    ...corsMessages["ja"],
     ...ja,
     ...executionMessages.ja,
     ...harMessages.ja,
@@ -64,6 +68,7 @@ export const messages = {
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
   },
   "zh-CN": {
+    ...corsMessages["zh-CN"],
     ...zhCN,
     ...executionMessages["zh-CN"],
     ...harMessages["zh-CN"],
@@ -84,6 +89,7 @@ export const messages = {
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
   },
   "zh-TW": {
+    ...corsMessages["zh-TW"],
     ...zhTW,
     ...executionMessages["zh-TW"],
     ...harMessages["zh-TW"],
@@ -104,6 +110,7 @@ export const messages = {
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
   },
   ko: {
+    ...corsMessages["ko"],
     ...ko,
     ...executionMessages.ko,
     ...harMessages.ko,

@@ -24,11 +24,13 @@ const props = withDefaults(
   }>(),
   { maxBytes: 16 * 1024 * 1024, rows: 10, file: true },
 );
-const emit = defineEmits<{ "update:modelValue": [value: string] }>();
+const emit = defineEmits<{ "update:modelValue": [value: string]; rejected: [] }>();
 const { t } = useAppI18n();
 const picker = ref<HTMLInputElement>();
 const editor = ref<HTMLTextAreaElement>();
 const fileError = ref("");
+// Hosts can invalidate their analysis when an attempted edit was rejected.
+watch(fileError, (error) => { if (error) emit("rejected"); }, { flush: "sync" });
 const loading = ref(false);
 const large = computed(() => props.modelValue.length >= LARGE_TEXT_THRESHOLD);
 const visibleText = computed(() =>

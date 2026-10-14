@@ -1,3 +1,4 @@
+import { corsGuide } from "./cors-guide.ts";
 import type { ToolId } from "./catalog";
 import type { Locale } from "./preferences";
 import { chmodGuide } from "./chmod-guide.ts";
@@ -145,6 +146,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  cors: corsGuide,
   ...utilityGuides,
   ...inspectorGuides,
   ...fileHttpInspectorGuides,

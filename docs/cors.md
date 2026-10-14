@@ -39,8 +39,8 @@ Uses the WHATWG Fetch [CORS protocol](https://fetch.spec.whatwg.org/#http-cors-p
   is effective only without credentials. Authorization always needs an explicit
   Allow-Headers entry. GET/HEAD/POST need no Allow-Methods entry even when another
   condition requires preflight.
-- Duplicate singleton headers fail rather than silently selecting a value.
-  Repeated list headers are combined. Malformed header lines/lists are rejected.
+- Duplicate relevant singleton headers fail rather than silently selecting a value.
+  Repeated list headers are combined. Malformed header lines and evaluated lists are rejected.
 - Vary: Origin is an advisory cache check when reflecting a specific origin;
   its absence does not itself cause CORS failure. A `null` origin also gets an
   explicit warning. Expose-Headers and Max-Age are outside the decision scope.
@@ -54,7 +54,8 @@ input is only a three-digit HTTP status, validated as an integer from 100–599.
 
 The bounded parser is pure TypeScript without added packages. Short inputs apply
 immediately. A combined response length above 2,048 UTF-16 units uses the shared
-800ms delay, manual apply and cancellation controls. Edits discard stale results.
+800ms delay, manual apply and cancellation controls. Edits discard stale results. Rejected oversized edits retain the previous input but
+clear results and exports; an explicit notice explains how to correct or reset them.
 Input and reports remain in memory; export occurs only through an explicit action.
 The existing fonts, five locales, themes and Vapor/shadcn-vue conventions apply.
 

@@ -10,6 +10,7 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 
 | ツール                  | 主な機能                                                                    | 処理                | 初期状態 |
 | ----------------------- | --------------------------------------------------------------------------- | ------------------- | -------- |
+| CORS応答条件チェック | Origin・メソッド・credentialsと実応答／プリフライトヘッダーを通信なしで比較 | TypeScript | オン |
 | SRI integrity生成       | ローカルJS/CSSの生バイト列からSHA-256/384/512 integrity属性・HTML例を生成       | Web Crypto / Worker | オフ     |
 | BOM・改行コード検査     | UTF-8/UTF-16とBOM、CRLF/LF/CRを厳密に解析し、任意でUTF-8へ変換              | TypeScript / Worker | オフ     |
 | Magic Bytes検査        | バイナリ先頭・末尾の既知署名と拡張子・宣言MIMEの不一致を調査                            | TypeScript / Worker | オン     |
@@ -57,6 +58,20 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 | UUID・ULID生成と検査 | UUID v4/v7・ULIDを暗号学的乱数で生成、時刻情報検査 | TypeScript | オフ |
 | パスワード・ランダムトークン生成 | 指定文字集合・除外・長さ・件数を指定して安全な乱数生成 | TypeScript | オフ |
 | Open Graph/Twitter Cardメタタグ生成 | HTML属性をエスケープしたOGP・SNS用メタタグ、ローカル模擬プレビュー | TypeScript | オン |
+
+### CORS応答条件チェック（Issue #56）
+
+実リクエストを送らず、記録済みの実応答とOPTIONS応答を別々に貼り付けて条件を確認します。
+正確なOrigin、メソッド、credentials: include、CORS非セーフリストのヘッダー名を指定し、
+Allow-Origin / Allow-Credentials / Allow-Methods / Allow-Headers / OPTIONSステータスの理由付き表を表示します。
+非セーフリスト名は実際の値から利用者が指定し、空欄は対象なしを意味します。
+Authorizationの明示許可、credentials時のワイルドカード制限、Vary: Originの参考注意に対応します。
+
+各応答は16 KiB UTF-8・100行、Originは2 KiB、メソッドは32文字、対象名は2 KiB・32項目、
+応答リストは128項目まで。上限超過や不正入力はエラーにし、部分結果を確定値として表示しません。
+長い入力は800ms遅延・手動適用・中止に対応。入力・結果はメモリ内のみで、明示操作時だけJSON出力します。
+実ブラウザーでの成功や安全性は保証せず、リダイレクト・キャッシュ・CSP・通信・Cookieポリシーは対象外です。
+新規依存はなく、既存5言語・Vapor・テーマ・フォント配信を利用します。[詳細仕様](docs/cors.md)。
 
 ### 日時・JWT・ID・パスワード・OGタグ（Issues #3, #17, #21, #22, #104）
 

@@ -1,4 +1,5 @@
 export type ToolId =
+  | "cors"
   | "chmod"
   | "csv"
   | "logs"
@@ -57,6 +58,11 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "cors", category: "network", wasm: false, devtoys: false,
+    keywords: "cors origin preflight access-control allow credentials options http response クロスオリジン プリフライト 跨源 跨來源 사전 요청",
+    color: "blue",
+  },
   {
     id: "sri", category: "network", wasm: false, devtoys: true,
     keywords: "sri subresource integrity sha256 sha384 sha512 cryptographic hash checksum script link リソース 改ざん 完全性 哈希 完整性 무결성",

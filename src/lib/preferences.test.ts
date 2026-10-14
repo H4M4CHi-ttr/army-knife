@@ -107,6 +107,7 @@ describe("private browser preferences", () => {
     expect(migrated.enabledTools).toEqual([
       "csv",
       "sets",
+      "cors",
       "magic",
       "user-agent",
       "set-cookie",

@@ -42,6 +42,20 @@ The pure TypeScript tests cover IPv4 and IPv6 parsing and subnet boundaries, exa
 
 The App integration tests use `@vue/test-utils` and happy-dom to mount the actual Vue application, settings dialog, and tool components. They execute the real JSON comparison and inspect its displayed changes, enforce disabled-tool routing, check that CSV and log inputs are discarded on navigation, and verify theme, language, opt-in, and preference-only persistence through the UI. Only the network-dependent font loader is replaced in this suite. WASM success is never simulated; the routing test verifies that switching tools before the 800ms automatic deadline cancels the pending engine start. Small JSON input updates synchronously; large input waits for the debounce or an explicit manual action. The compiled engine and real browser loading are verified separately by the WASM smoke test and Playwright.
 
+## CORS checker coverage
+
+`src/lib/tools/cors.test.ts` exercises origin serialization and exact matching,
+credentials on both responses, wildcard exceptions including Authorization,
+Fetch method normalization, forced preflight, response status, repeated singleton
+and list fields, Vary advisories, malformed input, and byte/line/list limits.
+`tests/e2e/cors.spec.ts` runs the production Vapor view in all four browser projects:
+five locales, empty/error/result states, keyboard checkboxes, light/dark screenshots,
+responsive widths, 800ms/manual/cancel behavior, stale output removal, explicit JSON
+download and reload clearing. Its own exact-dist-asset audit also rejects external
+requests, query strings, request bodies, WebSockets, private-marker leakage and
+browser errors. These tests check the offline analyzer; they do not contact a
+cross-origin server or claim a complete browser CORS conformance test.
+
 ## Browser coverage
 
 The lightweight converter engines have dedicated pure TypeScript regression tests in `src/lib/tools/quick-converters.test.ts` for SI/IEC precision, CSS font/viewport contexts, exact signed radix conversion, Unicode normalization, Slug collisions, and U+/JS escape parsing including invalid scalar values. `tests/e2e/quick.spec.ts` covers all five locales in Chromium and Firefox across desktop/small viewports, explicit opt-in, errors, and no secret persistence or network-parameter leakage. Radix coverage includes a value above JavaScript's safe-integer range and invalid base digits.
