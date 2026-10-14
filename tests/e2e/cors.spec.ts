@@ -48,6 +48,15 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await expect(page.getByTestId("cors-outcome")).toHaveText(messages["cors.possible"]);
     await expect(page.getByTestId("cors-check-preflight-headers")).toHaveAttribute("data-state", "pass");
     await expect(page.getByTestId("cors-check-actual-credentials")).toBeVisible();
+    const firstCell = page.getByTestId("cors-check-actual-origin").locator("td").first();
+    expect((await firstCell.boundingBox())!.width).toBeGreaterThanOrEqual(90);
+    const table = page.locator(".cors-table");
+    await table.focus();
+    if (testInfo.project.name.endsWith("small")) {
+      await page.keyboard.press("ArrowRight");
+      await expect.poll(() => table.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+      await table.evaluate((element) => { element.scrollLeft = 0; });
+    }
     // Native keyboard control in the compiled Vapor view.
     await page.locator("#cors-credentials").focus();
     await page.keyboard.press("Space");

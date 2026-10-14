@@ -149,7 +149,8 @@ function clear() {
     <h3 data-testid="cors-outcome" :data-outcome="result.outcome">{{ t("cors." + result.outcome) }}</h3>
     <p>{{ t(result.preflightRequired ? "cors.required" : "cors.notRequired") }} · <code>{{ result.method }}</code></p>
     <p v-if="result.nullOrigin" class="notice">{{ t("cors.null") }}</p>
-    <div class="table-scroll">
+    <p class="hint cors-table-hint">{{ t("cors.tableHint") }}</p>
+    <div class="table-scroll cors-table" role="region" tabindex="0" :aria-label="t('labels.result')">
       <table class="data-table">
         <thead><tr><th>{{ t("cors.columnPhase") }}</th><th>{{ t("cors.condition") }}</th><th>{{ t("cors.columnState") }}</th><th>{{ t("cors.columnReason") }}</th></tr></thead>
         <tbody><tr v-for="(check, index) in result.checks" :key="index" :data-testid="`cors-check-${check.phase}-${check.rule}`" :data-state="check.state">
@@ -174,7 +175,16 @@ function clear() {
 .check-label { display: flex; align-items: start; gap: .5rem; overflow-wrap: anywhere; }
 .check-label input { margin-top: .25rem; flex-shrink: 0; }
 .cors-scope { margin-top: 1rem; }
+.data-table { min-width: 44rem; }
+.data-table td:first-child { min-width: 7rem; }
+.data-table td:nth-child(2) { min-width: 9rem; }
+.data-table td:nth-child(3) { min-width: 5rem; }
 .data-table td { white-space: normal; overflow-wrap: anywhere; }
 .data-table td:last-child { min-width: 16rem; }
-@media (max-width: 700px) { .cors-fields, .cors-blocks { grid-template-columns: minmax(0, 1fr); } }
+.cors-table-hint { display: none; }
+.cors-table:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+@media (max-width: 700px) {
+  .cors-fields, .cors-blocks { grid-template-columns: minmax(0, 1fr); }
+  .cors-table-hint { display: block; }
+}
 </style>

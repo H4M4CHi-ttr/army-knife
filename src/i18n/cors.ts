@@ -1,6 +1,7 @@
 import type { Locale } from "../lib/locales";
 
 const en = {
+  "cors.tableHint": "Scroll the table horizontally to read every condition. Keyboard: focus the table and use the arrow keys.",
   "cors.rejected": "The edit was rejected. Previous input is retained, and results and exports are cleared. Correct that field, load the sample, or clear the form.",
   "tool.cors.name": "CORS response checker",
   "tool.cors.description": "Compare request conditions with pasted actual and preflight response headers, without sending requests.",
@@ -61,6 +62,7 @@ const en = {
 type Messages = Record<keyof typeof en, string>;
 
 const ja: Messages = {
+  "cors.tableHint": "表を横スクロールすると全条件を確認できます。キーボードでは表にフォーカスして矢印キーを使います。",
   "cors.rejected": "入力を拒否しました。前の入力を保持し、結果と出力操作を消去しました。対象欄を修正するか、サンプル・クリアを使用してください。",
   "tool.cors.name": "CORS応答条件チェック",
   "tool.cors.description": "実通信をせず、リクエスト条件と実応答・プリフライトのヘッダーを比較。",
@@ -120,6 +122,7 @@ const ja: Messages = {
 };
 
 const zhCN: Messages = {
+  "cors.tableHint": "横向滚动表格可查看所有条件。键盘操作：聚焦表格后使用方向键。",
   "cors.rejected": "本次编辑被拒绝。保留先前输入，并清除结果和导出操作。请修正该字段，加载示例或清空表单。",
   "tool.cors.name": "CORS响应条件检查",
   "tool.cors.description": "不发送请求，比较请求条件与实际响应及预检响应头。",
@@ -178,6 +181,7 @@ const zhCN: Messages = {
   "errors.CORS_STATUS": "请输入100–599之间的三位OPTIONS状态码。",
 };
 const zhTW: Messages = {
+  "cors.tableHint": "橫向捲動表格可查看所有條件。鍵盤操作：聚焦表格後使用方向鍵。",
   "cors.rejected": "本次編輯被拒絕。保留先前輸入，並清除結果與匯出操作。請修正該欄位，載入範例或清空表單。",
   "tool.cors.name": "CORS回應條件檢查",
   "tool.cors.description": "不傳送請求，比較請求條件與實際回應及預檢回應標頭。",
@@ -236,6 +240,7 @@ const zhTW: Messages = {
   "errors.CORS_STATUS": "請輸入100–599之間的三位OPTIONS狀態碼。",
 };
 const ko: Messages = {
+  "cors.tableHint": "표를 가로로 스크롤하여 모든 조건을 확인하세요. 키보드는 표에 초점을 맞춘 후 방향키를 사용하세요.",
   "cors.rejected": "편집이 거부되었습니다. 이전 입력을 유지하고 결과와 내보내기를 지웠습니다. 해당 필드를 수정하거나 예제를 불러오거나 양식을 지우세요.",
   "tool.cors.name": "CORS 응답 조건 검사",
   "tool.cors.description": "요청을 보내지 않고 요청 조건과 실제 응답 및 사전 요청 헤더를 비교합니다.",
