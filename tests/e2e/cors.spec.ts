@@ -155,11 +155,17 @@ test("rejected oversized edits cannot produce a truncated success or export stal
     await expect(page.getByRole("alert")).toHaveCount(0);
     await expect(page.getByTestId("cors-outcome")).toHaveAttribute("data-outcome", "possible");
     // Oversized paste is stopped before the browser inserts the text into the DOM.
-    await page.locator(selector!).evaluate((element, text) => {
-      const clipboard = new DataTransfer();
-      clipboard.setData("text/plain", text);
-      element.dispatchEvent(new ClipboardEvent("paste", { clipboardData: clipboard, bubbles: true, cancelable: true }));
+    const prevented = await page.locator(selector!).evaluate((element, text) => {
+      // Firefox hides data on synthetic ClipboardEvents. Exercise the real Vue
+      // paste handler with the same clipboardData stub used by app.spec.ts.
+      const event = new Event("paste", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "clipboardData", {
+        value: { getData: (type: string) => type === "text/plain" ? text : "" },
+      });
+      element.dispatchEvent(event);
+      return event.defaultPrevented;
     }, oversized!);
+    expect(prevented).toBe(true);
     await expect(page.getByRole("alert")).toBeVisible();
     await expect(page.getByTestId("cors-result")).toHaveCount(0);
   }
