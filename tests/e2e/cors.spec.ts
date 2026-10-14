@@ -55,6 +55,12 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     if (testInfo.project.name.endsWith("small")) {
       await page.keyboard.press("ArrowRight");
       await expect.poll(() => table.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+      await table.evaluate((element) => { element.scrollLeft = element.scrollWidth; });
+      const reasonCell = page.getByTestId("cors-check-actual-origin").locator("td").last();
+      const viewport = (await table.boundingBox())!;
+      const reason = (await reasonCell.boundingBox())!;
+      expect(reason.x).toBeGreaterThanOrEqual(viewport.x - 1);
+      expect(reason.x + reason.width).toBeLessThanOrEqual(viewport.x + viewport.width + 1);
       await table.evaluate((element) => { element.scrollLeft = 0; });
     }
     // Native keyboard control in the compiled Vapor view.

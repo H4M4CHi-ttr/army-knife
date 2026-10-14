@@ -175,7 +175,10 @@ function clear() {
 .check-label { display: flex; align-items: start; gap: .5rem; overflow-wrap: anywhere; }
 .check-label input { margin-top: .25rem; flex-shrink: 0; }
 .cors-scope { margin-top: 1rem; }
-.data-table { min-width: 44rem; }
+.data-table { min-width: 37rem; table-layout: fixed; }
+.data-table th:first-child { width: 7rem; }
+.data-table th:nth-child(2) { width: 9rem; }
+.data-table th:nth-child(3) { width: 5rem; }
 .data-table td:first-child { min-width: 7rem; }
 .data-table td:nth-child(2) { min-width: 9rem; }
 .data-table td:nth-child(3) { min-width: 5rem; }
