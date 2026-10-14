@@ -183,6 +183,7 @@ describe("App integration with real local tools", () => {
     expect(cards).toEqual([
       "tool-card-chmod",
       "tool-card-cidr",
+      "tool-card-cors",
       "tool-card-css-units",
       "tool-card-csv",
       "tool-card-data-units",

@@ -72,15 +72,21 @@ test("HTML findings render locally without loading or executing pasted resources
 });
 
 test("large HTML scans are deferred and can be canceled between bounded batches", async ({ page }) => {
+  await page.clock.install({ time: new Date("2026-01-01T00:00:00Z") });
   await page.goto("./en/tools/html-accessibility/");
   await page.locator(INPUT).fill(" ".repeat(2_049));
   await page.getByTestId("auto-apply-toggle").uncheck();
   const source = "<img>".repeat(9_000);
   await page.locator(INPUT).fill(source);
   await expect(page.getByTestId("execution-status")).toHaveText("Ready to apply");
+  // Hold the real analyzer at its first setTimeout batch boundary. Otherwise a
+  // fast scan may finish while Firefox scrolls the transient Cancel button.
+  await page.clock.pauseAt(new Date("2026-01-01T00:01:00Z"));
+  await page.getByTestId("apply-control").scrollIntoViewIfNeeded();
   await page.getByTestId("apply-now").click();
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "running");
   await page.getByRole("button", { name: "Cancel" }).click();
+  await page.clock.runFor(1);
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "cancelled");
   await expect(page.getByTestId("html-accessibility-result")).toHaveCount(0);
 });
