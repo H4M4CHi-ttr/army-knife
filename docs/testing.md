@@ -56,6 +56,8 @@ light/dark visual evidence, clipboard output, and input privacy.
 
 The shortcut dictionary additionally has normalization and data-integrity tests plus real-App integration tests for focus-only capture, ordered strokes, OS distinctions, modifier-only prefixes, manual/on-screen input, filters, provenance, and all five locales. `tests/e2e/shortcuts.spec.ts` covers the production shortcut view in all four projects, including keyboard operation, responsive themes, source visibility, query clearing, and the exact-asset network/privacy audit. These tests validate the investigator; vendor bindings remain documentation-checked rather than execution-tested in each vendor application.
 
+The HTML accessibility checker tests the limited rule set, input/finding bounds, incomplete-result state, and cancellation between scan batches. Its four-project browser test pastes scripts and remote resource URLs, verifies that neither executes nor makes a request, and checks responsive output; a successful screenshot is attached to the browser report.
+
 [Playwright's configuration](../playwright.config.ts) runs the same scenarios in four projects:
 
 | Project            | Engine   | Viewport    |
@@ -85,6 +87,7 @@ The browser scenarios verify:
 - Each locale activates the correct self-hosted Noto and code font CSS, and those font faces actually load.
 - The settings dialog accepts keyboard operation, traps focus while open, closes with Escape, and restores focus to its trigger.
 - Both themes fit desktop and small viewports without page-level horizontal overflow. Screenshots are attached for human review.
+- The HTML accessibility checker keeps pasted markup inert, performs no request for embedded resource URLs, does not persist input, and allows long scans to be canceled.
 
 Every scenario also has a network audit. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
 
@@ -97,7 +100,7 @@ Each run that reaches the browser tests uploads `browser-report-<run ID>-<attemp
 - `playwright-report/`: the HTML report and its embedded attachments.
 - `test-results/`: screenshots and retained failure traces.
 
-Open `playwright-report/index.html` from the downloaded artifact to inspect the test results and the explicit light/dark dashboard, IPv6, countdown, HAR, dotenv, URL editor, and PostgreSQL plan screenshots. The report is retained on successful runs too, so visual review does not depend on a failure. Failed scenarios retain a Playwright trace and an automatic failure screenshot. The suite uses one retry on CI; the report shows both the first attempt and the retry where applicable.
+Open `playwright-report/index.html` from the downloaded artifact to inspect the test results and the explicit light/dark dashboard, IPv6, countdown, HAR, dotenv, URL editor, PostgreSQL plan, and HTML accessibility checker screenshots. The report is retained on successful runs too, so visual review does not depend on a failure. Failed scenarios retain a Playwright trace and an automatic failure screenshot. The suite uses one retry on CI; the report shows both the first attempt and the retry where applicable.
 
 To inspect the report with Playwright's report viewer, run `pnpm exec playwright show-report /path/to/playwright-report`. Visual artifacts support review; there are no screenshot baseline comparisons that would silently accept a layout change.
 

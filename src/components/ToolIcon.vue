@@ -58,6 +58,7 @@ const icons = {
   "url-encode": Link2,
   "dummy-text": ScanText,
   "css-specificity": Contrast,
+  "html-accessibility": ScanText,
   "fluid-type": TableProperties,
   "cubic-bezier": Workflow,
   "css-gradient": Contrast,

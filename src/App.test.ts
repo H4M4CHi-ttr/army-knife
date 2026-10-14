@@ -190,6 +190,7 @@ describe("App integration with real local tools", () => {
       "tool-card-explain",
       "tool-card-git-conflicts",
       "tool-card-har",
+      "tool-card-html-accessibility",
       "tool-card-http-reference",
       "tool-card-json-diff",
       "tool-card-logs",

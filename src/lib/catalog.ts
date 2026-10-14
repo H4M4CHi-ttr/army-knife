@@ -18,6 +18,7 @@ export type ToolId =
   | "url-encode"
   | "dummy-text"
   | "css-specificity"
+  | "html-accessibility"
   | "fluid-type"
   | "cubic-bezier"
   | "css-gradient"
@@ -100,6 +101,11 @@ export const tools: readonly ToolDefinition[] = [
     id: "css-specificity", category: "design", wasm: false, devtoys: true,
     keywords: "css specificity selectors pseudo :is :has :not :where セレクター 詳細度 选择器 特異性 특이성",
     color: "orange",
+  },
+  {
+    id: "html-accessibility", category: "design", wasm: false, devtoys: false,
+    keywords: "html accessibility a11y audit alt label aria-labelledby heading duplicate id iframe title accessible name アクセシビリティ 検査 无障碍 無障礙 접근성",
+    color: "green",
   },
   {
     id: "fluid-type", category: "design", wasm: false, devtoys: true,

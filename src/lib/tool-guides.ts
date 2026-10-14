@@ -8,6 +8,7 @@ import { inspectorGuides } from "./inspector-guides.ts";
 import { fileHttpInspectorGuides } from "./file-http-inspector-guides.ts";
 import { designGuides } from "./design-guides.ts";
 import { quickGuides } from "./quick-guides.ts";
+import { htmlAccessibilityGuide } from "./html-accessibility-guide.ts";
 
 /** Public documentation only. User input never becomes part of this data. */
 export interface ToolGuide {
@@ -1039,4 +1040,5 @@ export const toolGuides = {
       },
     },
   ),
+  "html-accessibility": htmlAccessibilityGuide,
 } satisfies Record<ToolId, Record<Locale, ToolGuide>>;
