@@ -25,7 +25,7 @@ const reference = ref("2024-01-31T12:00:00Z");
 const samples: Record<BacklogKind, string> = {
   "ndjson": '{"id":1,"status":"ok"}\n{"id":2,"status":"error"}\n{broken}',
   "json-pointer": '{"name":"Ada","data":[true,{"a/b":"x"}],"empty":[]}',
-  "csv-insert": 'id,name,value\n1,"Ada, Q","O''Reilly"\n2,<NULL>,42',
+  "csv-insert": 'id,name,value\n1,"Ada, Q","O\'Reilly"\n2,<NULL>,42',
   "sqlite-plan": '2|0|0|SCAN orders\n8|2|0|SEARCH orders USING INDEX idx_orders_status (status=?)',
   "jsonl-logs": '{"timestamp":"2024-02-01T00:00:00Z","level":"info","service":"api","requestId":"abc"}\n{"timestamp":"2024-02-01T00:00:02Z","level":"error","service":"api","requestId":"abc"}',
   "stack-trace": 'TypeError: example\n    at handle (/app/index.js:20:5)\n    at run (/app/main.js:10:2)\n\nTypeError: another\n    at handle (/app/index.js:50:1)\n    at run (/app/main.js:11:2)',
