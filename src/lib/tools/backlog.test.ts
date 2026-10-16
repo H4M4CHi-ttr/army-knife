@@ -48,6 +48,16 @@ describe("#38 CSV SQL generator", () => {
     expect(r.exportText).toContain("''");
     expect(r.metrics.find(x => x.key === "statements")?.value).toBe("2");
   });
+  it("uses mode-independent MySQL UTF-8 expressions and Postgres E strings for backslash and quotes", () => {
+    const mysql = csvToInsert("value\n\"\\\\' OR 1=1 --\"", { dialect: "mysql" });
+    expect(mysql.exportText).toMatch(/CONVERT\(0x[0-9a-f]+ USING utf8mb4\)/);
+    expect(mysql.exportText).not.toContain(" OR 1=1 --");
+    expect(mysql.exportText).toContain("INSERT INTO " + "\u0060" + "records" + "\u0060");
+    const pg = csvToInsert("value\n\"\\\\' OR 1=1 --\"", { dialect: "postgres" });
+    expect(pg.exportText).toContain("E'");
+    expect(pg.exportText).toContain("\\\\\\\\");
+    expect(pg.exportText).toContain("'' OR 1=1");
+  });
   it("rejects column count mismatch, bad identifiers and malformed quotes", () => {
     expect(() => csvToInsert("a,b\n1", {})).toThrow();
     expect(() => csvToInsert("a\n1", { table: "users;DROP" })).toThrow();
