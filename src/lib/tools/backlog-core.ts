@@ -43,7 +43,7 @@ export function lines(input: string): string[] {
 }
 type ParsedLine = { line: number; value?: JsonValue; error?: string };
 function parseLines(input: string): ParsedLine[] {
-  return lines(input).flatMap((text, index) => {
+  return lines(input).flatMap((text, index): ParsedLine[] => {
     if (!text.trim()) return [];
     try { return [{ line: index + 1, value: parseJsonSafely(text) }]; }
     catch (error) { return [{ line: index + 1, error: error instanceof ToolError ? error.code : "JSON_INVALID" }]; }
