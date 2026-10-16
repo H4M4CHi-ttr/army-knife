@@ -10,6 +10,7 @@ import { fileHttpInspectorGuides } from "./file-http-inspector-guides.ts";
 import { designGuides } from "./design-guides.ts";
 import { quickGuides } from "./quick-guides.ts";
 import { htmlAccessibilityGuide } from "./html-accessibility-guide.ts";
+import { backlogGuides } from "./backlog-guides.ts";
 
 /** Public documentation only. User input never becomes part of this data. */
 export interface ToolGuide {
@@ -155,6 +156,7 @@ export const toolGuides = {
   base64: base64Guide,
   ...fiveToolGuides,
   ...quickGuides,
+  ...backlogGuides,
   csv: localized("name,score\nAda,98\nLinus,\nGrace,99", {
     ja: {
       introduction:
