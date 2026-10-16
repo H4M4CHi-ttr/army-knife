@@ -214,7 +214,19 @@ export function csvToInsert(input: string, opts: BacklogOptions = {}): BacklogRe
     if (record.length !== headers.length) return fail();
     const tuple = "(" + record.map(v => {
       if (/[\u0000]/.test(v)) return fail();
+      try { encodeURIComponent(v); } catch { return fail(); } // Reject unpaired UTF-16 surrogates.
       if (nullToken && v === nullToken) return "NULL";
+      if (dialect === "mysql") {
+        // A UTF-8 hex expression is invariant under NO_BACKSLASH_ESCAPES and SQL quoting modes.
+        if (!v) return "''";
+        const hex = Array.from(new TextEncoder().encode(v), byte => byte.toString(16).padStart(2, "0")).join("");
+        return "CONVERT(0x" + hex + " USING utf8mb4)";
+      }
+      if (dialect === "postgres") {
+        // E-string escapes do not depend on standard_conforming_strings server settings.
+        return "E'" + v.replace(/\\/g, "\\\\").replace(/'/g, "''") + "'";
+      }
+      // SQLite single-quoted strings have no backslash escape interpretation.
       return "'" + v.replace(/'/g, "''") + "'";
     }).join(", ") + ")";
     group.push(tuple);
