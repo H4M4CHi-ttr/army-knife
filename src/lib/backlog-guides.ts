@@ -1,6 +1,6 @@
 import type { Locale } from "./locales";
 import type { ToolGuide } from "./tool-guides";
-import { backlogCopy } from "../i18n/backlog";
+import { backlogCopy } from "../i18n/backlog.ts";
 import type { BacklogKind } from "./tools/backlog-core";
 
 const exampleInput: Record<BacklogKind, string> = {
