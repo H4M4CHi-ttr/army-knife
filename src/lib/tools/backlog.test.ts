@@ -34,16 +34,16 @@ describe("#36 reversible RFC 6901 paths", () => {
     expect(() => convertJsonPointer('[{"pointer":"","kind":"object"},{"pointer":"/a","kind":"value","value":1},{"pointer":"/a","kind":"value","value":2}]', "restore")).toThrow();
     expect(() => convertJsonPointer('[{"pointer":"","kind":"object"},{"pointer":"/a/b","kind":"value","value":1}]', "restore")).toThrow();
     const restored = convertJsonPointer('[{"pointer":"","kind":"object"},{"pointer":"/__proto__","kind":"value","value":1}]', "restore");
-    expect(JSON.parse(restored.exportText)).toEqual({ "__proto__": 1 });
+    expect(JSON.parse(restored.exportText)).toEqual(JSON.parse('{"__proto__":1}'));
     expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 });
 describe("#38 CSV SQL generator", () => {
   it("escapes SQL literals, embedded CSV newline, and explicit NULL independently of blank", () => {
-    const r = csvToInsert('id,note\n1,"O''Reilly"\n2,<NULL>\n3,"line\nbreak"\n4,', { table: "public.events", nullToken: "<NULL>", groupSize: 2 });
+    const r = csvToInsert('id,note\n1,"O\'Reilly"\n2,<NULL>\n3,"line\nbreak"\n4,', { table: "public.events", nullToken: "<NULL>", groupSize: 2 });
     expect(r.exportText).toContain('"public"."events"');
     expect(r.exportText).toContain("'O''Reilly'");
-    expect(r.exportText).toContain("( '").toBe(false);
+    expect(r.exportText).not.toContain("( '");
     expect(r.exportText).toContain("NULL");
     expect(r.exportText).toContain("''");
     expect(r.metrics.find(x => x.key === "statements")?.value).toBe("2");
