@@ -355,6 +355,10 @@ XML DTD, network fetch or crawler is allowed.
 | #68 | ISO 8601 duration | Calendar years/months separated from fixed seconds, UTC reference arithmetic; local DST and ISO intervals out of scope |
 | #112 | PostgreSQL DSN inspector | PostgreSQL URL and keyword-value syntax with secrets redacted in every output; no connection attempt |
 
+For SQL generation, PostgreSQL uses explicit `E'…'` strings, SQLite uses doubled quotes, and
+MySQL values use `CONVERT(0x… USING utf8mb4)` so backslashes and quote combinations do not
+depend on the connection's `SQL_MODE`. Invalid UTF-16 surrogate input is rejected.
+
 The standard limits are **64 KiB UTF-8 input**, **2,000 lines/records**, **100 preview rows** and
 **128 KiB exported output**. Larger records or unsupported syntax fail explicitly rather than
 silently producing a complete-looking but truncated report. There are no new runtime dependencies;
