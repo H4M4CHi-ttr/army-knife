@@ -332,3 +332,35 @@ pnpm test            # includes local worker limit and cancellation tests
 ```
 The browser timing artifact is a diagnostic measurement rather than a fixed
 pass/fail latency threshold because browsers and CI runners vary.
+
+## 10 local-first inspectors and converters (October 2026)
+
+The following developer tools execute entirely in the browser. They do not submit pasted text,
+files, credentials or results to remote services. The toolbar can load synthetic examples and
+copy/download reports explicitly. These tools use the existing Vue 3.6 Vapor execution controls,
+including immediate small-input updates, delayed/manual larger-input updates and cancellable workers.
+Sitemap XML uses the browser's inert `DOMParser` on the UI thread (64 KiB maximum); no external
+XML DTD, network fetch or crawler is allowed.
+
+| Issue | Tool | Main behavior and limitations |
+| --- | --- | --- |
+| #35 | NDJSON / JSONL inspector | Per-line validity, type/key distribution; invalid lines do not discard valid rows |
+| #36 | JSON Pointer flatten/restore | Typed RFC 6901 node list preserves empty objects, arrays and numeric keys |
+| #38 | CSV → SQL INSERT | Strict ASCII identifiers, CSV quoting, dialect quoting, explicit NULL marker, batches; output is **not executed** |
+| #41 | SQLite EXPLAIN QUERY PLAN | Four-column pipe/TSV or JSON input; counts SCAN/SEARCH/TEMP B-TREE and shows parent hierarchy; no database connection |
+| #49 | Structured JSONL log inspector | Counts levels/services; optional exact requestId/traceId filter and time ordering; missing times are reported |
+| #51 | Stack trace grouping | JS, Python, Java, .NET frame signatures. Anonymous, noncryptographic fingerprints; no source map resolution |
+| #63 | robots.txt rule tester | Simulated user agent and path with Allow/Disallow, '*' and '$'. Not an exact crawler implementation; percent-encoded paths compared verbatim |
+| #64 | sitemap.xml inspector | urlset and sitemapindex XML, URL/host/duplicate counts and lastmod checks; no crawling |
+| #68 | ISO 8601 duration | Calendar years/months separated from fixed seconds, UTC reference arithmetic; local DST and ISO intervals out of scope |
+| #112 | PostgreSQL DSN inspector | PostgreSQL URL and keyword-value syntax with secrets redacted in every output; no connection attempt |
+
+For SQL generation, PostgreSQL uses explicit `E'…'` strings, SQLite uses doubled quotes, and
+MySQL values use `CONVERT(0x… USING utf8mb4)` so backslashes and quote combinations do not
+depend on the connection's `SQL_MODE`. Invalid UTF-16 surrogate input is rejected.
+
+The standard limits are **64 KiB UTF-8 input**, **2,000 lines/records**, **100 preview rows** and
+**128 KiB exported output**. Larger records or unsupported syntax fail explicitly rather than
+silently producing a complete-looking but truncated report. There are no new runtime dependencies;
+five UI languages, localized static guides and regression tests ship with these tools.
+

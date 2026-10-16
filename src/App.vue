@@ -68,6 +68,7 @@ const PathBatchTool = defineAsyncComponent(() => import("@/components/tools/Path
 const PaletteTool = defineAsyncComponent(() => import("@/components/tools/PaletteTool.vue"));
 const QuickTool = defineAsyncComponent(() => import("@/components/tools/QuickTool.vue"));
 const FileInspectorTool = defineAsyncComponent(() => import("@/components/tools/FileInspectorTool.vue"));
+const BacklogTool = defineAsyncComponent(() => import("@/components/tools/BacklogTool.vue"));
 const TextInspectorTool = defineAsyncComponent(() => import("@/components/tools/TextInspectorTool.vue"));
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
@@ -804,6 +805,10 @@ onBeforeUnmount(() => {
               v-else-if="['data-units', 'css-units', 'radix', 'unicode-normalize', 'slug', 'unicode-escape'].includes(selectedTool.id)"
               :id="selectedTool.id as QuickToolId"
               :key="`${selectedTool.id}:${preferences.locale}`"
+            />
+            <BacklogTool
+              v-else-if="selectedTool.id === 'ndjson' || selectedTool.id === 'json-pointer' || selectedTool.id === 'csv-insert' || selectedTool.id === 'sqlite-plan' || selectedTool.id === 'jsonl-logs' || selectedTool.id === 'stack-trace' || selectedTool.id === 'robots' || selectedTool.id === 'sitemap' || selectedTool.id === 'iso-duration' || selectedTool.id === 'pg-dsn'"
+              :kind="selectedTool.id" :key="selectedTool.id + ':' + preferences.locale"
             />
             <FileInspectorTool
               v-else-if="selectedTool.id === 'sri' || selectedTool.id === 'encoding' || selectedTool.id === 'magic'"
