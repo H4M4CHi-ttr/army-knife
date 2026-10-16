@@ -6,7 +6,7 @@ import type { BacklogKind } from "./tools/backlog-core";
 const exampleInput: Record<BacklogKind, string> = {
   "ndjson": '{"id":1}\n{"id":2}\n{bad}',
   "json-pointer": '{"a/b":[1,{}],"~":null}',
-  "csv-insert": 'id,value\n1,"O''Reilly"\n2,<NULL>',
+  "csv-insert": 'id,value\n1,"O\'Reilly"\n2,<NULL>',
   "sqlite-plan": "2|0|0|SCAN orders\n4|2|0|SEARCH orders USING INDEX i_orders",
   "jsonl-logs": '{"timestamp":"2024-02-01T00:00:00Z","level":"info","service":"web","requestId":"abc"}',
   "stack-trace": "TypeError: sample\n at handle (/app/a.js:10:2)\n at run (/app/b.js:20:4)",
