@@ -1,4 +1,3 @@
-import { assertInputSize, ToolError } from "./errors";
 import { guard, lines, checkedRows, report, fail, type BacklogOptions, type BacklogReport } from "./backlog-core";
 
 /** #51: diagnostic grouping; stable non-reversible hash rather than file paths or PII. */
