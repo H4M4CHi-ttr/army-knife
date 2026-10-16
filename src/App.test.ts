@@ -5,6 +5,7 @@ import App from "./App.vue";
 import { i18n } from "./i18n";
 import { setFontLocale } from "./lib/fonts";
 import { defaultPreferences, settings, STORAGE_KEY } from "./lib/preferences";
+import { tools } from "./lib/catalog";
 import { legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "./lib/routes";
 import * as engine from "./lib/wasm/client";
 
@@ -180,31 +181,7 @@ describe("App integration with real local tools", () => {
       .findAll('[data-testid^="tool-card-"]')
       .map((card) => card.attributes("data-testid"))
       .sort();
-    expect(cards).toEqual([
-      "tool-card-chmod",
-      "tool-card-cidr",
-      "tool-card-cors",
-      "tool-card-css-units",
-      "tool-card-csv",
-      "tool-card-data-units",
-      "tool-card-env",
-      "tool-card-explain",
-      "tool-card-git-conflicts",
-      "tool-card-har",
-      "tool-card-html-accessibility",
-      "tool-card-http-reference",
-      "tool-card-json-diff",
-      "tool-card-logs",
-      "tool-card-magic",
-      "tool-card-og-tags",
-      "tool-card-set-cookie",
-      "tool-card-shortcuts",
-      "tool-card-slug",
-      "tool-card-unicode",
-      "tool-card-unicode-normalize",
-      "tool-card-url",
-      "tool-card-user-agent",
-    ]);
+    expect(cards).toEqual(tools.filter(tool => !tool.devtoys).map(tool => "tool-card-" + tool.id).sort());
     expect(wrapper.find(".tool-panel").exists()).toBe(false);
     expect(setFontLocale).toHaveBeenCalledWith("en");
   });
