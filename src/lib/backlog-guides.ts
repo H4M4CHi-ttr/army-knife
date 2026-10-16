@@ -55,4 +55,4 @@ export const backlogGuides: Record<BacklogKind, Record<Locale, ToolGuide>> =
         }),
       ),
     ]),
-  ) as Record<BacklogKind, Record<Locale, ToolGuide>>;
+  ) as unknown as Record<BacklogKind, Record<Locale, ToolGuide>>;
