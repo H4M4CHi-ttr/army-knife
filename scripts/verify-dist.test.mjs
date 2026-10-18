@@ -9,7 +9,7 @@ import { cssReferences, verifyDist } from './verify-dist.mjs';
 
 const project = dirname(dirname(fileURLToPath(import.meta.url)));
 const sourceLock = JSON.parse(readFileSync(join(project, 'scripts/font-sources.lock.json'), 'utf8'));
-const csp = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; font-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'; manifest-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:";
+const csp = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com; font-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'; manifest-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.googletagmanager.com https://*.google-analytics.com";
 
 function write(root, name, value) {
   const path = join(root, name);
