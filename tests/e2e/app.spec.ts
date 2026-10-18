@@ -760,3 +760,76 @@ test("large UTF-8 files decode in a local worker and malformed files are rejecte
   // A failed file import must not overwrite the last valid document.
   await expect(page.getByTestId("large-input-summary")).toBeVisible();
 });
+
+
+test("opt-in local search model downloads only after consent and respects privacy", async ({
+  page,
+  networkAudit,
+}) => {
+  await dashboard(page);
+  const search = page.locator(".global-search");
+  expect(networkAudit.requests.some((request) => request.url.includes("classifier-v1.json.gz")))
+    .toBe(false);
+
+  await settings(page);
+  await page.getByTestId("search-mode-select").selectOption("classifier");
+  await page.getByTestId("settings-close").click();
+  await expect(page.getByTestId("classifier-status")).toContainText(
+    "Experimental local classifier active", { timeout: 30_000 },
+  );
+
+  await search.fill("My page loads slowly; which HTTP calls are blocking it?");
+  await expect(page.getByTestId("classifier-status")).toContainText("active");
+  await expect(page.getByTestId("tool-card-har")).toBeVisible();
+
+  // The trained model contains only the original 12 labels. Newly introduced
+  // CORS and HTML/CSS tools must remain searchable through the lexical fallback.
+  await search.fill("CORS");
+  await expect(page.locator('.tool-grid a[data-testid^="tool-card-"]').first())
+    .toHaveAttribute("data-testid", "tool-card-cors");
+
+  await search.fill(PRIVATE_MARKER);
+  await expect(page.getByTestId("classifier-status")).toContainText("active");
+  expect(await page.evaluate((key) => localStorage.getItem(key), PREFERENCE_KEY))
+    .not.toContain(PRIVATE_MARKER);
+
+  const modelRequests = networkAudit.requests.filter((request) =>
+    new URL(request.url).pathname.endsWith("/models/classifier-v1.json.gz"));
+  expect(modelRequests).toHaveLength(1);
+  expect(modelRequests[0]?.method).toBe("GET");
+  expect(modelRequests[0]?.body).toBeNull();
+
+  await search.fill("pretty print JSON");
+  await expect(page.getByTestId("classifier-status")).toContainText("active");
+  await expect(page.getByTestId("tool-card-json-format")).toHaveCount(0);
+  await assertNoOverflow(page);
+});
+
+test("hybrid model stays available across locale navigation and can be disabled", async ({ page }) => {
+  await dashboard(page);
+  await settings(page);
+  await page.getByTestId("search-mode-select").selectOption("hybrid");
+  await page.getByTestId("locale-select").selectOption("ja");
+  await expect(page).toHaveURL(/\/army-knife\/ja\/$/);
+  await expect(page.getByTestId("classifier-status"))
+    .toContainText("ローカル分類器", { timeout: 30_000 });
+
+  const search = page.locator(".global-search");
+  await search.fill("CORS");
+  await expect(page.getByTestId("classifier-status")).toContainText("ローカル分類器");
+  await expect(page.locator('.tool-grid a[data-testid^="tool-card-"]').first())
+    .toHaveAttribute("data-testid", "tool-card-cors");
+  await search.fill("");
+
+  await page.reload();
+  await expect(page.getByTestId("classifier-status"))
+    .toContainText("ローカル分類器", { timeout: 30_000 });
+  await settings(page);
+  await expect(page.getByTestId("search-mode-select")).toHaveValue("hybrid");
+  await page.getByTestId("search-mode-select").selectOption("lexical");
+  await page.getByTestId("settings-close").click();
+  await expect(page.getByTestId("classifier-status")).toHaveCount(0);
+  await search.fill("CORS");
+  await expect(page.getByTestId("tool-card-cors")).toBeVisible();
+  await assertNoOverflow(page);
+});
