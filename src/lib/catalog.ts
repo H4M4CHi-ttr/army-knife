@@ -46,7 +46,17 @@ export type ToolId =
   | "encoding"
   | "magic"
   | "user-agent"
-  | "set-cookie";
+  | "set-cookie"
+  | "ndjson"
+  | "json-pointer"
+  | "csv-insert"
+  | "sqlite-plan"
+  | "jsonl-logs"
+  | "stack-trace"
+  | "robots"
+  | "sitemap"
+  | "iso-duration"
+  | "pg-dsn";
 export type Category = "data" | "text" | "network" | "design";
 export interface ToolDefinition {
   id: ToolId;
@@ -58,6 +68,27 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "ndjson", category: "data", wasm: false, devtoys: false,
+    keywords: "jsonl ndjson parser per-line validity json keys line error JSONL JSON行", color: "green" },
+  { id: "json-pointer", category: "data", wasm: false, devtoys: false,
+    keywords: "json pointer flatten restore rfc6901 escape unescape structure JSONフラット化 逆変換", color: "purple" },
+  { id: "csv-insert", category: "data", wasm: false, devtoys: false,
+    keywords: "csv to sql insert generator postgres mysql sqlite quote escaping CSV SQL生成", color: "orange" },
+  { id: "sqlite-plan", category: "data", wasm: false, devtoys: false,
+    keywords: "sqlite explain query plan scan search index virtual machine SQL 実行計画", color: "blue" },
+  { id: "jsonl-logs", category: "data", wasm: false, devtoys: false,
+    keywords: "json structured log aggregate level service requestId traceId timeline ログ解析", color: "orange" },
+  { id: "stack-trace", category: "text", wasm: false, devtoys: false,
+    keywords: "stack trace javascript python java dotnet group frames fingerprint スタックトレース", color: "rose" },
+  { id: "robots", category: "network", wasm: false, devtoys: false,
+    keywords: "robots txt user agent allow disallow crawl rules robots.txt クローラー", color: "blue" },
+  { id: "sitemap", category: "network", wasm: false, devtoys: false,
+    keywords: "sitemap xml urlset sitemapindex lastmod duplicate site XML サイトマップ", color: "green" },
+  { id: "iso-duration", category: "data", wasm: false, devtoys: false,
+    keywords: "iso8601 duration P1M months days calendar utc time period 期間", color: "purple" },
+  { id: "pg-dsn", category: "network", wasm: false, devtoys: false,
+    keywords: "postgresql postgres connection string dsn sslmode hostname password masked 接続文字列", color: "blue" },
+
   {
     id: "cors", category: "network", wasm: false, devtoys: false,
     keywords: "cors origin preflight access-control allow credentials options http response クロスオリジン プリフライト 跨源 跨來源 사전 요청",

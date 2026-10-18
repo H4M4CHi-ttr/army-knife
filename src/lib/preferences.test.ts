@@ -107,24 +107,10 @@ describe("private browser preferences", () => {
     expect(migrated.enabledTools).toEqual([
       "csv",
       "sets",
-      "cors",
-      "magic",
-      "user-agent",
-      "set-cookie",
-      "html-accessibility",
-      "chmod",
-      "shortcuts",
-      "har",
-      "env",
-      "url",
-      "explain",
-      "data-units",
-      "css-units",
-      "unicode-normalize",
-      "slug",
-      "http-reference",
-      "git-conflicts",
-      "og-tags",
+      ...tools.filter(tool =>
+        !tool.devtoys &&
+        !["csv", "logs", "sets", "cidr", "unicode", "json-diff", "json-format", "contrast"].includes(tool.id),
+      ).map(tool => tool.id),
     ]);
     expect(migrated.enabledTools).not.toContain("cidr");
     expect(migrated.enabledTools).not.toContain("json-format");
