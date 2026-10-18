@@ -1,0 +1,605 @@
+{
+  "description": "Held-out candidate tasks: two new paraphrases for every tool in each of five UI languages. Never used for fitting or tuning. Crafted for this experiment; not an external user study.",
+  "items": [
+    {
+      "language": "ja",
+      "query": "ページの表示が重いけど、どのHTTP呼び出しが原因？",
+      "expected": "har"
+    },
+    {
+      "language": "ja",
+      "query": "読み込み時に失敗した通信をまとめて把握したい",
+      "expected": "har"
+    },
+    {
+      "language": "ja",
+      "query": "devとprodの設定値が食い違っていないか調べる",
+      "expected": "env"
+    },
+    {
+      "language": "ja",
+      "query": "デプロイしたら動かないのでdotenvの差を追いたい",
+      "expected": "env"
+    },
+    {
+      "language": "ja",
+      "query": "リンクの疑問符より後ろの値を書き換えたい",
+      "expected": "url"
+    },
+    {
+      "language": "ja",
+      "query": "URL内で同じキーを複数回使ったまま編集する",
+      "expected": "url"
+    },
+    {
+      "language": "ja",
+      "query": "DBでどの演算ノードが最も時間を食っている？",
+      "expected": "explain"
+    },
+    {
+      "language": "ja",
+      "query": "テーブルの行数予測が外れている箇所を探す",
+      "expected": "explain"
+    },
+    {
+      "language": "ja",
+      "query": "表データの列ごとの記入漏れを洗い出す",
+      "expected": "csv"
+    },
+    {
+      "language": "ja",
+      "query": "区切り文字付きファイルの項目のばらつきを見たい",
+      "expected": "csv"
+    },
+    {
+      "language": "ja",
+      "query": "例外が何回起きているか記録から数える",
+      "expected": "logs"
+    },
+    {
+      "language": "ja",
+      "query": "大量の実行履歴のうち問題の行だけ取り出したい",
+      "expected": "logs"
+    },
+    {
+      "language": "ja",
+      "query": "名簿Aにあって名簿Bに載っていない人を調べる",
+      "expected": "sets"
+    },
+    {
+      "language": "ja",
+      "query": "二つの名前一覧にどちらも登場する項目を抽出",
+      "expected": "sets"
+    },
+    {
+      "language": "ja",
+      "query": "10.0.0.0/8には何個のアドレスが入る？",
+      "expected": "cidr"
+    },
+    {
+      "language": "ja",
+      "query": "IPv4ブロックの境界とネットマスクを求めたい",
+      "expected": "cidr"
+    },
+    {
+      "language": "ja",
+      "query": "普通のスペースに見えるのに削除できない記号を探す",
+      "expected": "unicode"
+    },
+    {
+      "language": "ja",
+      "query": "コピーした文字列の中の隠し書式コードを洗う",
+      "expected": "unicode"
+    },
+    {
+      "language": "ja",
+      "query": "二つのAPIレスポンスで変更されたフィールドを知る",
+      "expected": "json-diff"
+    },
+    {
+      "language": "ja",
+      "query": "入れ子オブジェクトの追加や削除を突き合わせる",
+      "expected": "json-diff"
+    },
+    {
+      "language": "ja",
+      "query": "1行の波括弧だらけのデータを見やすくしたい",
+      "expected": "json-format"
+    },
+    {
+      "language": "ja",
+      "query": "機械向けのJSONを余分な空白なしにしたい",
+      "expected": "json-format"
+    },
+    {
+      "language": "ja",
+      "query": "薄い灰色の文章が読めるか判断したい",
+      "expected": "contrast"
+    },
+    {
+      "language": "ja",
+      "query": "ボタン上の文字と地色の組み合わせを評価する",
+      "expected": "contrast"
+    },
+    {
+      "language": "en",
+      "query": "My page loads slowly; which HTTP calls are blocking it?",
+      "expected": "har"
+    },
+    {
+      "language": "en",
+      "query": "Inspect a browser capture to identify failing network operations",
+      "expected": "har"
+    },
+    {
+      "language": "en",
+      "query": "Find the mismatch between deployed and local settings",
+      "expected": "env"
+    },
+    {
+      "language": "en",
+      "query": "Two dotenv snapshots produce different behavior; inspect them",
+      "expected": "env"
+    },
+    {
+      "language": "en",
+      "query": "Change the values after the question mark in a link",
+      "expected": "url"
+    },
+    {
+      "language": "en",
+      "query": "Preserve repeated keys while editing a web address",
+      "expected": "url"
+    },
+    {
+      "language": "en",
+      "query": "Which database plan node consumes most of the time?",
+      "expected": "explain"
+    },
+    {
+      "language": "en",
+      "query": "Identify where actual table rows diverge from optimizer estimates",
+      "expected": "explain"
+    },
+    {
+      "language": "en",
+      "query": "Find incomplete cells by column in a delimited dataset",
+      "expected": "csv"
+    },
+    {
+      "language": "en",
+      "query": "Summarize the consistency of fields in a spreadsheet export",
+      "expected": "csv"
+    },
+    {
+      "language": "en",
+      "query": "How often did each exception occur in service output?",
+      "expected": "logs"
+    },
+    {
+      "language": "en",
+      "query": "Extract the important lines from a giant application trace",
+      "expected": "logs"
+    },
+    {
+      "language": "en",
+      "query": "Show names present in the first roster but absent from the second",
+      "expected": "sets"
+    },
+    {
+      "language": "en",
+      "query": "Find entries that occur in both inventories",
+      "expected": "sets"
+    },
+    {
+      "language": "en",
+      "query": "How many addresses does 10.0.0.0/8 contain?",
+      "expected": "cidr"
+    },
+    {
+      "language": "en",
+      "query": "Find the network boundary and netmask for a prefix",
+      "expected": "cidr"
+    },
+    {
+      "language": "en",
+      "query": "A space-looking symbol refuses to disappear from pasted text",
+      "expected": "unicode"
+    },
+    {
+      "language": "en",
+      "query": "Find hidden formatting codes embedded in a copied string",
+      "expected": "unicode"
+    },
+    {
+      "language": "en",
+      "query": "What fields changed between two API responses?",
+      "expected": "json-diff"
+    },
+    {
+      "language": "en",
+      "query": "Show additions and removals inside nested objects",
+      "expected": "json-diff"
+    },
+    {
+      "language": "en",
+      "query": "Turn one long line of curly braces into readable JSON",
+      "expected": "json-format"
+    },
+    {
+      "language": "en",
+      "query": "Strip unnecessary whitespace from a JSON payload",
+      "expected": "json-format"
+    },
+    {
+      "language": "en",
+      "query": "Is faint gray text still legible against this page?",
+      "expected": "contrast"
+    },
+    {
+      "language": "en",
+      "query": "Evaluate the accessibility of text and button background colors",
+      "expected": "contrast"
+    },
+    {
+      "language": "zh-CN",
+      "query": "网页加载太慢，究竟是哪些HTTP调用拖慢了速度？",
+      "expected": "har"
+    },
+    {
+      "language": "zh-CN",
+      "query": "找出浏览器抓包中失败的网络操作",
+      "expected": "har"
+    },
+    {
+      "language": "zh-CN",
+      "query": "部署后的配置与本地设置有什么不同？",
+      "expected": "env"
+    },
+    {
+      "language": "zh-CN",
+      "query": "两个dotenv文件导致行为不一样，定位不一致之处",
+      "expected": "env"
+    },
+    {
+      "language": "zh-CN",
+      "query": "想改掉链接问号后面的数值",
+      "expected": "url"
+    },
+    {
+      "language": "zh-CN",
+      "query": "保留重复字段名的同时修改网址",
+      "expected": "url"
+    },
+    {
+      "language": "zh-CN",
+      "query": "数据库计划中哪个节点最耗费时间？",
+      "expected": "explain"
+    },
+    {
+      "language": "zh-CN",
+      "query": "找出优化器预估行数与实际记录差距最大的地方",
+      "expected": "explain"
+    },
+    {
+      "language": "zh-CN",
+      "query": "按列检查分隔符数据中没有填写的单元格",
+      "expected": "csv"
+    },
+    {
+      "language": "zh-CN",
+      "query": "整理电子表格导出文件各字段的质量",
+      "expected": "csv"
+    },
+    {
+      "language": "zh-CN",
+      "query": "服务输出中每种异常出现了多少次？",
+      "expected": "logs"
+    },
+    {
+      "language": "zh-CN",
+      "query": "从海量应用追踪记录里挑出关键行",
+      "expected": "logs"
+    },
+    {
+      "language": "zh-CN",
+      "query": "第一份花名册有、第二份没有的人是谁？",
+      "expected": "sets"
+    },
+    {
+      "language": "zh-CN",
+      "query": "找出两个清单里都出现的条目",
+      "expected": "sets"
+    },
+    {
+      "language": "zh-CN",
+      "query": "10.0.0.0/8包含多少个网络地址？",
+      "expected": "cidr"
+    },
+    {
+      "language": "zh-CN",
+      "query": "根据前缀推算网络边界和掩码",
+      "expected": "cidr"
+    },
+    {
+      "language": "zh-CN",
+      "query": "粘贴后有一种像空格的符号删不掉",
+      "expected": "unicode"
+    },
+    {
+      "language": "zh-CN",
+      "query": "找到文本中隐藏的格式控制代码",
+      "expected": "unicode"
+    },
+    {
+      "language": "zh-CN",
+      "query": "两次API返回的数据到底哪些字段变了？",
+      "expected": "json-diff"
+    },
+    {
+      "language": "zh-CN",
+      "query": "核对多层对象里新增与删除的属性",
+      "expected": "json-diff"
+    },
+    {
+      "language": "zh-CN",
+      "query": "把挤在一整行里的大括号数据变得易读",
+      "expected": "json-format"
+    },
+    {
+      "language": "zh-CN",
+      "query": "去掉JSON内容里的多余空白",
+      "expected": "json-format"
+    },
+    {
+      "language": "zh-CN",
+      "query": "浅灰色文字放在背景上还能看清吗？",
+      "expected": "contrast"
+    },
+    {
+      "language": "zh-CN",
+      "query": "检查按钮底色与文字颜色的无障碍可读程度",
+      "expected": "contrast"
+    },
+    {
+      "language": "zh-TW",
+      "query": "網頁載入很慢，想知道是哪個HTTP呼叫拖累速度",
+      "expected": "har"
+    },
+    {
+      "language": "zh-TW",
+      "query": "從瀏覽器擷取紀錄中找出失敗的網路操作",
+      "expected": "har"
+    },
+    {
+      "language": "zh-TW",
+      "query": "正式部署的參數跟本機設定哪裡不同？",
+      "expected": "env"
+    },
+    {
+      "language": "zh-TW",
+      "query": "兩份dotenv檔案造成行為不一樣，想找出原因",
+      "expected": "env"
+    },
+    {
+      "language": "zh-TW",
+      "query": "修改連結問號後面帶的數值",
+      "expected": "url"
+    },
+    {
+      "language": "zh-TW",
+      "query": "保留相同欄位名稱重複出現的網址參數",
+      "expected": "url"
+    },
+    {
+      "language": "zh-TW",
+      "query": "資料庫執行流程哪一個節點最花時間？",
+      "expected": "explain"
+    },
+    {
+      "language": "zh-TW",
+      "query": "找出優化器估算筆數與實際資料量落差",
+      "expected": "explain"
+    },
+    {
+      "language": "zh-TW",
+      "query": "按照欄位找出分隔資料中沒有填寫的儲存格",
+      "expected": "csv"
+    },
+    {
+      "language": "zh-TW",
+      "query": "檢查試算表匯出檔每個欄位的資料品質",
+      "expected": "csv"
+    },
+    {
+      "language": "zh-TW",
+      "query": "伺服器輸出的每種例外狀況發生了幾次？",
+      "expected": "logs"
+    },
+    {
+      "language": "zh-TW",
+      "query": "從大量程式追蹤紀錄擷取關鍵訊息",
+      "expected": "logs"
+    },
+    {
+      "language": "zh-TW",
+      "query": "第一份名單有而第二份沒有的人有哪些？",
+      "expected": "sets"
+    },
+    {
+      "language": "zh-TW",
+      "query": "列出同時出現在兩份清單的項目",
+      "expected": "sets"
+    },
+    {
+      "language": "zh-TW",
+      "query": "10.0.0.0/8到底包含多少個位址？",
+      "expected": "cidr"
+    },
+    {
+      "language": "zh-TW",
+      "query": "從網路前綴推算分界與遮罩",
+      "expected": "cidr"
+    },
+    {
+      "language": "zh-TW",
+      "query": "貼上的文字有一種像空白卻刪不掉的符號",
+      "expected": "unicode"
+    },
+    {
+      "language": "zh-TW",
+      "query": "找出字串裡藏起來的格式控制碼",
+      "expected": "unicode"
+    },
+    {
+      "language": "zh-TW",
+      "query": "兩次API回傳內容有哪些欄位改變？",
+      "expected": "json-diff"
+    },
+    {
+      "language": "zh-TW",
+      "query": "核對巢狀物件新增及刪除的屬性",
+      "expected": "json-diff"
+    },
+    {
+      "language": "zh-TW",
+      "query": "把擠成一行的大括號資料排版得清楚一些",
+      "expected": "json-format"
+    },
+    {
+      "language": "zh-TW",
+      "query": "移除JSON文字不必要的空格來縮小體積",
+      "expected": "json-format"
+    },
+    {
+      "language": "zh-TW",
+      "query": "淡灰色字體放在底色上是否還能看清？",
+      "expected": "contrast"
+    },
+    {
+      "language": "zh-TW",
+      "query": "評估按鈕文字和背景配色的可讀程度",
+      "expected": "contrast"
+    },
+    {
+      "language": "ko",
+      "query": "웹페이지가 느린데 어떤 HTTP 호출이 병목인지 찾고 싶어",
+      "expected": "har"
+    },
+    {
+      "language": "ko",
+      "query": "브라우저 캡처에서 실패한 네트워크 작업을 골라내고 싶어",
+      "expected": "har"
+    },
+    {
+      "language": "ko",
+      "query": "배포 서버와 내 컴퓨터의 설정값이 왜 다를까",
+      "expected": "env"
+    },
+    {
+      "language": "ko",
+      "query": "서로 다른 dotenv 파일이 동작에 미치는 차이를 조사",
+      "expected": "env"
+    },
+    {
+      "language": "ko",
+      "query": "링크의 물음표 뒤에 붙은 값만 수정하고 싶어",
+      "expected": "url"
+    },
+    {
+      "language": "ko",
+      "query": "주소에 같은 키가 여러 번 있어도 그대로 유지하며 편집",
+      "expected": "url"
+    },
+    {
+      "language": "ko",
+      "query": "데이터베이스 처리 단계 중 시간이 가장 많이 드는 곳은?",
+      "expected": "explain"
+    },
+    {
+      "language": "ko",
+      "query": "옵티마이저 예상 건수와 실제 레코드 수의 불일치 확인",
+      "expected": "explain"
+    },
+    {
+      "language": "ko",
+      "query": "구분자로 나눈 자료에서 칸이 비어 있는 열 찾기",
+      "expected": "csv"
+    },
+    {
+      "language": "ko",
+      "query": "스프레드시트 내보내기 파일의 항목별 상태를 요약",
+      "expected": "csv"
+    },
+    {
+      "language": "ko",
+      "query": "서버 출력에서 예외가 각각 몇 번 나왔는지 세기",
+      "expected": "logs"
+    },
+    {
+      "language": "ko",
+      "query": "아주 긴 실행 기록에서 문제가 되는 줄만 뽑기",
+      "expected": "logs"
+    },
+    {
+      "language": "ko",
+      "query": "첫 번째 명단에는 있지만 두 번째에는 없는 이름 찾기",
+      "expected": "sets"
+    },
+    {
+      "language": "ko",
+      "query": "두 개의 목록에 모두 등장하는 항목만 추리기",
+      "expected": "sets"
+    },
+    {
+      "language": "ko",
+      "query": "10.0.0.0/8에 주소가 총 몇 개 들어갈까?",
+      "expected": "cidr"
+    },
+    {
+      "language": "ko",
+      "query": "네트워크 접두사로 경계와 넷마스크 계산하기",
+      "expected": "cidr"
+    },
+    {
+      "language": "ko",
+      "query": "붙여넣은 글에서 공백처럼 보이는데 지워지지 않는 기호",
+      "expected": "unicode"
+    },
+    {
+      "language": "ko",
+      "query": "문자열 안에 숨어 있는 형식 제어 코드 찾기",
+      "expected": "unicode"
+    },
+    {
+      "language": "ko",
+      "query": "두 번 받은 API 응답 중 바뀐 필드는 무엇인가",
+      "expected": "json-diff"
+    },
+    {
+      "language": "ko",
+      "query": "중첩 객체에서 추가되거나 삭제된 속성 확인",
+      "expected": "json-diff"
+    },
+    {
+      "language": "ko",
+      "query": "중괄호가 한 줄로 붙어 있는 데이터를 보기 편하게",
+      "expected": "json-format"
+    },
+    {
+      "language": "ko",
+      "query": "JSON의 필요 없는 공백을 지워 용량 줄이기",
+      "expected": "json-format"
+    },
+    {
+      "language": "ko",
+      "query": "옅은 회색 글씨가 배경 위에서 읽을 만한가",
+      "expected": "contrast"
+    },
+    {
+      "language": "ko",
+      "query": "버튼 배경색과 글자색 조합이 충분히 선명한지 검사",
+      "expected": "contrast"
+    }
+  ]
+}
