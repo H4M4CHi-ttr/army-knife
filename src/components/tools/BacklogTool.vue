@@ -119,7 +119,7 @@ function clear() { input.value = ""; }
       </div>
     </div>
     <CodeInput
-      v-model="input" input-id="backlog-source"
+      v-model="input" :input-id="kind + '-input'"
       :label="t('backlog.sourceLabel')" :max-bytes="BACKLOG_LIMITS.inputBytes" :rows="10"
     />
     <p class="hint">{{ t("tool." + kind + ".hint") }}</p>
