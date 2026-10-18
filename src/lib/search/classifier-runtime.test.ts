@@ -4,7 +4,7 @@ import { gunzipSync } from "node:zlib";
 import { describe, expect, it } from "vite-plus/test";
 import { tools } from "../catalog";
 import { searchTools } from "./index";
-import { createBrowserClassifier, mergeRankings } from "./classifier-runtime";
+import { CLASSIFIER_TOOL_IDS, createBrowserClassifier, combineClassifierRankings } from "./classifier-runtime";
 
 const modelPath = resolve(process.cwd(), "public/models/classifier-v1.json.gz");
 const benchmarkPath = resolve(process.cwd(), "scripts/search-compare/heldout.json");
@@ -22,7 +22,8 @@ describe("browser LinearSVC classifier parity", () => {
     expect(compressed.length).toBeLessThan(430_000);
     expect(trained.featureCount).toBe(10_265);
     expect(trained.weightBytes).toBe(533_828);
-    expect(trained.rank("")).toHaveLength(tools.length);
+    expect(trained.rank("")).toHaveLength(CLASSIFIER_TOOL_IDS.length);
+    expect(tools.length).toBeGreaterThan(CLASSIFIER_TOOL_IDS.length);
   });
 
   it("reproduces the Python model's measured 120-case recall on all five languages", () => {
@@ -42,19 +43,33 @@ describe("browser LinearSVC classifier parity", () => {
     expect([...locales.values()]).toEqual([24, 24, 24, 24, 24]);
   });
 
-  it("reproduces the offline hybrid's top-3 recall without backend calls", () => {
+  it("keeps most historical training-tool hits with the enlarged hybrid catalog", () => {
     let top1 = 0;
     let top3 = 0;
     for (const sample of queries.items) {
-      const ids = mergeRankings(
+      const ids = combineClassifierRankings(
         searchTools(sample.query).map((tool) => tool.id),
         trained.rank(sample.query),
+        "hybrid",
       );
       if (ids[0] === sample.expected) top1++;
       if (ids.slice(0, 3).includes(sample.expected as typeof ids[number])) top3++;
     }
-    expect(top1).toBe(85);
-    expect(top3).toBe(113);
+    expect(top1).toBeGreaterThanOrEqual(55);
+    expect(top3).toBeGreaterThanOrEqual(78);
+  });
+
+  it("never hides a new tool that the fixed 12-label classifier cannot predict", () => {
+    for (const query of ["CORS", "CSS specificity", "file signature magic bytes"]) {
+      const lexical = searchTools(query).map((tool) => tool.id);
+      const winner = lexical[0];
+      expect(winner).toBeDefined();
+      expect(CLASSIFIER_TOOL_IDS).not.toContain(winner);
+      for (const mode of ["classifier", "hybrid"] as const) {
+        const ranked = combineClassifierRankings(lexical, trained.rank(query), mode);
+        expect(ranked[0]).toBe(winner);
+      }
+    }
   });
 
   it("never trusts malformed or out-of-catalog model data", () => {
