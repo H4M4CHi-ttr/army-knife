@@ -43,7 +43,7 @@ test("connection string never leaves the app, including clipboard/export", async
     if (body) sent.push(body);
   });
   await openTool(page, "en", "pg-dsn");
-  await page.locator("#backlog-source").fill("postgresql://demo:PRIVATE_SENTINEL_982734@example.test/db");
+  await page.locator("#pg-dsn-input").fill("postgresql://demo:PRIVATE_SENTINEL_982734@example.test/db");
   await expect(page.getByTestId("backlog-results")).toContainText("<redacted>");
   await expect(page.getByTestId("backlog-results")).not.toContainText("PRIVATE_SENTINEL_982734");
   const state = await page.evaluate(() => ({
