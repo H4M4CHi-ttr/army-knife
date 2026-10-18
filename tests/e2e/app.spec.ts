@@ -281,6 +281,7 @@ test("only preferences persist; input text never enters storage or location", as
     "favorites",
     "knownTools",
     "locale",
+    "searchMode",
     "theme",
     "version",
   ]);
