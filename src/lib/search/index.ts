@@ -1,5 +1,5 @@
 import { tools, type ToolDefinition } from "../catalog";
-import { messages } from "../../i18n";
+import { messages } from "../../i18n/messages";
 import { searchIntents, type SearchIntentMap } from "./intents";
 
 /**
@@ -9,7 +9,7 @@ import { searchIntents, type SearchIntentMap } from "./intents";
 export interface SearchLanguagePack {
   language: string;
   labels: Readonly<Record<string, unknown>>;
-  intents: Partial<SearchIntentMap>;
+  intents: SearchIntentMap;
 }
 
 interface SearchField {

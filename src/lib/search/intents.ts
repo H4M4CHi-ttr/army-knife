@@ -1,6 +1,6 @@
 import type { ToolId } from "../catalog";
 
-export type SearchIntentMap = Readonly<Record<ToolId, readonly string[]>>;
+export type SearchIntentMap = Readonly<Partial<Record<ToolId, readonly string[]>>>;
 
 /**
  * Example user goals, not executable instructions. Keys are stable tool IDs.

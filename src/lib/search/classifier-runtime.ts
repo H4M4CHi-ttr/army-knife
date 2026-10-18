@@ -1,5 +1,12 @@
 import { isToolId, tools, type ToolId } from "../catalog";
 
+/** Fixed 12-tool label set of the 411,410-byte snapshot. New tools use lexical search. */
+export const CLASSIFIER_TOOL_IDS = [
+  "har", "env", "url", "explain", "csv", "logs",
+  "sets", "cidr", "unicode", "json-diff", "json-format", "contrast",
+] as const satisfies readonly ToolId[];
+const classifierLabelSet = new Set<string>(CLASSIFIER_TOOL_IDS);
+
 export interface BrowserClassifier {
   readonly featureCount: number;
   readonly weightBytes: number;
@@ -31,9 +38,9 @@ export function createBrowserClassifier(value: unknown): BrowserClassifier {
   if (
     vocabulary.length < 100 || vocabulary.length > 40_000 ||
     idf.length !== vocabulary.length ||
-    classes.length !== tools.length ||
+    classes.length !== CLASSIFIER_TOOL_IDS.length ||
     new Set(classes).size !== classes.length ||
-    !classes.every(isToolId) || !tools.every((tool) => classes.includes(tool.id)) ||
+    !classes.every(isToolId) || !CLASSIFIER_TOOL_IDS.every((id) => classes.includes(id)) ||
     weights.length !== classes.length || intercept.length !== classes.length ||
     !vocabulary.every((word) => typeof word === "string" && word.length >= 2 && word.length <= 16) ||
     !idf.every((n) => typeof n === "number" && Number.isFinite(n) && n > 0) ||
@@ -92,4 +99,23 @@ export function mergeRankings(lexical: readonly ToolId[], ranked: readonly ToolI
     score: (right.has(id) ? 1 / (15 + right.get(id)!) : 0) +
       (left.has(id) ? 1 / (15 + left.get(id)!) : 0),
   })).sort((a, b) => b.score - a.score || a.index - b.index).map(({ id }) => id);
+}
+
+/** Rank new catalog tools using lexical search while classifying the original 12. */
+export function combineClassifierRankings(
+  lexical: readonly ToolId[],
+  classified: readonly ToolId[],
+  mode: "classifier" | "hybrid",
+): ToolId[] {
+  // If the best lexical result is outside the training set, protect it from
+  // a classifier that has no way to predict that label.
+  const untrainedWinner =
+    lexical[0] && !classifierLabelSet.has(lexical[0]) ? [lexical[0]] : [];
+  const initial = mode === "classifier" ? [...classified] : mergeRankings(lexical, classified);
+  const seen = new Set<ToolId>();
+  return [...untrainedWinner, ...initial, ...lexical].filter((id) => {
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
 }
