@@ -38,6 +38,9 @@ import { getTool, tools, type Category, type ToolId } from "@/lib/catalog";
 import type { QuickToolId } from "@/lib/tools/quick-converters";
 import { settings } from "@/lib/preferences";
 import { setFontLocale } from "@/lib/fonts";
+import { searchTools } from "@/lib/search";
+import { ClassifierClient } from "@/lib/search/classifier-client";
+import { combineClassifierRankings } from "@/lib/search/classifier-runtime";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
@@ -72,6 +75,10 @@ const TextInspectorTool = defineAsyncComponent(() => import("@/components/tools/
 const { t, locale } = useI18n();
 const { preferences, status } = settings;
 const query = ref("");
+const classifierRank = ref<{ query: string; ids: ToolId[] } | null>(null);
+const classifierStatus = ref<"idle" | "loading" | "ready" | "error">("idle");
+let classifierWorker: ClassifierClient | null = null;
+let classifierFailed = false;
 const activeCategory = ref<Category | "all">("all");
 const favoritesOnly = ref(false);
 const mobileOpen = ref(false);
@@ -149,19 +156,22 @@ const pageStates = {
   },
 };
 const pageState = computed(() => pageStates[preferences.locale]);
-const matches = computed(() =>
-  enabled.value.filter((tool) => {
-    const haystack =
-      `${t(`tool.${tool.id}.name`)} ${t(`tool.${tool.id}.description`)} ${tool.keywords}`.toLocaleLowerCase(
-        locale.value,
-      );
-    return query.value
-      .toLocaleLowerCase(locale.value)
-      .trim()
-      .split(/\s+/)
-      .every((part) => haystack.includes(part));
-  }),
-);
+const matches = computed(() => {
+  const fallback = searchTools(query.value, enabled.value);
+  const result = classifierRank.value;
+  if (!query.value.trim() || preferences.searchMode === "lexical" ||
+      !result || result.query !== query.value) return fallback;
+  const orderedIds = combineClassifierRankings(
+    searchTools(query.value, tools).map((tool) => tool.id),
+    result.ids,
+    preferences.searchMode,
+  );
+  const allowed = new Map(enabled.value.map((tool) => [tool.id, tool]));
+  return orderedIds.flatMap((id) => {
+    const match = allowed.get(id);
+    return match ? [match] : [];
+  });
+});
 const shown = computed(() =>
   matches.value.filter(
     (tool) =>
@@ -434,6 +444,55 @@ function onKey(event: KeyboardEvent) {
     query.value = "";
   }
 }
+watch(
+  [query, () => preferences.searchMode],
+  ([input, mode], _, onCleanup) => {
+    classifierRank.value = null;
+    if (mode === "lexical") {
+      classifierWorker?.stop();
+      classifierWorker = null;
+      classifierFailed = false;
+      classifierStatus.value = "idle";
+      return;
+    }
+    if (classifierFailed) {
+      classifierStatus.value = "error";
+      return;
+    }
+
+    const client = (classifierWorker ??= new ClassifierClient());
+    classifierStatus.value = "loading";
+    let obsolete = false;
+    const start = async () => {
+      try {
+        if (input.trim()) {
+          const ids = await client.rank(input);
+          if (!obsolete && query.value === input && preferences.searchMode !== "lexical") {
+            classifierRank.value = { query: input, ids };
+          }
+        } else {
+          await client.load();
+        }
+        if (!obsolete && preferences.searchMode !== "lexical") {
+          classifierStatus.value = "ready";
+        }
+      } catch {
+        if (!obsolete) {
+          classifierFailed = true;
+          classifierStatus.value = "error";
+          client.stop();
+          if (classifierWorker === client) classifierWorker = null;
+        }
+      }
+    };
+    const timer = window.setTimeout(() => { void start(); }, input.trim() ? 100 : 0);
+    onCleanup(() => {
+      obsolete = true;
+      window.clearTimeout(timer);
+    });
+  },
+  { immediate: true },
+);
 watch(() => preferences.theme, applyTheme, { immediate: true });
 watch(
   () => preferences.locale,
@@ -473,6 +532,8 @@ onMounted(() => {
   systemTheme.addEventListener("change", applyTheme);
 });
 onBeforeUnmount(() => {
+  classifierWorker?.stop();
+  classifierWorker = null;
   document.removeEventListener("click", onInternalLinkClick);
   window.removeEventListener("hashchange", onHash);
   window.removeEventListener("popstate", onLocation);
@@ -583,9 +644,10 @@ onBeforeUnmount(() => {
             autocomplete="off"
             spellcheck="false"
             :maxlength="150"
-            @keydown.enter="pageRoute.kind === 'tool' && matches[0] && chooseTool(matches[0].id)"
+            @keydown.enter="query.trim() && matches[0] && chooseTool(matches[0].id)"
           /><kbd>⌘ / Ctrl K</kbd>
           <div v-if="query && pageRoute.kind === 'tool'" class="search-results">
+            <p v-if="preferences.searchMode !== 'lexical'" class="hint" role="status">{{ t(`search.status.${classifierStatus}`) }}</p>
             <a v-for="tool in matches" :key="tool.id" :href="toolHref(tool.id)"
               ><ToolIcon :id="tool.id" />{{ t(`tool.${tool.id}.name`) }}<ArrowUpRight
             /></a>
@@ -636,6 +698,7 @@ onBeforeUnmount(() => {
             </div>
           </section>
           <div class="collection-toolbar">
+            <p v-if="preferences.searchMode !== 'lexical'" class="hint classifier-status" role="status" data-testid="classifier-status">{{ t(`search.status.${classifierStatus}`) }}</p>
             <h2>
               {{ t("app.collection") }}<span>{{ shown.length.toString().padStart(2, "0") }}</span>
             </h2>

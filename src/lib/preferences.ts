@@ -4,6 +4,7 @@ import { isToolId, tools, type ToolId } from "./catalog";
 import { LOCALES, type Locale } from "./locales";
 export { LOCALES, type Locale } from "./locales";
 export type Theme = "system" | "light" | "dark";
+export type SearchMode = "lexical" | "classifier" | "hybrid";
 export const STORAGE_KEY = "army-knife:preferences:v1";
 export interface Preferences {
   version: 1;
@@ -13,6 +14,7 @@ export interface Preferences {
   favorites: ToolId[];
   knownTools: ToolId[];
   autoApply: boolean;
+  searchMode: SearchMode;
 }
 
 // The first release did not record which tools were available. Remember that
@@ -49,6 +51,7 @@ export function defaultPreferences(locale: Locale = "en"): Preferences {
     favorites: [],
     knownTools: tools.map((tool) => tool.id),
     autoApply: true,
+    searchMode: "lexical",
   };
 }
 
@@ -82,6 +85,9 @@ export function parsePreferences(raw: string | null, locale: Locale): Preference
       favorites: ids(record.favorites, []),
       knownTools: defaults.knownTools,
       autoApply: typeof record.autoApply === "boolean" ? record.autoApply : true,
+      searchMode: ["lexical", "classifier", "hybrid"].includes(record.searchMode as string)
+        ? (record.searchMode as SearchMode)
+        : "lexical",
     };
   } catch {
     return defaults;
@@ -115,6 +121,7 @@ export function createPreferences(
         favorites: preferences.favorites.filter(isToolId),
         knownTools: tools.map((tool) => tool.id),
         autoApply: preferences.autoApply,
+        searchMode: preferences.searchMode,
       };
       try {
         if (storage) {
