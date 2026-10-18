@@ -233,8 +233,9 @@ export function verifyDist(directory = join(PROJECT_ROOT, 'dist')) {
     }
     const required = {
       'default-src': ["'none'"],
-      'script-src': ["'self'", "'wasm-unsafe-eval'"],
-      'connect-src': ["'self'"],
+      'script-src': ["'self'", "'wasm-unsafe-eval'", "https://www.googletagmanager.com"],
+      'img-src': ["'self'", "data:", "blob:", "https://www.googletagmanager.com", "https://*.google-analytics.com"],
+      'connect-src': ["'self'", "https://www.googletagmanager.com", "https://*.google-analytics.com", "https://*.google.com"],
       'font-src': ["'self'"],
       'worker-src': ["'self'"],
       'form-action': ["'none'"],
