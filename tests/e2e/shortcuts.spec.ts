@@ -278,6 +278,7 @@ test("private key queries and search text leave no saved data or URL", async ({ 
     "favorites",
     "knownTools",
     "locale",
+    "searchMode",
     "theme",
     "version",
   ]);
