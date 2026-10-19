@@ -151,10 +151,16 @@ test("PKCE cancels a pending native digest and rejects oversized paste without s
   await expect(page.getByRole("status")).toContainText("cancelled");
   await page.getByTestId("pkce-sample").click();
   await expect(page.getByTestId("pkce-challenge")).toHaveText(RFC_CHALLENGE);
-  await page.locator("#pkce-verifier-input").evaluate((element) => {
-    const data = new DataTransfer(); data.setData("text/plain", "a".repeat(100000));
-    element.dispatchEvent(new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data }));
+  const prevented = await page.locator("#pkce-verifier-input").evaluate((element) => {
+    // Match the shared large-paste fixture: Firefox hides synthetic ClipboardEvent data.
+    const event = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "clipboardData", {
+      value: { getData: (type: string) => type === "text/plain" ? "a".repeat(100000) : "" },
+    });
+    element.dispatchEvent(event);
+    return event.defaultPrevented;
   });
+  expect(prevented).toBe(true);
   await expect(page.getByRole("alert")).toHaveText(pkceMessages.en["errors.PKCE_VERIFIER"]);
   await expect(page.getByTestId("pkce-result")).toHaveCount(0);
   await page.getByTestId("pkce-sample").click();
