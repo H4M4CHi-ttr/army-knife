@@ -159,3 +159,15 @@ The separate deployment job depends on the entire quality job, runs only for `ma
 In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. The pinned [`configure-pages` action](https://github.com/actions/configure-pages/blob/v5.0.0/action.yml) has `enablement: false`; the workflow does not use an administrator token or attempt to enable Pages through an alternate path. A repository that has not enabled Pages will fail at configuration, leaving the quality report available for review. Once Pages is configured, rerun the workflow on `main`.
 
 The Pages artifact is created by [`upload-pages-artifact`](https://github.com/actions/upload-pages-artifact/blob/v4.0.0/action.yml) and published by [`deploy-pages`](https://github.com/actions/deploy-pages/blob/v4.0.5/action.yml). The job output exposes the resulting site URL. Dependency and font downloads happen during the build; the deployed application serves its scripts, WASM, styles, and fonts from the GitHub Pages site itself.
+
+## PKCE coverage (2026-10-20 JST)
+
+`src/lib/tools/pkce.test.ts` checks the RFC 7636 Appendix B vector, exact 43/128
+character boundaries, full unreserved alphabet, state omission/limits, malformed
+settings, cryptographic failures, aborts and the five-second watchdog. The Vapor
+view tests pin manual generation, immediate S256 checking, explicit per-field
+copy, invalidation and late-result disposal on edits/clear/cancel/unmount.
+`tests/e2e/pkce.spec.ts` covers five languages, light/dark, keyboard controls,
+actual native digest values, privacy, reload/navigation and oversized pastes in
+all Chromium/Firefox desktop/small projects. It audits the exact built asset graph
+and fails on private-marker leakage, unexpected network calls or browser errors.

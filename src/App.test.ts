@@ -197,6 +197,7 @@ describe("App integration with real local tools", () => {
       "tool-card-logs",
       "tool-card-magic",
       "tool-card-og-tags",
+      "tool-card-pkce",
       "tool-card-set-cookie",
       "tool-card-shortcuts",
       "tool-card-slug",

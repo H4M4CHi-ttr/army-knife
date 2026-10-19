@@ -1,3 +1,4 @@
+import { pkceGuide } from "./pkce-guide.ts";
 import { corsGuide } from "./cors-guide.ts";
 import type { ToolId } from "./catalog";
 import type { Locale } from "./preferences";
@@ -1043,4 +1044,5 @@ export const toolGuides = {
     },
   ),
   "html-accessibility": htmlAccessibilityGuide,
+  pkce: pkceGuide,
 } satisfies Record<ToolId, Record<Locale, ToolGuide>>;

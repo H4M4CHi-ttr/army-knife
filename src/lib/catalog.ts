@@ -1,4 +1,5 @@
 export type ToolId =
+  | "pkce"
   | "cors"
   | "chmod"
   | "csv"
@@ -58,6 +59,11 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "pkce", category: "network", wasm: false, devtoys: false,
+    keywords: "oauth pkce s256 sha256 verifier challenge state authorization 認可 検証子 授权 授權 인가 검증자",
+    color: "rose",
+  },
   {
     id: "cors", category: "network", wasm: false, devtoys: false,
     keywords: "cors origin preflight access-control allow credentials options http response クロスオリジン プリフライト 跨源 跨來源 사전 요청",
