@@ -9,6 +9,7 @@ This is a **2026-10-14 snapshot**, reviewed against the [official DevToys tool l
 
 | Army Knife tool                        | Default | Reason                                                                                                                                                                                                  |
 | -------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| OAuth PKCE S256 generator | On | Dedicated linked verifier/S256 challenge/optional state workflow. No dedicated PKCE tool in the official bundle/source checked on 2026-10-20 JST; generic password/hash tools differ. Extensions are outside this comparison. |
 | CORS response condition checker | On | Compares recorded actual/preflight response conditions with an explicit cross-origin Fetch scenario. No CORS checker appears in the official bundled list reviewed on 2026-10-14; extensions are outside this comparison. |
 | SRI integrity generator                  | Off     | Hashing overlaps with bundled hash generators; SRI-specific HTML is additional, but conservatively requires opt-in. No third-party dependency. |
 | BOM & line-ending inspector              | Off     | Text encoding and conversion overlap some bundled tools, so conservative opt-in is used. |
@@ -171,3 +172,11 @@ The project uses VoidZero's **Vite+**, not only Vite. Its [local CLI documentati
 - **HTTP status/MIME offline reference: On.** A curated, local reference for response semantics and media types, distinct from sending or diagnosing live requests.
 - **Git merge/diff3 conflict inspector: On.** Passive parsing and independent copying; never applies a patch, resolves a conflict or performs Git operations.
 - These conservative decisions use the documented bundled DevToys snapshot above, without claiming absence of third-party extensions. Inputs are memory-only; preferences are the only persistent app data.
+
+## OAuth PKCE S256
+
+The [PKCE specification](pkce.md) describes strictly bounded native Web Crypto
+operations, full RFC unreserved verifier syntax, manual random generation, optional
+independent state and cancellation by discarding late results. No Worker or WASM
+is required for the maximum 128-byte digest. No added runtime dependency or license
+is introduced; existing self-hosted Noto/Sarasa font delivery is reused.

@@ -10,6 +10,7 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 
 | ツール                  | 主な機能                                                                    | 処理                | 初期状態 |
 | ----------------------- | --------------------------------------------------------------------------- | ------------------- | -------- |
+| OAuth PKCE生成 | S256 verifier/challenge・任意stateの生成と既存verifierの確認 | Web Crypto | オン |
 | CORS応答条件チェック | Origin・メソッド・credentialsと実応答／プリフライトヘッダーを通信なしで比較 | TypeScript | オン |
 | SRI integrity生成       | ローカルJS/CSSの生バイト列からSHA-256/384/512 integrity属性・HTML例を生成       | Web Crypto / Worker | オフ     |
 | BOM・改行コード検査     | UTF-8/UTF-16とBOM、CRLF/LF/CRを厳密に解析し、任意でUTF-8へ変換              | TypeScript / Worker | オフ     |
@@ -58,6 +59,26 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 | UUID・ULID生成と検査 | UUID v4/v7・ULIDを暗号学的乱数で生成、時刻情報検査 | TypeScript | オフ |
 | パスワード・ランダムトークン生成 | 指定文字集合・除外・長さ・件数を指定して安全な乱数生成 | TypeScript | オフ |
 | Open Graph/Twitter Cardメタタグ生成 | HTML属性をエスケープしたOGP・SNS用メタタグ、ローカル模擬プレビュー | TypeScript | オン |
+
+### OAuth PKCE生成（Issue #80、2026-10-20 JST）
+
+S256の`code_verifier`・`code_challenge`と、任意の独立した`state`をブラウザー内で生成します。
+生成はボタン操作時のみ。既存verifierの確認ではRFC 7636のASCII非予約文字43〜128文字を
+厳密に検査し、SHA-256のbase64url（パディングなし）を即時に計算します。
+公開RFCテスト例も用意していますが、秘密値としての再利用はできません。
+
+生成verifierは43〜128文字、stateは省略または16〜128文字。`crypto.getRandomValues`の
+6ビットから各文字を偏りなく生成し、最短verifierでも258ビットの乱数を使います。
+stateの文字数範囲はこのツールの方針で、OAuthのプロトコル上限ではありません。
+Web Cryptoが使えない場合に安全でない乱数へ代替しません。ハッシュは最大128バイト・5秒上限。
+中止は結果の破棄で、ブラウザー内部のdigest自体は停止できません。
+
+5言語Vapor画面・ライト／ダーク・個別コピー・キャンセル・上限超過の貼り付け拒否に対応。
+入力と結果はメモリー内のみで、URL・storage・ログ・通信には含めません。
+新規依存・計測・外部フォントは追加しません。認可エンドポイントに接続せず、
+stateのセッション関連付けや照合は呼び出し側OAuthクライアントの責任です。
+DevToys公式バンドルに専用PKCEワークフローがないことを確認し、既定オンにしています。
+[仕様・制約と検証](docs/pkce.md)。
 
 ### CORS応答条件チェック（Issue #56）
 

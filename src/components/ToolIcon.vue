@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  pkce: KeyRound,
   cors: Network,
   chmod: FileLock2,
   base64: Binary,

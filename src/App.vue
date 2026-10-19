@@ -60,6 +60,7 @@ const OgTagsTool = defineAsyncComponent(() => import("@/components/tools/OgTagsT
 const TextCodecTool = defineAsyncComponent(() => import("@/components/tools/TextCodecTool.vue"));
 const DummyTextTool = defineAsyncComponent(() => import("@/components/tools/DummyTextTool.vue"));
 const SpecificityTool = defineAsyncComponent(() => import("@/components/tools/SpecificityTool.vue"));
+const PkceTool = defineAsyncComponent(() => import("@/components/tools/PkceTool.vue"));
 const CorsTool = defineAsyncComponent(() => import("@/components/tools/CorsTool.vue"));
 const HtmlAccessibilityTool = defineAsyncComponent(() => import("@/components/tools/HtmlAccessibilityTool.vue"));
 const FluidTypeTool = defineAsyncComponent(() => import("@/components/tools/FluidTypeTool.vue"));
@@ -845,6 +846,7 @@ onBeforeUnmount(() => {
             />
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PkceTool v-else-if="selectedTool.id === 'pkce'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CorsTool v-else-if="selectedTool.id === 'cors'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HtmlAccessibilityTool v-else-if="selectedTool.id === 'html-accessibility'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <FluidTypeTool v-else-if="selectedTool.id === 'fluid-type'" :key="`${selectedTool.id}:${preferences.locale}`" />
