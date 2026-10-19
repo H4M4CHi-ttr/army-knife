@@ -73,6 +73,18 @@ describe("PKCE Vapor view", () => {
     await flushPromises();
     expect(wrapper.find('[data-testid="pkce-result"]').exists()).toBe(false);
   });
+  it("requires a valid state length while its generation checkbox is enabled", async () => {
+    await generate();
+    await wrapper.get("#pkce-state-length").setValue("0");
+    expect(wrapper.find('[data-testid="pkce-result"]').exists()).toBe(false);
+    await wrapper.get('[data-testid="pkce-generate"]').trigger("click");
+    await flushPromises();
+    expect(wrapper.get('[role="alert"]').text()).toContain("16 to 128");
+    expect(wrapper.find('[data-testid="pkce-result"]').exists()).toBe(false);
+    await wrapper.get("#pkce-state-enabled").setValue(false);
+    await generate();
+    expect(wrapper.find('[data-testid="pkce-state"]').exists()).toBe(false);
+  });
   it("rejects an oversized paste before inserting a truncated valid verifier", async () => {
     await wrapper.get('[data-testid="pkce-sample"]').trigger("click");
     await vi.waitFor(() => expect(wrapper.find('[data-testid="pkce-result"]').exists()).toBe(true));

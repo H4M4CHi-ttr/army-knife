@@ -75,6 +75,10 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
       expect(geometry.content).toBeLessThanOrEqual(geometry.viewport + 1);
       await testInfo.attach(`pkce-${locale}-${theme}`, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
     }
+    await page.locator("#pkce-state-length").fill("0");
+    await page.getByTestId("pkce-generate").click();
+    await expect(page.getByRole("alert")).toHaveText(messages["errors.PKCE_STATE_LENGTH"]);
+    await expect(page.getByTestId("pkce-result")).toHaveCount(0);
     await page.locator("#pkce-state-enabled").focus();
     await page.keyboard.press("Space");
     await expect(page.locator("#pkce-state-enabled")).not.toBeChecked();

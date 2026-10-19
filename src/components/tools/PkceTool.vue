@@ -5,6 +5,7 @@ import { useAppI18n } from "@/i18n/useAppI18n";
 import { useToolExecution } from "@/composables/useToolExecution";
 import { copyText } from "@/lib/io";
 import { createPkce } from "@/lib/tools/pkce";
+import { ToolError } from "@/lib/tools/errors";
 
 const { t } = useAppI18n();
 const mode = ref<"generate" | "derive">("generate");
@@ -20,9 +21,14 @@ const { result, error, busy, control, apply, cancel } = useToolExecution({
   canRun: () => mode.value === "generate" || (!pasteRejected.value && verifier.value.length > 0),
   mode: () => mode.value === "generate" ? "deferred" : "instant",
   auto: false,
-  execute: (signal) => createPkce(mode.value === "generate"
+  execute: (signal) => {
+    // Zero is the engine's omission sentinel, reserved for the unchecked option.
+    if (mode.value === "generate" && stateEnabled.value && stateLength.value === 0)
+      throw new ToolError("PKCE_STATE_LENGTH");
+    return createPkce(mode.value === "generate"
     ? { mode: "generate", verifierLength: verifierLength.value, stateLength: stateEnabled.value ? stateLength.value : 0 }
-    : { mode: "derive", verifier: verifier.value }, signal),
+    : { mode: "derive", verifier: verifier.value }, signal);
+  },
 });
 watch(result, () => { copied.value = ""; copyError.value = false; }, { flush: "sync" });
 watch([mode, verifier], () => { pasteRejected.value = false; }, { flush: "sync" });
