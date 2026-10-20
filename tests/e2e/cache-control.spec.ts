@@ -59,6 +59,9 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await page.locator("#cache-control-input").fill('max-age="unfinished');
     await expect(page.getByRole("alert")).toHaveText(messages["errors.CACHE_CONTROL_SYNTAX"]);
     await expect(result).toHaveCount(0);
+    await page.locator("#cache-control-input").fill("Cache-Control: public\r\n Cache-Control: private");
+    await expect(page.getByRole("alert")).toHaveText(messages["errors.CACHE_CONTROL_HEADERS"]);
+    await expect(result).toHaveCount(0);
     await page.getByTestId("cache-control-sample").click();
     for (const theme of ["light", "dark"] as const) {
       await page.getByTestId("settings-button").click();

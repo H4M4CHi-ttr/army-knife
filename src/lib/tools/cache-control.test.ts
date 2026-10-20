@@ -56,6 +56,9 @@ describe("response Cache-Control inspection", () => {
   it.each(["Cache-Control: public\nETag: secret", "public\nmax-age=60", "HTTP/1.1 200 OK\nCache-Control: public", "Cache-Control: public\rCache-Control: private"])("rejects other headers, raw multiline values and obsolete folding: %j", (input) => {
     expect(() => inspectCacheControl(input)).toThrow();
   });
+  it.each(["\n ", "\n\t", "\r\n ", "\r\n\t"])("rejects an indented continuation rather than treating it as another field: %j", (separator) => {
+    expect(() => inspectCacheControl(`Cache-Control: public${separator}Cache-Control: private`)).toThrow("CACHE_CONTROL_HEADERS");
+  });
   it("enforces byte, physical line, directive, name and decoded value limits", () => {
     expect(() => inspectCacheControl("x=" + "a".repeat(CACHE_CONTROL_LIMITS.bytes))).toThrow(expect.objectContaining({ code: "INPUT_TOO_LARGE" }));
     expect(() => inspectCacheControl('x="' + "é".repeat(CACHE_CONTROL_LIMITS.bytes / 2) + '"')).toThrow(expect.objectContaining({ code: "INPUT_TOO_LARGE" }));

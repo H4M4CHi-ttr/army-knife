@@ -37,6 +37,9 @@ export function inspectCacheControl(input: string): CacheControlReport {
   if (!lines.length) throw new ToolError("CACHE_CONTROL_EMPTY");
   let source: string;
   if (/^cache-control:/i.test(lines[0]!)) {
+    // Leading whitespace is obsolete folding, not a repeated field. Check before
+    // trimming so a continuation cannot be reclassified as a new header.
+    if (physicalLines.some((line) => /^[ \t]/.test(line))) throw new ToolError("CACHE_CONTROL_HEADERS");
     if (lines.some((line) => !/^cache-control:/i.test(line))) throw new ToolError("CACHE_CONTROL_HEADERS");
     source = lines.map((line) => line.slice(14)).join(",");
   } else {
