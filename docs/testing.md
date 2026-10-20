@@ -171,3 +171,15 @@ copy, invalidation and late-result disposal on edits/clear/cancel/unmount.
 actual native digest values, privacy, reload/navigation and oversized pastes in
 all Chromium/Firefox desktop/small projects. It audits the exact built asset graph
 and fails on private-marker leakage, unexpected network calls or browser errors.
+
+## Cache-Control coverage (2026-10-21 JST)
+
+`src/lib/tools/cache-control.test.ts` checks response field grammar, quoted commas
+and escapes, repeated directives/fields, exact decimal seconds, qualified fields,
+unknown/prototype-like names, malformed input and every input/structure bound.
+The Vapor view tests exercise immediate/deferred updates, the 800ms boundary,
+manual apply, pending cancellation, rejected-paste recovery and inert text.
+`tests/e2e/cache-control.spec.ts` runs all five languages, both themes and
+Chromium/Firefox desktop/small. It verifies keyboard operation, JSON copy/download,
+reload/navigation clearing and the exact-built-asset network/privacy audit. These
+tests exercise the offline inspector, not browser HTTP-cache conformance.
