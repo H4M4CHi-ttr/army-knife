@@ -1,4 +1,5 @@
 export type ToolId =
+  | "cache-control"
   | "pkce"
   | "cors"
   | "chmod"
@@ -59,6 +60,11 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "cache-control", category: "network", wasm: false, devtoys: false,
+    keywords: "http response cache-control max-age s-maxage no-cache no-store private public immutable stale cache header キャッシュ 応答 鲜度 缓存 快取 캐시 응답",
+    color: "orange",
+  },
   {
     id: "pkce", category: "network", wasm: false, devtoys: false,
     keywords: "oauth pkce s256 sha256 verifier challenge state authorization 認可 検証子 授权 授權 인가 검증자",

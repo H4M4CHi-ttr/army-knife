@@ -1,4 +1,5 @@
 import { pkceGuide } from "./pkce-guide.ts";
+import { cacheControlGuide } from "./cache-control-guide.ts";
 import { corsGuide } from "./cors-guide.ts";
 import type { ToolId } from "./catalog";
 import type { Locale } from "./preferences";
@@ -147,6 +148,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  "cache-control": cacheControlGuide,
   cors: corsGuide,
   ...utilityGuides,
   ...inspectorGuides,

@@ -44,6 +44,7 @@ import { combineClassifierRankings } from "@/lib/search/classifier-runtime";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
+const CacheControlTool = defineAsyncComponent(() => import("@/components/tools/CacheControlTool.vue"));
 const JsonTool = defineAsyncComponent(() => import("@/components/tools/JsonTool.vue"));
 const CidrTool = defineAsyncComponent(() => import("@/components/tools/CidrTool.vue"));
 const UnicodeTool = defineAsyncComponent(() => import("@/components/tools/UnicodeTool.vue"));
@@ -846,6 +847,7 @@ onBeforeUnmount(() => {
             />
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <CacheControlTool v-else-if="selectedTool.id === 'cache-control'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <PkceTool v-else-if="selectedTool.id === 'pkce'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CorsTool v-else-if="selectedTool.id === 'cors'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HtmlAccessibilityTool v-else-if="selectedTool.id === 'html-accessibility'" :key="`${selectedTool.id}:${preferences.locale}`" />
