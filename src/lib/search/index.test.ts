@@ -81,6 +81,7 @@ describe("local multilingual intent search", () => {
   });
 
   it("also finds new tools by localized catalog text without retraining", () => {
+    expect(searchTools("Server-Timing")[0]?.id).toBe("server-timing");
     expect(searchTools("Cache-Control")[0]?.id).toBe("cache-control");
     expect(searchTools("CORS")[0]?.id).toBe("cors");
     expect(searchTools("CSS specificity")[0]?.id).toBe("css-specificity");

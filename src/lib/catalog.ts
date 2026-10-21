@@ -1,4 +1,5 @@
 export type ToolId =
+  | "server-timing"
   | "cache-control"
   | "pkce"
   | "cors"
@@ -60,6 +61,11 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "server-timing", category: "network", wasm: false, devtoys: false,
+    keywords: "http server-timing duration performance metrics header response latency 計測 応答 時間 性能 服务器 伺服器 시간 성능",
+    color: "blue",
+  },
   {
     id: "cache-control", category: "network", wasm: false, devtoys: false,
     keywords: "http response cache-control max-age s-maxage no-cache no-store private public immutable stale cache header キャッシュ 応答 鲜度 缓存 快取 캐시 응답",

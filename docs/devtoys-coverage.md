@@ -181,3 +181,11 @@ operations, full RFC unreserved verifier syntax, manual random generation, optio
 independent state and cancellation by discarding late results. No Worker or WASM
 is required for the maximum 128-byte digest. No added runtime dependency or license
 is introduced; existing self-hosted Noto/Sarasa font delivery is reused.
+
+## Server-Timing
+
+The official bundled list at [devtoys.app](https://devtoys.app/) was checked on
+2026-10-22 JST. It has no dedicated Server-Timing sender-syntax inspector, so this
+complementary tool defaults **on**. The comparison excludes third-party extensions.
+[Scope, strict grammar, precision and bounds](server-timing.md) describe the
+offline interpretation; no duration summation or live request diagnosis is made.
