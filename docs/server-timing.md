@@ -70,3 +70,12 @@ suite exercises five languages, both themes, keyboard disclosures, responsive
 layout, explicit JSON copy/download, clearing and exact-built-asset request audits
 on Chromium/Firefox at desktop/small sizes. All existing Rust/WASM, lint, type,
 Vapor, font, production, distribution/license and browser gates remain required.
+
+Independent review caught a quoted-string/escape field-boundary issue before
+publication. LF/CRLF regressions reproduced it; each repeated field is now scanned
+independently while the metric cap remains global. Follow-up review found no
+remaining material issue.
+
+Synthetic screenshots from the passing production Chromium scenarios were
+visually inspected: [English desktop, light](screenshots/server-timing-en-light.png)
+and [Japanese small viewport, dark](screenshots/server-timing-ja-dark.png).
