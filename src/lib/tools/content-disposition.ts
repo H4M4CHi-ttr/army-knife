@@ -21,14 +21,16 @@ export interface DispositionReport {
 }
 const TOKEN = /[!#$%&'*+.^_`|~0-9A-Za-z-]/;
 // Inspection deliberately detects controls instead of removing them from names.
-// eslint-disable-next-line no-control-regex
-const HIDDEN = /[\x00-\x1f\x7f-\x9f\u00ad\u034f\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/;
+// eslint-disable-next-line no-control-regex, no-misleading-character-class
+const HIDDEN = /[\x00-\x1f\x7f-\x9f\u00ad\u{034f}\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/u;
 const trim = (s: string) => s.replace(/^[ \t]+|[ \t]+$/g, "");
 function fail(code = "DISPOSITION_SYNTAX"): never { throw new ToolError(code); }
 
 /** Quote strings and expose invisible characters; the report preserves originals. */
 export function dispositionDisplay(value: string): string {
-  return JSON.stringify(value).replace(/[\x7f-\x9f\u00ad\u034f\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/g,
+  // U+034F is intentionally matched as a single invisible combining character.
+  // eslint-disable-next-line no-misleading-character-class
+  return JSON.stringify(value).replace(/[\x7f-\x9f\u00ad\u{034f}\u061c\u180e\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/gu,
     (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
 }
 function filenameNotes(value: string): FilenameNote[] {

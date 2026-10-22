@@ -64,3 +64,25 @@ Playwright tests cover five locales, both themes, keyboard controls, responsive
 layout, explicit JSON export, reload/navigation clearing and exact-dist-asset
 network audits. CI also runs the existing Rust/WASM, font, distribution and license
 gates on the final head.
+
+Visual review uses synthetic input in Chromium at 1440×1000 and 390×844:
+[English light desktop](screenshots/content-disposition-en-light-desktop.png),
+[English light small](screenshots/content-disposition-en-light-small.png),
+[Japanese dark desktop](screenshots/content-disposition-ja-dark-desktop.png), and
+[Japanese dark small](screenshots/content-disposition-ja-dark-small.png).
+The filename* result, fallback, path/direction warnings and explicit output
+controls were inspected without clipping, overlap or page-level overflow.
+
+In the development cloud environment, unchanged WASM and fonts were restored from
+the exact base commit's successful Pages artifact (run 39687571163, base
+`a18ef2324bd41ea450995e55f17c4ead335a23e4`). The artifact ZIP SHA-256 was
+`18457d3b396b1be301ebc873cd36f7b6d8bc9e8d826f82513e68a86f20e5d4e6`.
+The original generated binding source came from its production source map;
+TypeScript generated local declarations from that source. Crate, source locks,
+font inputs and build scripts were unchanged, and actual WASM smoke/font checks
+passed. CI remains the source of Rust compilation and complete browser evidence.
+Local Firefox could launch with a workspace temporary profile but crashed when
+creating a blank page before loading application code; its sandbox was not
+disabled. Chromium's 16 dedicated browser cases passed locally. Final check
+results and independent review are recorded in
+[PR #155](https://github.com/H4M4CHi-ttr/army-knife/pull/155).
