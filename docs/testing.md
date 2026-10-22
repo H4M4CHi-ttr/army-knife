@@ -58,6 +58,13 @@ cross-origin server or claim a complete browser CORS conformance test.
 
 ## Browser coverage
 
+The Content-Disposition inspector adds strict response-field and extended-value
+unit tests plus real Vapor execution/lifecycle tests. Its dedicated four-project
+browser suite covers all five locales, both themes, keyboard operation, exact
+filename* decoding/priority, errors and bounds, delayed/manual/cancel behavior,
+explicit JSON export, input clearing and the exact-dist-asset privacy audit.
+See [its specification and limits](content-disposition.md).
+
 The lightweight converter engines have dedicated pure TypeScript regression tests in `src/lib/tools/quick-converters.test.ts` for SI/IEC precision, CSS font/viewport contexts, exact signed radix conversion, Unicode normalization, Slug collisions, and U+/JS escape parsing including invalid scalar values. `tests/e2e/quick.spec.ts` covers all five locales in Chromium and Firefox across desktop/small viewports, explicit opt-in, errors, and no secret persistence or network-parameter leakage. Radix coverage includes a value above JavaScript's safe-integer range and invalid base digits.
 
 Base64 text conversion includes RFC 4648, Unicode, BOM, invalid UTF-8, alphabet/padding and size-limit unit tests. `tests/e2e/base64.spec.ts` covers fresh-install opt-in, standard and URL-safe conversions in all five locales across Chromium/Firefox desktop/small, noncanonical/error handling, Worker execution, output download and privacy checks.

@@ -1,4 +1,5 @@
 export type ToolId =
+  | "content-disposition"
   | "server-timing"
   | "cache-control"
   | "pkce"
@@ -61,6 +62,11 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  {
+    id: "content-disposition", category: "network", wasm: false, devtoys: false,
+    keywords: "http content-disposition attachment inline filename filename* download utf8 header ファイル名 ダウンロード 保存名 文件名 檔名 파일명 다운로드",
+    color: "purple",
+  },
   {
     id: "server-timing", category: "network", wasm: false, devtoys: false,
     keywords: "http server-timing duration performance metrics header response latency 計測 応答 時間 性能 服务器 伺服器 시간 성능",

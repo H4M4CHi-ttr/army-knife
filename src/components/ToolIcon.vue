@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  "content-disposition": FileKey2,
   "server-timing": Activity,
   "cache-control": Activity,
   pkce: KeyRound,

@@ -115,6 +115,7 @@ describe("private browser preferences", () => {
     expect(migrated.enabledTools).toEqual([
       "csv",
       "sets",
+      "content-disposition",
       "server-timing",
       "cache-control",
       "pkce",
