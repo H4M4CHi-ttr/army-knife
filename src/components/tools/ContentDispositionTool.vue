@@ -35,7 +35,7 @@ function sample() { replace('Content-Disposition: attachment; filename="EURO rat
         <Button variant="ghost" size="sm" data-testid="disposition-clear" @click="replace('')">{{ t("actions.clear") }}</Button>
       </div>
     </div>
-    <CodeInput :key="revision" :model-value="input" :label="t('disposition.input')" input-id="disposition-input" :rows="5" :file="false" :max-bytes="DISPOSITION_LIMITS.bytes" placeholder="attachment; filename=report.csv" @update:model-value="accept" @rejected="rejected = true" />
+    <CodeInput :key="revision" :model-value="input" :label="t('disposition.input')" input-id="content-disposition-input" :rows="5" :file="false" :max-bytes="DISPOSITION_LIMITS.bytes" placeholder="attachment; filename=report.csv" @update:model-value="accept" @rejected="rejected = true" />
     <div class="run-bar">
       <p class="hint">{{ t("tool.content-disposition.hint") }}</p>
       <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />

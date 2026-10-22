@@ -41,23 +41,23 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await page.goto(`./${locale}/tools/content-disposition/`);
     await expect(page.locator("#page-guide")).toHaveAttribute("data-locale", locale);
     await expect(page.locator("#page-guide")).toContainText(m["tool.content-disposition.description"]);
-    await expect(page.locator("#disposition-input")).toHaveValue("");
+    await expect(page.locator("#content-disposition-input")).toHaveValue("");
     const result = page.getByTestId("disposition-result");
     await expect(result).toHaveCount(0);
     await page.getByTestId("disposition-sample").focus();
     await page.keyboard.press("Enter");
     await expect(page.getByTestId("disposition-selected")).toContainText('"€ rates.csv"');
     await expect(result).toContainText('"EURO rates.csv"');
-    await page.locator("#disposition-input").fill("attachment;filename=\"../fallback.csv\";filename*=UTF-8''safe%E2%80%AE.csv");
+    await page.locator("#content-disposition-input").fill("attachment;filename=\"../fallback.csv\";filename*=UTF-8''safe%E2%80%AE.csv");
     await expect(result.locator('[data-filename-note="path"]')).toHaveText(m["disposition.filename.path"]);
     await expect(result.locator('[data-filename-note="controls"]')).toHaveText(m["disposition.filename.controls"]);
     await expect(page.getByTestId("disposition-selected")).toContainText("\\u202e");
     const parameters = result.locator("summary");
     await parameters.focus(); await page.keyboard.press("Enter");
     await expect(result.locator(".disposition-parameters ul")).toBeVisible();
-    await page.locator("#disposition-input").fill("attachment;filename=old.csv;filename*=shift_jis'ja'%83e.csv");
+    await page.locator("#content-disposition-input").fill("attachment;filename=old.csv;filename*=shift_jis'ja'%83e.csv");
     await expect(page.getByTestId("disposition-selected")).toHaveText(m["disposition.unresolved"]);
-    await page.locator("#disposition-input").fill("attachment;filename=a;FILENAME=b");
+    await page.locator("#content-disposition-input").fill("attachment;filename=a;FILENAME=b");
     await expect(page.getByRole("alert")).toHaveText(m["errors.DISPOSITION_DUPLICATE"]);
     await expect(result).toHaveCount(0);
     await page.getByTestId("disposition-sample").click();
@@ -80,7 +80,7 @@ test("Content-Disposition explicit export, inert markup and clearing on reload/n
   });
   await page.goto("./en/tools/content-disposition/");
   const input = `attachment;filename="<img src='https://example.invalid/${PRIVATE}'>";filename*=UTF-8''report.csv`;
-  await page.locator("#disposition-input").fill(input);
+  await page.locator("#content-disposition-input").fill(input);
   const result = page.getByTestId("disposition-result");
   await expect(result).toContainText(PRIVATE);
   await expect(result.locator("img")).toHaveCount(0);
@@ -98,14 +98,14 @@ test("Content-Disposition explicit export, inert markup and clearing on reload/n
   const state = await page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage }, url: location.href, cookie: document.cookie }));
   expect(JSON.stringify(state)).not.toContain(PRIVATE);
   await page.reload();
-  await expect(page.locator("#disposition-input")).toHaveValue("");
+  await expect(page.locator("#content-disposition-input")).toHaveValue("");
   await expect(result).toHaveCount(0);
-  await page.locator("#disposition-input").fill(input);
+  await page.locator("#content-disposition-input").fill(input);
   if (await page.locator(".mobile-menu").isVisible()) await page.locator(".mobile-menu").click();
   await page.locator('a[href="/army-knife/en/tools/cidr/"]').first().click();
   await expect(page.locator("#cidr-input")).toBeVisible();
   await page.goBack();
-  await expect(page.locator("#disposition-input")).toHaveValue("");
+  await expect(page.locator("#content-disposition-input")).toHaveValue("");
 });
 
 test("Content-Disposition countdown, cancellation and keyboard manual apply", async ({ page }) => {
@@ -113,23 +113,23 @@ test("Content-Disposition countdown, cancellation and keyboard manual apply", as
   await page.goto("./en/tools/content-disposition/");
   await page.clock.pauseAt(new Date("2026-01-01T01:00:00Z"));
   const long = `attachment;x="${"a".repeat(1024)}";y="${"b".repeat(1024)}"`;
-  await page.locator("#disposition-input").fill(long);
+  await page.locator("#content-disposition-input").fill(long);
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "pending");
   await page.clock.fastForward(799);
   await expect(page.getByTestId("disposition-result")).toHaveCount(0);
   await page.clock.fastForward(1);
   await expect(page.getByTestId("disposition-result")).toBeVisible();
-  await page.locator("#disposition-input").fill(long + ";filename=a");
+  await page.locator("#content-disposition-input").fill(long + ";filename=a");
   await expect(page.getByTestId("disposition-result")).toHaveCount(0);
   await page.getByTestId("disposition-cancel").click();
   await page.clock.fastForward(1000);
   await expect(page.getByTestId("disposition-result")).toHaveCount(0);
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "cancelled");
   await page.getByTestId("auto-apply-toggle").uncheck();
-  await page.locator("#disposition-input").fill(long + ";filename=b");
+  await page.locator("#content-disposition-input").fill(long + ";filename=b");
   await page.getByTestId("apply-now").focus(); await page.keyboard.press("Enter");
   await expect(page.getByTestId("disposition-selected")).toContainText('"b"');
-  await page.locator("#disposition-input").fill(long + ";filename=c");
+  await page.locator("#content-disposition-input").fill(long + ";filename=c");
   await page.clock.fastForward(1000);
   await expect(page.getByTestId("disposition-result")).toHaveCount(0);
   await page.getByTestId("auto-apply-toggle").check();
@@ -140,7 +140,7 @@ test("Content-Disposition countdown, cancellation and keyboard manual apply", as
 test("Content-Disposition rejects oversized paste and malformed fields without stale exports", async ({ page }) => {
   await page.goto("./en/tools/content-disposition/");
   await page.getByTestId("disposition-sample").click();
-  const prevented = await page.locator("#disposition-input").evaluate((element) => {
+  const prevented = await page.locator("#content-disposition-input").evaluate((element) => {
     const event = new Event("paste", { bubbles: true, cancelable: true });
     Object.defineProperty(event, "clipboardData", { value: { getData: () => "x".repeat(8193) } });
     element.dispatchEvent(event); return event.defaultPrevented;
@@ -155,13 +155,13 @@ test("Content-Disposition rejects oversized paste and malformed fields without s
     ["attachment\nContent-Disposition: inline", "SYNTAX"],
     ["attachment;filename*0*=UTF-8''part", "CONTINUATION"],
   ]) {
-    await page.locator("#disposition-input").fill(input!);
+    await page.locator("#content-disposition-input").fill(input!);
     await expect(page.getByRole("alert")).toHaveText(dispositionMessages.en[`errors.DISPOSITION_${code}` as keyof typeof dispositionMessages.en]);
     await expect(page.getByTestId("disposition-result")).toHaveCount(0);
   }
   await page.getByTestId("disposition-clear").click();
   await expect(page.getByRole("alert")).toHaveCount(0);
-  await page.locator("#disposition-input").fill("inline");
+  await page.locator("#content-disposition-input").fill("inline");
   await expect(page.getByTestId("disposition-result")).toBeVisible();
 });
 
