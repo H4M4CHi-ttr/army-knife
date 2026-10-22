@@ -45,6 +45,7 @@ import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, t
 
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
 const ServerTimingTool = defineAsyncComponent(() => import("@/components/tools/ServerTimingTool.vue"));
+const ContentDispositionTool = defineAsyncComponent(() => import("@/components/tools/ContentDispositionTool.vue"));
 const CacheControlTool = defineAsyncComponent(() => import("@/components/tools/CacheControlTool.vue"));
 const JsonTool = defineAsyncComponent(() => import("@/components/tools/JsonTool.vue"));
 const CidrTool = defineAsyncComponent(() => import("@/components/tools/CidrTool.vue"));
@@ -849,6 +850,7 @@ onBeforeUnmount(() => {
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ServerTimingTool v-else-if="selectedTool.id === 'server-timing'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ContentDispositionTool v-else-if="selectedTool.id === 'content-disposition'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CacheControlTool v-else-if="selectedTool.id === 'cache-control'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <PkceTool v-else-if="selectedTool.id === 'pkce'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CorsTool v-else-if="selectedTool.id === 'cors'" :key="`${selectedTool.id}:${preferences.locale}`" />

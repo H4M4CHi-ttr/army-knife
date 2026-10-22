@@ -24,12 +24,14 @@ import { htmlAccessibilityMessages } from "./html-accessibility.ts";
 
 import { pkceMessages } from "./pkce.ts";
 import { serverTimingMessages } from "./server-timing.ts";
+import { dispositionMessages } from "./content-disposition.ts";
 import { cacheControlMessages } from "./cache-control.ts";
 import { corsMessages } from "./cors.ts";
 import { searchMessages } from "./search.ts";
 
 export const messages = {
   en: {
+    ...dispositionMessages.en,
     ...serverTimingMessages.en,
     ...cacheControlMessages.en,
     ...pkceMessages["en"],
@@ -55,6 +57,7 @@ export const messages = {
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
   },
   ja: {
+    ...dispositionMessages.ja,
     ...serverTimingMessages.ja,
     ...cacheControlMessages.ja,
     ...pkceMessages["ja"],
@@ -80,6 +83,7 @@ export const messages = {
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
   },
   "zh-CN": {
+    ...dispositionMessages["zh-CN"],
     ...serverTimingMessages["zh-CN"],
     ...cacheControlMessages["zh-CN"],
     ...pkceMessages["zh-CN"],
@@ -105,6 +109,7 @@ export const messages = {
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
   },
   "zh-TW": {
+    ...dispositionMessages["zh-TW"],
     ...serverTimingMessages["zh-TW"],
     ...cacheControlMessages["zh-TW"],
     ...pkceMessages["zh-TW"],
@@ -130,6 +135,7 @@ export const messages = {
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
   },
   ko: {
+    ...dispositionMessages.ko,
     ...serverTimingMessages.ko,
     ...cacheControlMessages.ko,
     ...pkceMessages["ko"],

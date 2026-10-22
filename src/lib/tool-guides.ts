@@ -1,4 +1,5 @@
 import { serverTimingGuide } from "./server-timing-guide.ts";
+import { dispositionGuide } from "./content-disposition-guide.ts";
 import { pkceGuide } from "./pkce-guide.ts";
 import { cacheControlGuide } from "./cache-control-guide.ts";
 import { corsGuide } from "./cors-guide.ts";
@@ -149,6 +150,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  "content-disposition": dispositionGuide,
   "server-timing": serverTimingGuide,
   "cache-control": cacheControlGuide,
   cors: corsGuide,

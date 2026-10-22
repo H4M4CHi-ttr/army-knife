@@ -184,6 +184,7 @@ describe("App integration with real local tools", () => {
       "tool-card-cache-control",
       "tool-card-chmod",
       "tool-card-cidr",
+      "tool-card-content-disposition",
       "tool-card-cors",
       "tool-card-css-units",
       "tool-card-csv",
