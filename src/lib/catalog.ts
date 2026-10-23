@@ -1,4 +1,5 @@
 export type ToolId =
+  | "git-patch"
   | "content-disposition"
   | "server-timing"
   | "cache-control"
@@ -62,6 +63,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "git-patch", category: "text", wasm: false, devtoys: false,
+    keywords: "git patch unified diff hunk rename added deleted inspect 差分 パッチ 変更 追加 削除 补丁 修補 패치 변경", color: "orange" },
   {
     id: "content-disposition", category: "network", wasm: false, devtoys: false,
     keywords: "http content-disposition attachment inline filename filename* download utf8 header ファイル名 ダウンロード 保存名 文件名 檔名 파일명 다운로드",

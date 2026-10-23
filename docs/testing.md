@@ -190,3 +190,13 @@ manual apply, pending cancellation, rejected-paste recovery and inert text.
 Chromium/Firefox desktop/small. It verifies keyboard operation, JSON copy/download,
 reload/navigation clearing and the exact-built-asset network/privacy audit. These
 tests exercise the offline inspector, not browser HTTP-cache conformance.
+
+## Git patch coverage (2026-10-24 JST)
+
+The [Git patch specification](git-patch.md) defines the supported two-way format
+and explicit failure of binary/combined/truncated input. Pure tests check hunk
+counts, exact large line numbers, zero/omitted ranges, metadata, CRLF and bounds.
+Real Vapor view tests cover selection, stale-result removal, delayed/manual/cancel
+operation, disposal, rejected pastes, inert markup and memory-only data. The
+four-project browser suite covers five languages, themes, keyboard controls,
+explicit whole-report export and the exact-dist-asset network privacy audit.
