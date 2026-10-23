@@ -1,3 +1,4 @@
+import { patchGuide } from "./git-patch-guide.ts";
 import { serverTimingGuide } from "./server-timing-guide.ts";
 import { dispositionGuide } from "./content-disposition-guide.ts";
 import { pkceGuide } from "./pkce-guide.ts";
@@ -150,6 +151,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  "git-patch": patchGuide,
   "content-disposition": dispositionGuide,
   "server-timing": serverTimingGuide,
   "cache-control": cacheControlGuide,

@@ -1,0 +1,64 @@
+import { flushPromises, mount, type VueWrapper } from "@vue/test-utils";
+import { defineComponent, h, vaporInteropPlugin } from "vue";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import GitPatchTool from "./GitPatchTool.vue";
+import { i18n } from "@/i18n";
+import { defaultPreferences, settings } from "@/lib/preferences";
+import { PATCH_SAMPLE } from "@/lib/tools/git-patch";
+let wrapper: VueWrapper;
+beforeEach(() => {
+  localStorage.clear(); sessionStorage.clear();
+  Object.assign(settings.preferences, defaultPreferences("en"));
+  i18n.global.locale.value = "en";
+  wrapper = mount(defineComponent({ render: () => h("div", [h(GitPatchTool)]) }), { global: { plugins: [vaporInteropPlugin, i18n] } });
+});
+afterEach(() => { wrapper?.unmount(); vi.useRealTimers(); });
+const result = () => wrapper.find('[data-testid="patch-result"]');
+const long = () => PATCH_SAMPLE.replace("+Welcome!", "+" + "x".repeat(2100));
+describe("Git patch Vapor view", () => {
+  it("updates instantly, selects files and clears stale exports after invalid input", async () => {
+    expect(result().exists()).toBe(false);
+    await wrapper.get("#git-patch-input").setValue(PATCH_SAMPLE);
+    expect(result().text()).toContain("+2");
+    expect(wrapper.findAll("details.patch-hunk")).toHaveLength(1);
+    await wrapper.get("#patch-file").setValue("1");
+    expect(wrapper.findAll("details.patch-hunk")).toHaveLength(0);
+    expect(result().text()).toContain("rename to new.txt");
+    await wrapper.get("#git-patch-input").setValue(PATCH_SAMPLE + "extra");
+    expect(result().exists()).toBe(false);
+    expect(wrapper.get('[role="alert"]').text()).toContain("Malformed");
+    await wrapper.get('[data-testid="patch-sample"]').trigger("click");
+    expect(wrapper.get<HTMLSelectElement>("#patch-file").element.value).toBe("0");
+    await wrapper.get('[data-testid="patch-clear"]').trigger("click");
+    expect(result().exists()).toBe(false);
+  });
+  it("supports delayed/manual/cancel operation and disposal", async () => {
+    vi.useFakeTimers();
+    await wrapper.get("#git-patch-input").setValue(long());
+    expect(wrapper.get('[data-testid="apply-control"]').attributes("data-status")).toBe("pending");
+    await vi.advanceTimersByTimeAsync(799); expect(result().exists()).toBe(false);
+    await vi.advanceTimersByTimeAsync(1); await flushPromises(); expect(result().exists()).toBe(true);
+    await wrapper.get("#git-patch-input").setValue(long() + "\n");
+    await wrapper.get('[data-testid="patch-cancel"]').trigger("click");
+    await vi.advanceTimersByTimeAsync(1000); expect(result().exists()).toBe(false);
+    await wrapper.get('[data-testid="auto-apply-toggle"]').setValue(false);
+    await wrapper.get("#git-patch-input").setValue(long());
+    await vi.advanceTimersByTimeAsync(1000); expect(result().exists()).toBe(false);
+    await wrapper.get('[data-testid="apply-now"]').trigger("click"); expect(result().exists()).toBe(true);
+    await wrapper.get('[data-testid="auto-apply-toggle"]').setValue(true);
+    await wrapper.get("#git-patch-input").setValue(long() + "\n"); wrapper.unmount();
+    await vi.advanceTimersByTimeAsync(1000); expect(vi.getTimerCount()).toBe(0);
+  });
+  it("rejects oversized paste, keeps markup inert and input private", async () => {
+    const privatePatch = PATCH_SAMPLE.replace("+Welcome!", "+<img src='https://example.invalid/PRIVATE_PATCH_791'>");
+    await wrapper.get("#git-patch-input").setValue(privatePatch);
+    expect(result().find("img").exists()).toBe(false);
+    expect(result().text()).toContain("PRIVATE_PATCH_791");
+    expect(JSON.stringify({ ...localStorage, ...sessionStorage })).not.toContain("PRIVATE_PATCH_791");
+    expect(location.href).not.toContain("PRIVATE_PATCH_791");
+    const paste = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(paste, "clipboardData", { value: { getData: () => "x".repeat(65537) } });
+    wrapper.get("#git-patch-input").element.dispatchEvent(paste); await flushPromises();
+    expect(paste.defaultPrevented).toBe(true); expect(result().exists()).toBe(false);
+  });
+});
