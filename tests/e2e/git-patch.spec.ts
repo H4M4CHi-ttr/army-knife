@@ -60,6 +60,7 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     for (const theme of ["light", "dark"] as const) {
       await page.getByTestId("settings-button").click();
       await page.getByTestId(`theme-${theme}`).click(); await page.getByTestId("settings-close").click();
+      await page.evaluate(() => { (document.activeElement as HTMLElement)?.blur(); window.scrollTo(0, 0); });
       const size = await page.evaluate(() => ({ viewport: document.documentElement.clientWidth, content: document.documentElement.scrollWidth }));
       expect(size.content).toBeLessThanOrEqual(size.viewport + 1);
       await testInfo.attach(`git-patch-${locale}-${theme}`, { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
@@ -130,6 +131,7 @@ test("Git patch rejects unsupported, truncated and oversized input without parti
   await page.goto("./en/tools/git-patch/");
   for (const [input, code] of [
     [PATCH_SAMPLE.replace("@@ -1,2 +1,3 @@", "@@ -1,9 +1,3 @@"), "SYNTAX"],
+    ["diff --git a/x b/x\nnew file mode 100644\nindex 0000000..64700d8\n", "SYNTAX"],
     ["diff --git a/x b/x\nGIT binary patch\nliteral 1\nA\n", "UNSUPPORTED"],
     ["diff --cc a\n", "UNSUPPORTED"],
     ["diff --git a/x b/x\nold mode 100644\nnew mode 100755\n".repeat(51), "LIMIT"],

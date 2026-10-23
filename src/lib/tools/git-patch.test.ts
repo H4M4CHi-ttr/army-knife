@@ -78,6 +78,23 @@ describe("recorded Git patch inspection", () => {
     "--- a/x\n+++ b/x\n@@ -1 +1 @@\n-a\n+b\n",
     "From 123 Mon Sep 17 00:00:00 2001\n" + patch,
   ])("rejects unsupported formats explicitly", input => fails(input, "PATCH_UNSUPPORTED"));
+  it.each([
+    "new file mode 100644\nindex 0000000..64700d8\n",
+    "deleted file mode 100644\nindex 64700d8..0000000\n",
+    "old mode 100644\nnew mode 100755\nindex 7898192..6178079\n",
+    "similarity index 50%\nrename from x\nrename to y\nindex 7898192..6178079 100644\n",
+    "similarity index 50%\ncopy from x\ncopy to y\n",
+    "new file mode 100644\n",
+  ])("rejects truncated content hidden by metadata-only headers", metadata => {
+    fails("diff --git a/x b/y\n" + metadata, "PATCH_SYNTAX");
+  });
+  it("keeps empty added/deleted files with SHA-1 or SHA-256 empty-blob indexes", () => {
+    for (const empty of ["e69de29", "473a0f4", "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"]) {
+      const add = `diff --git a/x b/x\nnew file mode 100644\nindex 0000000..${empty}\n`;
+      const del = `diff --git a/x b/x\ndeleted file mode 100644\nindex ${empty}..0000000\n`;
+      expect(inspectGitPatch(add + del)).toMatchObject({ hunks: 0, additions: 0, deletions: 0 });
+    }
+  });
   it("enforces input, line, file and hunk bounds without truncation", () => {
     fails("x".repeat(PATCH_LIMITS.bytes + 1), "INPUT_TOO_LARGE");
     fails("界".repeat(22000), "INPUT_TOO_LARGE");

@@ -7,6 +7,8 @@ export interface PatchFile { header: string; oldPath: string | null; newPath: st
 export interface GitPatchReport { files: PatchFile[]; hunks: number; additions: number; deletions: number }
 export const PATCH_SAMPLE = "diff --git a/greeting.txt b/greeting.txt\nindex 1234567..abcdef0 100644\n--- a/greeting.txt\n+++ b/greeting.txt\n@@ -1,2 +1,3 @@ greeting\n Hello\n-world\n+developer\n+Welcome!\ndiff --git a/old.txt b/new.txt\nsimilarity index 100%\nrename from old.txt\nrename to new.txt\n";
 function fail(code = "PATCH_SYNTAX"): never { throw new ToolError(code); }
+const EMPTY_BLOBS = ["e69de29bb2d1d6434b8b29ae775ad8c2e48c5391", "473a0f4c3be8a93681a267e3b1e9a7dcda1185436fe141f7749120a303721813"];
+const isEmptyBlob = (hash: string) => EMPTY_BLOBS.some(empty => empty.startsWith(hash));
 const unsupported = (line: string) => /^(?:diff --(?:cc|combined) |GIT binary patch$|Binary files |@@@)/.test(line);
 
 /** Read-only structural inspection. Paths and content never become file operations. */
@@ -27,6 +29,8 @@ export function inspectGitPatch(input: string): GitPatchReport {
     const file: PatchFile = { header: fileHeader[1]!, oldPath: null, newPath: null, metadata: [], hunks: [], additions: 0, deletions: 0 };
     let oldEnd = 0n, newEnd = 0n;
     const metadataKinds = new Set<string>();
+    let indexHashes: readonly [string, string] | null = null;
+    let similarity: number | null = null;
     while (position < lines.length && !lines[position]!.startsWith("diff --git ")) {
       const line = lines[position]!;
       if (unsupported(line)) fail("PATCH_UNSUPPORTED");
@@ -79,9 +83,13 @@ export function inspectGitPatch(input: string): GitPatchReport {
       }
       if (file.oldPath !== null) fail();
       let kind: string | null = null;
-      if (/^index [0-9a-f]{4,64}\.\.[0-9a-f]{4,64}(?: [0-7]{6})?$/.test(line)) kind = "index";
+      const index = /^index ([0-9a-f]{4,64})\.\.([0-9a-f]{4,64})(?: [0-7]{6})?$/.exec(line);
+      if (index) { kind = "index"; indexHashes = [index[1]!, index[2]!]; }
       else if (/^(?:old mode|new mode|new file mode|deleted file mode) [0-7]{6}$/.test(line)) kind = line.slice(0, line.lastIndexOf(" "));
-      else if (/^(?:similarity|dissimilarity) index (?:100|[1-9]?\d)%$/.test(line)) kind = line.split(" ")[0]!;
+      else if (/^(?:similarity|dissimilarity) index (?:100|[1-9]?\d)%$/.test(line)) {
+        kind = line.split(" ")[0]!;
+        similarity = kind === "similarity" ? Number(line.slice(17, -1)) : 100 - Number(line.slice(20, -1));
+      }
       else {
         const path = /^(rename from|rename to|copy from|copy to) (.+)$/.exec(line);
         if (path) kind = path[1]!;
@@ -96,7 +104,19 @@ export function inspectGitPatch(input: string): GitPatchReport {
     if (metadataKinds.has("old mode") !== metadataKinds.has("new mode")) fail();
     if (metadataKinds.has("new file mode") && metadataKinds.has("deleted file mode")) fail();
     if (file.oldPath !== null && !file.hunks.length) fail();
-    if (!file.hunks.length && !["rename from", "copy from", "old mode", "new file mode", "deleted file mode"].some(k => metadataKinds.has(k))) fail();
+    if (!file.hunks.length) {
+      const added = metadataKinds.has("new file mode"), deleted = metadataKinds.has("deleted file mode");
+      if (added || deleted) {
+        // A new/deleted nonempty blob requires a body. Empty Git blobs have known
+        // SHA-1/SHA-256 hashes; retain Git's usual abbreviations without rounding.
+        if (!indexHashes || !/^0+$/.test(indexHashes[added ? 0 : 1]) || !isEmptyBlob(indexHashes[added ? 1 : 0])) fail();
+      } else {
+        if (indexHashes && indexHashes[0] !== indexHashes[1]) fail();
+        if (similarity !== null && similarity !== 100) fail();
+        if ((metadataKinds.has("rename from") || metadataKinds.has("copy from")) && similarity !== 100) fail();
+      }
+      if (!["rename from", "copy from", "old mode", "new file mode", "deleted file mode"].some(k => metadataKinds.has(k))) fail();
+    }
     report.files.push(file); report.additions += file.additions; report.deletions += file.deletions;
   }
   return report;

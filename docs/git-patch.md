@@ -27,7 +27,10 @@ This is a scoped structural inspector, not a guarantee that a patch can apply.
 Reject malformed/truncated hunks, unsupported/unknown records, binary patches,
 combined diff, mail preambles, and standalone non-Git unified diff. Never return
 partial totals after an error. Empty files and metadata-only mode/rename/copy
-sections are supported. Display all accepted rows; do not silently truncate.
+sections are supported. With no text hunks, new/deleted files require an empty-blob
+SHA-1/SHA-256 index abbreviation; rename/copy sections require 100% similarity,
+and unequal index hashes or non-100% similarity reject a missing body. Pure mode
+changes without an index remain supported. Display all accepted rows; do not silently truncate.
 
 Limits: UTF-8 64 KiB, 2,000 physical lines, 50 files, 200 hunks total, hunk range
 starts at most 20 decimal digits. Short input (up to 2,048 UTF-16 units) updates
@@ -50,3 +53,33 @@ truncation, extra/overlapping rows, binary/combined records, bounds and inert
 markup. Test view invalidation, rejected pastes, clear/disposal, scheduling,
 keyboard, five languages, both themes, export and memory-only privacy. Run all
 repository quality gates on the final commit and review screenshots before merge.
+
+## Review and visual evidence
+
+Independent read-only review of the initial implementation found one issue:
+truncated new/deleted-file, edited mode, or rename/copy metadata could hide a
+missing content body. Six reproductions failed before the fix and pass afterward;
+the actual new guide's complete patch reports 14 additions while its truncated
+header now rejects. The full unit suite passes 894 tests after this fix.
+
+Local final code passed type checking, Vapor (38 SFCs), lint (10 pre-existing
+warnings), 22 distribution/script tests, production build, 270 localized static
+pages and the asset/font/license graph verification. Actual unchanged WASM smoke
+checks passed; local Rust regeneration is unavailable. Local WASM/fonts were
+reused only from successful exact-base main run 39868064022 attempt 3, with the
+artifact ZIP digest verified. CI remains responsible for fresh final-head
+Rust/Clippy/WASM/font generation and the entire Chromium/Firefox suite.
+
+The complete Chromium suite passed 298 tests before the review fix; the final
+code then passed all 16 dedicated Chromium tests, including the new truncation
+regression. Local Firefox cannot run reliably in this cloud sandbox (initial
+profile-directory failure; after configuring writable XDG paths, a target crash).
+No browser-security flags were changed. Final CI results are recorded in the PR.
+
+The following synthetic-example screenshots were inspected for clipped text,
+control overlap and overflow at desktop and 390px width:
+
+- [English light, desktop](screenshots/git-patch-en-light-desktop.png)
+- [English light, small](screenshots/git-patch-en-light-small.png)
+- [Japanese dark, desktop](screenshots/git-patch-ja-dark-desktop.png)
+- [Japanese dark, small](screenshots/git-patch-ja-dark-small.png)
