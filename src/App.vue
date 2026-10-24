@@ -43,6 +43,7 @@ import { ClassifierClient } from "@/lib/search/classifier-client";
 import { combineClassifierRankings } from "@/lib/search/classifier-runtime";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
+const HttpRangeTool = defineAsyncComponent(() => import("@/components/tools/HttpRangeTool.vue"));
 const GitPatchTool = defineAsyncComponent(() => import("@/components/tools/GitPatchTool.vue"));
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
 const ServerTimingTool = defineAsyncComponent(() => import("@/components/tools/ServerTimingTool.vue"));
@@ -850,6 +851,7 @@ onBeforeUnmount(() => {
             />
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <HttpRangeTool v-else-if="selectedTool.id === 'http-range'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GitPatchTool v-else-if="selectedTool.id === 'git-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ServerTimingTool v-else-if="selectedTool.id === 'server-timing'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ContentDispositionTool v-else-if="selectedTool.id === 'content-disposition'" :key="`${selectedTool.id}:${preferences.locale}`" />

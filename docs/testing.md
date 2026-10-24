@@ -200,3 +200,13 @@ Real Vapor view tests cover selection, stale-result removal, delayed/manual/canc
 operation, disposal, rejected pastes, inert markup and memory-only data. The
 four-project browser suite covers five languages, themes, keyboard controls,
 explicit whole-report export and the exact-dist-asset network privacy audit.
+
+## HTTP byte range coverage (2026-10-25 JST)
+
+The [byte range specification](http-range.md) defines exact inclusive interval
+resolution, suffix/zero semantics, strict grammar and bounds. Unit tests cover
+large decimal precision, clamping, mixed satisfiability and union vs member sums.
+Real Vapor tests cover dual-input invalidation, paste rejection, delayed/manual
+apply, cancel and disposal. The four-project browser suite checks five locales,
+themes, keyboard, narrow widths, explicit JSON exports, lifecycle clearing and
+the exact-distribution-asset network/privacy audit with synthetic values.
