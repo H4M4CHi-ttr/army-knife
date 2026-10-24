@@ -27,22 +27,22 @@
 
 **Files:** `src/lib/tools/http-range.ts`, `src/lib/tools/http-range.test.ts`.
 **Interfaces:** Produce `inspectHttpRanges(input: string, length: string): HttpRangeReport`, `HTTP_RANGE_LIMITS` and `HTTP_RANGE_SAMPLE`.
-- [ ] Write and run failing semantic/boundary/malformed/limit vectors.
-- [ ] Implement bounded parsing, BigInt resolution and union; pass vectors.
+- [x] Write and run failing semantic/boundary/malformed/limit vectors.
+- [x] Implement bounded parsing, BigInt resolution and union; pass vectors.
 
 ### Task 2: Integrated view
 
 **Files:** `src/components/tools/HttpRangeTool.vue`, view tests, catalog/App/icon, `src/i18n/http-range.ts`, messages, `src/lib/http-range-guide.ts`, guides, README, overlap/testing docs.
 **Interfaces:** Consume engine report; expose `/{locale}/tools/http-range/`.
-- [ ] Write and run failing view tests for immediate dual-input updates, lifecycle, scheduling and paste rejection.
-- [ ] Implement localized Vapor view/guides; type/unit/Vapor checks.
-- [ ] Commit, push isolated branch, initially draft PR.
+- [x] Write and run failing view tests for immediate dual-input updates, lifecycle, scheduling and paste rejection.
+- [x] Implement localized Vapor view/guides; type/unit/Vapor checks.
+- [x] Commit, push isolated branch, initially draft PR.
 
 ### Task 3: Release
 
 **Files:** `tests/e2e/http-range.spec.ts`, synthetic screenshots and evidence.
 **Interfaces:** Exercise production route with exact-dist-asset privacy audit.
-- [ ] Five locales, themes/keyboard/mobile, errors, export, delay/manual/cancel, memory-only lifecycle in four projects.
-- [ ] Independent review; fix substantive findings with regression tests.
+- [x] Five locales, themes/keyboard/mobile, errors, export, delay/manual/cancel, memory-only lifecycle in four projects.
+- [x] Independent review; fix substantive findings with regression tests.
 - [ ] All final-head checks, ready PR, recheck main/conflicts/head/checks/reviews; normal merge.
 - [ ] Confirm main contains merge; monitor automatic Pages deployment and public UI or precise blocker.

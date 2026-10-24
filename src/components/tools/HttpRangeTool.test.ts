@@ -78,4 +78,21 @@ describe("HTTP byte range Vapor view", () => {
     expect(wrapper.find("img").exists()).toBe(false);
     expect(JSON.stringify({ ...localStorage, ...sessionStorage })).not.toContain("PRIVATE_RANGE_51");
   });
+  it.each([
+    ["#http-range-input", "#http-range-length", "2000", "bytes=0-49"],
+    ["#http-range-length", "#http-range-input", "bytes=0-49", "2000"],
+  ])("keeps a rejected %s invalid when only the other field is edited", async (rejectedField, otherField, otherValue, recoveryValue) => {
+    await wrapper.get('[data-testid="range-sample"]').trigger("click");
+    const reject = async () => {
+      const paste = new Event("paste", { bubbles: true, cancelable: true });
+      Object.defineProperty(paste, "clipboardData", { value: { getData: () => "x".repeat(8193) } });
+      wrapper.get(rejectedField!).element.dispatchEvent(paste); await flushPromises();
+    };
+    await reject(); expect(result().exists()).toBe(false);
+    await wrapper.get(otherField!).setValue(otherValue!);
+    expect(result().exists()).toBe(false);
+    await reject(); expect(result().exists()).toBe(false);
+    await wrapper.get(rejectedField!).setValue(recoveryValue!);
+    expect(result().exists()).toBe(true);
+  });
 });

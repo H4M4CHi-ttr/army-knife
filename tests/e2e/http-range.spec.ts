@@ -150,6 +150,17 @@ test("HTTP range bounds and invalid fields clear every previous export", async (
     })).toBe(true);
     await expect(result).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Download", exact: true })).toHaveCount(0);
+    const other = selector === "#http-range-input" ? "#http-range-length" : "#http-range-input";
+    await page.locator(other).fill(selector === "#http-range-input" ? "2000" : "bytes=0-49");
+    await expect(result).toHaveCount(0);
+    await page.locator(selector).evaluate((element) => {
+      const event = new Event("paste", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "clipboardData", { value: { getData: () => "x".repeat(8193) } });
+      element.dispatchEvent(event);
+    });
+    await expect(result).toHaveCount(0);
+    await page.locator(selector).fill(selector === "#http-range-input" ? "bytes=0-49" : "2000");
+    await expect(result).toBeVisible();
   }
   await page.getByTestId("range-sample").click();
   for (const [input, code] of [

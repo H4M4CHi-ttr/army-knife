@@ -12,7 +12,9 @@ import { HTTP_RANGE_LIMITS, HTTP_RANGE_SAMPLE, inspectHttpRanges } from "@/lib/t
 const { t } = useAppI18n();
 const input = ref("");
 const length = ref("");
-const rejected = ref(false);
+const inputRejected = ref(false);
+const lengthRejected = ref(false);
+const rejected = computed(() => inputRejected.value || lengthRejected.value);
 const revision = ref(0);
 const source = computed(() => ({ input: input.value, length: length.value, rejected: rejected.value }));
 const { result, error, control, apply, cancel, setAuto } = useToolExecution({
@@ -22,9 +24,9 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution({
   execute: () => inspectHttpRanges(input.value, length.value),
 });
 const output = computed(() => result.value ? JSON.stringify(result.value, null, 2) : "");
-function acceptInput(value: string) { rejected.value = false; input.value = value; }
-function acceptLength(value: string) { rejected.value = false; length.value = value; }
-function replace(value: string, size: string) { revision.value++; rejected.value = false; input.value = value; length.value = size; }
+function acceptInput(value: string) { inputRejected.value = false; input.value = value; }
+function acceptLength(value: string) { lengthRejected.value = false; length.value = value; }
+function replace(value: string, size: string) { revision.value++; inputRejected.value = false; lengthRejected.value = false; input.value = value; length.value = size; }
 </script>
 
 <template>
@@ -36,8 +38,8 @@ function replace(value: string, size: string) { revision.value++; rejected.value
         <Button variant="ghost" size="sm" data-testid="range-clear" @click="replace('', '')">{{ t("actions.clear") }}</Button>
       </div>
     </div>
-    <CodeInput :key="'range-' + revision" :model-value="input" :label="t('range.input')" input-id="http-range-input" :rows="4" :file="false" :max-bytes="HTTP_RANGE_LIMITS.bytes" placeholder="bytes=0-99, -50" @update:model-value="acceptInput" @rejected="rejected = true" />
-    <CodeInput :key="'length-' + revision" :model-value="length" :label="t('range.length')" input-id="http-range-length" :rows="2" :file="false" :max-bytes="56" placeholder="1000" @update:model-value="acceptLength" @rejected="rejected = true" />
+    <CodeInput :key="'range-' + revision" :model-value="input" :label="t('range.input')" input-id="http-range-input" :rows="4" :file="false" :max-bytes="HTTP_RANGE_LIMITS.bytes" placeholder="bytes=0-99, -50" @update:model-value="acceptInput" @rejected="inputRejected = true" />
+    <CodeInput :key="'length-' + revision" :model-value="length" :label="t('range.length')" input-id="http-range-length" :rows="2" :file="false" :max-bytes="56" placeholder="1000" @update:model-value="acceptLength" @rejected="lengthRejected = true" />
     <div class="run-bar">
       <p class="hint">{{ t("tool.http-range.hint") }}</p>
       <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />
