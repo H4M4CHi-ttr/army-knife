@@ -1,4 +1,5 @@
 export type ToolId =
+  | "http-range"
   | "git-patch"
   | "content-disposition"
   | "server-timing"
@@ -63,6 +64,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "http-range", category: "network", wasm: false, devtoys: false,
+    keywords: "http range bytes content-range partial download resume suffix overlap バイト 範囲 再開 下载 位元組 범위 다운로드", color: "blue" },
   { id: "git-patch", category: "text", wasm: false, devtoys: false,
     keywords: "git patch unified diff hunk rename added deleted inspect 差分 パッチ 変更 追加 削除 补丁 修補 패치 변경", color: "orange" },
   {
