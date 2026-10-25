@@ -197,6 +197,7 @@ describe("App integration with real local tools", () => {
       "tool-card-html-accessibility",
       "tool-card-http-range",
       "tool-card-http-reference",
+      "tool-card-idn",
       "tool-card-json-diff",
       "tool-card-logs",
       "tool-card-magic",

@@ -57,6 +57,8 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await page.locator("#idn-input").fill("pаypal.example");
     await expect(result).toContainText(m["idn.warning.mixed"]);
     await expect(result).toContainText(m["idn.warning.lookalike"]);
+    await page.locator("#idn-input").fill("bücher.123.example");
+    await expect(page.getByTestId("idn-ascii")).toHaveText("xn--bcher-kva.123.example");
     await page.locator("#idn-input").fill("BÜCHER。ＥＸＡＭＰＬＥ．");
     await expect(page.getByTestId("idn-ascii")).toHaveText("xn--bcher-kva.example.");
     await page.getByTestId("idn-sample").click();
@@ -152,6 +154,15 @@ test("IDN bounds, malformed ACE and URL/IP syntax clear previous exports", async
   })).toBe(true);
   await expect(result).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Download", exact: true })).toHaveCount(0);
+  await page.getByTestId("idn-sample").click();
+  expect(await page.locator("#idn-input").evaluate((element) => {
+    const files = new DataTransfer();
+    files.items.add(new File(["new.example"], "domain.txt", { type: "text/plain" }));
+    const event = new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: files });
+    element.dispatchEvent(event); return event.defaultPrevented;
+  })).toBe(true);
+  await expect(result).toHaveCount(0);
+  await expect(page.locator("#idn-input")).toBeEnabled();
   for (const [input, code] of [
     ["xn--a.example", "SYNTAX"], ["xn--abc-.example", "SYNTAX"], ["a..example", "SYNTAX"],
     ["https://example.com", "SYNTAX"], ["example.com:80", "SYNTAX"], ["example.com\n", "SYNTAX"],

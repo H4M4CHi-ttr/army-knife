@@ -11,6 +11,10 @@ describe("IDN domain inspector", () => {
     ["faß.de", "xn--fa-hia.de", "faß.de"],
     ["e\u0301.example", "xn--9ca.example", "é.example"],
     ["a｡b", "a.b", "a.b"],
+    ["123.example", "123.example", "123.example"],
+    ["09.example", "09.example", "09.example"],
+    ["0x7f.example", "0x7f.example", "0x7f.example"],
+    ["bücher.123.example", "xn--bcher-kva.123.example", "bücher.123.example"],
   ])("normalizes and decodes %s", (input, ascii, unicode) => {
     const report = inspectIdn(input);
     expect(report).toMatchObject({ input, ascii, unicode, changed: input !== unicode, absolute: ascii.endsWith(".") });

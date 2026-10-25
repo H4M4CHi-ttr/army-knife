@@ -16,7 +16,8 @@ No package, Worker, Rust, telemetry, font or publishing configuration changes.
 
 ## Input and interpretation
 
-- One domain only, up to 2 KiB UTF-8. No surrounding whitespace, URLs, ports,
+- One domain only, up to 2 KiB UTF-8. File drops are rejected before reading.
+  No surrounding whitespace, URLs, ports,
   credentials, paths, percent escapes, controls or unpaired surrogates.
 - Map U+3002, U+FF0E and U+FF61 domain separators to ASCII dots. Permit one final
   root dot and retain it in both outputs. Reject empty labels, IP addresses and

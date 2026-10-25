@@ -69,4 +69,19 @@ describe("IDN Vapor view", () => {
     expect(wrapper.find("a").exists()).toBe(false);
     expect(JSON.stringify({ ...localStorage, ...sessionStorage })).not.toContain("idn-9167");
   });
+  it("rejects file drops immediately without reading them or retaining old exports", async () => {
+    await wrapper.get('[data-testid="idn-sample"]').trigger("click");
+    const file = new File(["new.example"], "domain.txt", { type: "text/plain" });
+    const read = vi.fn(() => new Promise<ArrayBuffer>(() => {}));
+    Object.defineProperty(file, "arrayBuffer", { value: read });
+    const drop = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(drop, "dataTransfer", { value: { files: [file], getData: () => "" } });
+    wrapper.get("#idn-input").element.dispatchEvent(drop); await flushPromises();
+    expect(drop.defaultPrevented).toBe(true);
+    expect(result().exists()).toBe(false);
+    expect(wrapper.get("#idn-input").attributes("disabled")).toBeUndefined();
+    expect(read).not.toHaveBeenCalled();
+    await wrapper.get("#idn-input").setValue("new.example");
+    expect(result().exists()).toBe(true);
+  });
 });

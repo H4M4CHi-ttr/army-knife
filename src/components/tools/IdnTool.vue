@@ -23,10 +23,16 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution({
 const output = computed(() => result.value ? JSON.stringify(result.value, null, 2) : "");
 function accept(value: string) { rejected.value = false; input.value = value; }
 function replace(value: string) { revision.value++; rejected.value = false; input.value = value; }
+function rejectFileDrop(event: DragEvent) {
+  if (!event.dataTransfer?.files.length) return;
+  event.preventDefault();
+  event.stopPropagation();
+  rejected.value = true;
+}
 </script>
 
 <template>
-  <div class="tool-panel">
+  <div class="tool-panel" @drop.capture="rejectFileDrop">
     <div class="tool-toolbar">
       <div class="toolbar-label"><span class="step-number">01</span>{{ t("labels.input") }}</div>
       <div class="control-row">

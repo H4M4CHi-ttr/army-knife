@@ -85,9 +85,10 @@ export function inspectIdn(input: string): IdnReport {
   if (domain.length > IDN_LIMITS.domainBytes || rawLabels.length > IDN_LIMITS.labels || rawLabels.some(l => l.length > IDN_LIMITS.labelBytes)) fail("IDN_LIMIT");
   const labels = rawLabels.map((ascii): IdnLabel => {
     if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(ascii)) fail();
-    const unicode = ascii.startsWith("xn--") ? decodePunycode(ascii.slice(4)) : ascii;
+    const encoded = ascii.startsWith("xn--");
+    const unicode = encoded ? decodePunycode(ascii.slice(4)) : ascii;
     // Reject fake ACE forms, invalid Unicode mappings and noncanonical encodings.
-    if (mapHost(unicode) !== ascii) fail();
+    if (encoded && mapHost(unicode) !== ascii) fail();
     const codePoints = Array.from(unicode, (character): IdnCodePoint => ({
       character, point: `U+${character.codePointAt(0)!.toString(16).toUpperCase().padStart(4, "0")}`, script: scriptOf(character),
     }));
