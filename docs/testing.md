@@ -210,3 +210,17 @@ Real Vapor tests cover dual-input invalidation, paste rejection, delayed/manual
 apply, cancel and disposal. The four-project browser suite checks five locales,
 themes, keyboard, narrow widths, explicit JSON exports, lifecycle clearing and
 the exact-distribution-asset network/privacy audit with synthetic values.
+
+## IDN / Punycode domain coverage (2026-10-26 JST)
+
+`src/lib/tools/idn.test.ts` covers RFC/Unicode vectors, separator and width mapping,
+emoji, normalized spelling, round trips, script advisory limitations, malformed
+ACE, IP/URL rejection, byte/label/domain limits and input-free error messages.
+`IdnTool.test.ts` exercises real Vapor updates, all-or-nothing invalidation,
+rejected paste, deferred/manual/cancel/dispose behavior and memory-only rendering.
+`tests/e2e/idn.spec.ts` runs the production route in all four browser projects:
+five locales, themes, keyboard, responsive screenshots, exact JSON export,
+malformed inputs, bounds, delayed/manual/cancel and navigation/reload clearing.
+Its exact-dist-asset audit checks external requests, query/body/header leakage,
+WebSockets and browser errors. Synthetic domains are rendered only as text.
+This verifies the offline inspector, not domain safety or a DNS service.

@@ -1,4 +1,5 @@
 export type ToolId =
+  | "idn"
   | "http-range"
   | "git-patch"
   | "content-disposition"
@@ -64,6 +65,7 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "idn", category: "network", wasm: false, devtoys: false, keywords: "idn punycode domain hostname unicode ascii xn-- internationalized homoglyph ドメイン 国際化 域名 網域 도메인", color: "purple" },
   { id: "http-range", category: "network", wasm: false, devtoys: false,
     keywords: "http range bytes content-range partial download resume suffix overlap バイト 範囲 再開 下载 位元組 범위 다운로드", color: "blue" },
   { id: "git-patch", category: "text", wasm: false, devtoys: false,
