@@ -1,3 +1,10 @@
+import { idnGuide } from "./idn-guide.ts";
+import { httpRangeGuide } from "./http-range-guide.ts";
+import { patchGuide } from "./git-patch-guide.ts";
+import { serverTimingGuide } from "./server-timing-guide.ts";
+import { dispositionGuide } from "./content-disposition-guide.ts";
+import { pkceGuide } from "./pkce-guide.ts";
+import { cacheControlGuide } from "./cache-control-guide.ts";
 import { corsGuide } from "./cors-guide.ts";
 import type { ToolId } from "./catalog";
 import type { Locale } from "./preferences";
@@ -63,7 +70,7 @@ export const guideLabels = {
     disabled:
       "このブラウザーではこのツールが無効になっています。使うには設定で有効にしてください。説明ページを開いても設定は変更されません。",
     privacy:
-      "入力はブラウザー内のメモリーで処理します。入力を外部送信、保存、ページ URL に埋め込みません。保存するのは設定だけです。",
+      "入力はブラウザー内のメモリーで処理し、外部送信・保存・URLへの埋め込みはしません。アプリが保存するのは設定だけです。サイトの閲覧状況は Google Analytics 4 で計測し、計測用 Cookie 等が使用される場合があります。",
   },
   en: {
     usage: "How to use",
@@ -82,7 +89,7 @@ export const guideLabels = {
     disabled:
       "This tool is disabled in this browser. Enable it in Settings to use it. Opening its guide does not change your preferences.",
     privacy:
-      "Inputs are processed in browser memory. They are not sent elsewhere, stored, or included in the page URL. Only preferences are saved.",
+      "Tool inputs stay in browser memory; they are never transmitted, saved or added to the page URL. The app only stores preferences. Google Analytics 4 measures site usage and may use analytics cookies.",
   },
   "zh-CN": {
     usage: "使用方法",
@@ -97,7 +104,7 @@ export const guideLabels = {
     availability: "无论工具是否启用，都可以阅读此说明页。交互界面遵循保存在此浏览器中的设置。",
     disabledTitle: "此工具已停用",
     disabled: "此浏览器中的此工具已停用。请在设置中启用后使用。打开说明页不会更改您的设置。",
-    privacy: "输入仅在浏览器内存中处理，不会发送到外部、保存或嵌入页面 URL。仅保存偏好设置。",
+    privacy: "工具输入仅在浏览器内存中处理，不会对外传输、保存或写入 URL。应用仅保存偏好设置。网站使用 Google Analytics 4 统计访问情况，可能使用统计 Cookie。",
   },
   "zh-TW": {
     usage: "使用方式",
@@ -112,7 +119,7 @@ export const guideLabels = {
     availability: "無論工具是否啟用，都能閱讀此說明頁。互動介面會遵循儲存在此瀏覽器中的設定。",
     disabledTitle: "此工具已停用",
     disabled: "此瀏覽器中的此工具已停用。請在設定中啟用後使用。開啟說明頁不會變更您的設定。",
-    privacy: "輸入僅在瀏覽器記憶體中處理，不會傳送至外部、儲存或嵌入頁面 URL。僅儲存偏好設定。",
+    privacy: "工具輸入僅在瀏覽器記憶體中處理，不會對外傳送、儲存或寫入 URL。應用程式僅儲存偏好設定。網站使用 Google Analytics 4 統計造訪情況，可能使用分析 Cookie。",
   },
   ko: {
     usage: "사용 방법",
@@ -131,7 +138,7 @@ export const guideLabels = {
     disabled:
       "이 브라우저에서 이 도구가 비활성화되어 있습니다. 사용하려면 설정에서 활성화하세요. 설명 페이지를 열어도 설정은 바뀌지 않습니다.",
     privacy:
-      "입력은 브라우저 메모리에서 처리됩니다. 외부 전송, 저장 또는 페이지 URL에 포함하지 않습니다. 환경 설정만 저장합니다.",
+      "도구 입력은 브라우저 메모리에서만 처리되며 외부 전송, 저장 또는 URL 삽입을 하지 않습니다. 앱은 환경 설정만 저장합니다. 사이트 사용 현황은 Google Analytics 4로 측정하며 분석용 쿠키를 사용할 수 있습니다.",
   },
 } satisfies Record<Locale, GuideLabels>;
 
@@ -147,6 +154,12 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  idn: idnGuide,
+  "http-range": httpRangeGuide,
+  "git-patch": patchGuide,
+  "content-disposition": dispositionGuide,
+  "server-timing": serverTimingGuide,
+  "cache-control": cacheControlGuide,
   cors: corsGuide,
   ...utilityGuides,
   ...inspectorGuides,
@@ -1045,4 +1058,5 @@ export const toolGuides = {
     },
   ),
   "html-accessibility": htmlAccessibilityGuide,
+  pkce: pkceGuide,
 } satisfies Record<ToolId, Record<Locale, ToolGuide>>;

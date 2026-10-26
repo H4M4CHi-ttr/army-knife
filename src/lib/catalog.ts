@@ -1,4 +1,11 @@
 export type ToolId =
+  | "idn"
+  | "http-range"
+  | "git-patch"
+  | "content-disposition"
+  | "server-timing"
+  | "cache-control"
+  | "pkce"
   | "cors"
   | "chmod"
   | "csv"
@@ -89,6 +96,31 @@ export const tools: readonly ToolDefinition[] = [
   { id: "pg-dsn", category: "network", wasm: false, devtoys: false,
     keywords: "postgresql postgres connection string dsn sslmode hostname password masked 接続文字列", color: "blue" },
 
+  { id: "idn", category: "network", wasm: false, devtoys: false, keywords: "idn punycode domain hostname unicode ascii xn-- internationalized homoglyph ドメイン 国際化 域名 網域 도메인", color: "purple" },
+  { id: "http-range", category: "network", wasm: false, devtoys: false,
+    keywords: "http range bytes content-range partial download resume suffix overlap バイト 範囲 再開 下载 位元組 범위 다운로드", color: "blue" },
+  { id: "git-patch", category: "text", wasm: false, devtoys: false,
+    keywords: "git patch unified diff hunk rename added deleted inspect 差分 パッチ 変更 追加 削除 补丁 修補 패치 변경", color: "orange" },
+  {
+    id: "content-disposition", category: "network", wasm: false, devtoys: false,
+    keywords: "http content-disposition attachment inline filename filename* download utf8 header ファイル名 ダウンロード 保存名 文件名 檔名 파일명 다운로드",
+    color: "purple",
+  },
+  {
+    id: "server-timing", category: "network", wasm: false, devtoys: false,
+    keywords: "http server-timing duration performance metrics header response latency 計測 応答 時間 性能 服务器 伺服器 시간 성능",
+    color: "blue",
+  },
+  {
+    id: "cache-control", category: "network", wasm: false, devtoys: false,
+    keywords: "http response cache-control max-age s-maxage no-cache no-store private public immutable stale cache header キャッシュ 応答 鲜度 缓存 快取 캐시 응답",
+    color: "orange",
+  },
+  {
+    id: "pkce", category: "network", wasm: false, devtoys: false,
+    keywords: "oauth pkce s256 sha256 verifier challenge state authorization 認可 検証子 授权 授權 인가 검증자",
+    color: "rose",
+  },
   {
     id: "cors", category: "network", wasm: false, devtoys: false,
     keywords: "cors origin preflight access-control allow credentials options http response クロスオリジン プリフライト 跨源 跨來源 사전 요청",

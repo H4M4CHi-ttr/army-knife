@@ -1,3 +1,6 @@
+import { idnMessages } from "./idn.ts";
+import { httpRangeMessages } from "./http-range.ts";
+import { patchMessages } from "./git-patch.ts";
 import { en } from "./en.ts";
 import { ja } from "./ja.ts";
 import { zhCN } from "./zh-CN.ts";
@@ -23,10 +26,22 @@ import { quickMessages } from "./quick.ts";
 import { htmlAccessibilityMessages } from "./html-accessibility.ts";
 import { backlogMessages } from "./backlog.ts";
 
+import { pkceMessages } from "./pkce.ts";
+import { serverTimingMessages } from "./server-timing.ts";
+import { dispositionMessages } from "./content-disposition.ts";
+import { cacheControlMessages } from "./cache-control.ts";
 import { corsMessages } from "./cors.ts";
+import { searchMessages } from "./search.ts";
 
 export const messages = {
   en: {
+    ...idnMessages["en"],
+    ...httpRangeMessages["en"],
+    ...patchMessages["en"],
+    ...dispositionMessages.en,
+    ...serverTimingMessages.en,
+    ...cacheControlMessages.en,
+    ...pkceMessages["en"],
     ...corsMessages["en"],
     ...en,
     ...executionMessages.en,
@@ -44,11 +59,19 @@ export const messages = {
     ...quickMessages["en"],
     ...htmlAccessibilityMessages.en,
     ...backlogMessages["en"],
+    ...searchMessages.en,
     ...toolMessagesEn,
     "contrast.largeHint":
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
   },
   ja: {
+    ...idnMessages["ja"],
+    ...httpRangeMessages["ja"],
+    ...patchMessages["ja"],
+    ...dispositionMessages.ja,
+    ...serverTimingMessages.ja,
+    ...cacheControlMessages.ja,
+    ...pkceMessages["ja"],
     ...corsMessages["ja"],
     ...ja,
     ...executionMessages.ja,
@@ -66,11 +89,19 @@ export const messages = {
     ...quickMessages["ja"],
     ...htmlAccessibilityMessages.ja,
     ...backlogMessages["ja"],
+    ...searchMessages.ja,
     ...toolMessagesJa,
     "contrast.largeHint":
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
   },
   "zh-CN": {
+    ...idnMessages["zh-CN"],
+    ...httpRangeMessages["zh-CN"],
+    ...patchMessages["zh-CN"],
+    ...dispositionMessages["zh-CN"],
+    ...serverTimingMessages["zh-CN"],
+    ...cacheControlMessages["zh-CN"],
+    ...pkceMessages["zh-CN"],
     ...corsMessages["zh-CN"],
     ...zhCN,
     ...executionMessages["zh-CN"],
@@ -88,11 +119,19 @@ export const messages = {
     ...quickMessages["zh-CN"],
     ...htmlAccessibilityMessages["zh-CN"],
     ...backlogMessages["zh-CN"],
+    ...searchMessages["zh-CN"],
     ...toolZhCN,
     "contrast.largeHint":
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
   },
   "zh-TW": {
+    ...idnMessages["zh-TW"],
+    ...httpRangeMessages["zh-TW"],
+    ...patchMessages["zh-TW"],
+    ...dispositionMessages["zh-TW"],
+    ...serverTimingMessages["zh-TW"],
+    ...cacheControlMessages["zh-TW"],
+    ...pkceMessages["zh-TW"],
     ...corsMessages["zh-TW"],
     ...zhTW,
     ...executionMessages["zh-TW"],
@@ -110,11 +149,19 @@ export const messages = {
     ...quickMessages["zh-TW"],
     ...htmlAccessibilityMessages["zh-TW"],
     ...backlogMessages["zh-TW"],
+    ...searchMessages["zh-TW"],
     ...toolZhTW,
     "contrast.largeHint":
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
   },
   ko: {
+    ...idnMessages["ko"],
+    ...httpRangeMessages["ko"],
+    ...patchMessages["ko"],
+    ...dispositionMessages.ko,
+    ...serverTimingMessages.ko,
+    ...cacheControlMessages.ko,
+    ...pkceMessages["ko"],
     ...corsMessages["ko"],
     ...ko,
     ...executionMessages.ko,
@@ -132,6 +179,7 @@ export const messages = {
     ...quickMessages["ko"],
     ...htmlAccessibilityMessages.ko,
     ...backlogMessages["ko"],
+    ...searchMessages.ko,
     ...toolKo,
     "contrast.largeHint":
       "큰 텍스트는 18pt(24 CSS px) 이상, 굵은 글씨는 14pt(약 18.7 CSS px) 이상입니다. 판정에는 반올림 전 비율을 사용합니다.",

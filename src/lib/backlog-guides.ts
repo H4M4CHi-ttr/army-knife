@@ -44,12 +44,14 @@ export const backlogGuides: Record<BacklogKind, Record<Locale, ToolGuide>> =
             limitations: [
               hint,
               locale === "ja"
-                ? "入力は最大64 KiB、最大2,000行・結果プレビュー100行、エクスポートは128 KiBまで。入力は保存・外部送信されません。"
+                ? "入力64 KiB（JSON Pointer復元は128 KiB）、対応形式は最大2,000行・レコード・ノード、プレビュー100行、出力128 KiB。入力の保存・外部送信なし。"
                 : locale === "ko"
-                  ? "입력 최대 64 KiB, 2,000줄, 미리 보기 100줄, 출력 최대 128 KiB. 입력은 저장·전송되지 않습니다."
-                  : locale.startsWith("zh")
-                    ? "输入最多64 KiB、2,000行、预览100行、导出128 KiB。输入不会存储或发送。"
-                    : "Input limit: 64 KiB / 2,000 lines, 100 preview rows, 128 KiB export. Input is never stored or transmitted.",
+                  ? "입력 64 KiB(JSON Pointer 복원 128 KiB), 해당 형식 최대 2,000줄·레코드·노드, 미리 보기 100줄, 출력 128 KiB. 입력은 저장·전송되지 않습니다."
+                  : locale === "zh-TW"
+                    ? "輸入64 KiB（JSON Pointer還原128 KiB），適用格式最多2,000列／記錄／節點，預覽100列，匯出128 KiB。不儲存或傳送輸入。"
+                    : locale === "zh-CN"
+                      ? "输入64 KiB（JSON Pointer还原128 KiB），适用格式最多2,000行/记录/节点，预览100行，导出128 KiB。不存储或发送输入。"
+                      : "Input: 64 KiB (JSON Pointer restore: 128 KiB), 2,000 lines/records/nodes where applicable, 100 preview rows, 128 KiB export. No input storage or transmission.",
             ],
           } satisfies ToolGuide];
         }),

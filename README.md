@@ -10,6 +10,23 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 
 | ツール                  | 主な機能                                                                    | 処理                | 初期状態 |
 | ----------------------- | --------------------------------------------------------------------------- | ------------------- | -------- |
+| NDJSON/JSONL検査 | 行ごとのJSON構文・型・キー分布と不正行を確認 | 即時 / Worker | オン |
+| JSON Pointerフラット化・復元 | 空コンテナと配列を保つ型付きRFC 6901ノードを相互変換 | 即時 / Worker | オン |
+| CSV → SQL INSERT生成 | 文字列・NULLを分けて3方言のINSERTを生成、SQL実行なし | 即時 / Worker | オン |
+| SQLite実行計画検査 | 記録済みSCAN・SEARCH・一時B-treeと親子関係を確認 | 即時 / Worker | オン |
+| JSONL構造化ログ集計 | レベル・サービス・requestId・時系列を集計 | 即時 / Worker | オン |
+| スタックトレース集約 | メッセージ・パスを除外し類似フレーム列を推定集約 | 即時 / Worker | オン |
+| robots.txtルールテスター | 仮のUser-Agent・パスに対するルールを通信なしで比較 | 即時 / Worker | オン |
+| sitemap.xml検査 | URL件数・重複・ドメイン・不正項目を確認、巡回なし | 即時 / 遅延・手動 | オン |
+| ISO 8601期間検査 | 暦の月数と固定秒を分けてUTC基準日へ加算 | 即時 / Worker | オン |
+| PostgreSQL接続文字列検査 | DSNを通信せず分解し、秘密フィールドとoptionsをマスク | 即時 / Worker | オン |
+| IDN・Punycodeドメイン検査 | Unicode／ASCIIラベル・コードポイント・限定的な文字体系混在注意を通信せず比較 | TypeScript | オン |
+| HTTPバイト範囲検査 | Rangeの閉区間・末尾指定・範囲外・重複を正確な整数で確認 | TypeScript / BigInt | オン |
+| Git patch検査 | 記録済み差分のファイル・hunk・追加削除行・rename情報を通信せず確認 | 即時 / 遅延・手動 | ON |
+| Content-Disposition解析 | ダウンロード名・filename*の文字コード・優先関係・不審なパスや制御文字を確認 | 即時 / 遅延・手動 | ON |
+| Server-Timing解析        | 宣言された時間・説明・重複パラメーターを精度を落とさず確認                    | 即時 / 遅延・手動   | ON       |
+| Cache-Control解析 | 応答のキャッシュ指示・正確な秒数・重複／不正引数・未知の拡張を通信なしで確認 | TypeScript | オン |
+| OAuth PKCE生成 | S256 verifier/challenge・任意stateの生成と既存verifierの確認 | Web Crypto | オン |
 | CORS応答条件チェック | Origin・メソッド・credentialsと実応答／プリフライトヘッダーを通信なしで比較 | TypeScript | オン |
 | SRI integrity生成       | ローカルJS/CSSの生バイト列からSHA-256/384/512 integrity属性・HTML例を生成       | Web Crypto / Worker | オフ     |
 | BOM・改行コード検査     | UTF-8/UTF-16とBOM、CRLF/LF/CRを厳密に解析し、任意でUTF-8へ変換              | TypeScript / Worker | オフ     |
@@ -58,6 +75,101 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 | UUID・ULID生成と検査 | UUID v4/v7・ULIDを暗号学的乱数で生成、時刻情報検査 | TypeScript | オフ |
 | パスワード・ランダムトークン生成 | 指定文字集合・除外・長さ・件数を指定して安全な乱数生成 | TypeScript | オフ |
 | Open Graph/Twitter Cardメタタグ生成 | HTML属性をエスケープしたOGP・SNS用メタタグ、ローカル模擬プレビュー | TypeScript | オン |
+
+### IDN・Punycodeドメイン検査（Issue #87、2026-10-26 JST）
+
+UnicodeドメインとASCII A-labelを、ブラウザーのWHATWG URL／UTS #46変換と
+RFC 3492の復元で比較します。ラベルごとの正規化表記・全文字のコードポイント・
+文字体系を表示し、混在やギリシャ／キリル文字の類似リスクを参考情報として示します。
+完全な類似文字検出やIDNA2008検証、DNS・登録可否・安全性の判定は行いません。
+
+入力UTF-8 2 KiB、ASCIIラベル63バイト、全体253バイト（末尾ルートドットを除く）・
+127ラベルまで。URL・ポート・パス・IP・不正なPunycodeを拒否し、部分結果を返しません。
+128文字超は800ms遅延／手動反映・待機中止。5言語Vapor画面・両テーマ・明示JSON出力に対応。
+入力と結果はメモリ内のみで、新規依存・計測・外部フォント・通信・公開設定の追加なし。
+DevToys公式バンドルに専用用途がないため既定オン。[設計・制約](docs/idn.md)。
+
+### HTTPバイト範囲検査（2026-10-25 JST）
+
+記録した`Range`と既知の表現サイズから、0始まりで両端を含む位置、項目別バイト数、
+重複込みの合計と重複を除いた量を確認します。閉区間・終端省略・末尾指定を扱い、
+範囲外の項目も保持。最大40桁の整数をBigIntで処理し、JSONにも文字列で正確に出力します。
+長さ0への正の末尾指定はRFC 9110の「充足可能だが空」として、架空の位置を作りません。
+
+RangeはUTF-8 8 KiB・32項目、サイズは40桁・入力56バイトまで。軽い編集は即時、
+合計2,048文字超は800ms遅延・手動反映・待機中止に対応。上限内の計算自体は同期です。
+5言語Vapor画面・両テーマ・明示JSON出力に対応し、入力と結果はメモリ内のみ。
+サーバー対応や応答ステータス・multipart構造は予測せず、通信・依存・計測は追加しません。
+DevToys公式バンドルに専用機能がないことを確認し既定オン。[仕様と制約](docs/http-range.md)。
+
+### Git patch検査（Issue #77、2026-10-24 JST）
+
+記録済みの2方向`git diff --patch`を、ファイル選択・折り畳みhunk・変更前後の
+正確な行番号で確認します。追加削除行とrename/copy・モード変更を集計し、
+不完全なhunkや未対応のバイナリ／combined diffでは部分結果を表示しません。
+引用パスは原文のまま保持し、CRLF区切りをLFへ正規化します。
+
+UTF-8 64 KiB・2,000行・50ファイル・200 hunkまで。2,048文字超は800ms遅延／
+手動反映・待機中止に対応。上限内の解析自体は同期処理です。
+5言語Vapor画面・両テーマ・明示JSON出力に対応し、入力と結果はメモリ内のみ。
+patch適用・パス参照・コマンド実行・新規依存・計測・通信の追加はありません。
+標準Git形式の構造検査であり、適用可能性は保証しません。DevToys公式バンドルに
+専用ツールがないことを確認し既定オン。[仕様と制約](docs/git-patch.md)。
+
+### Content-Disposition解析（2026-10-23 JST）
+
+応答のダウンロード名をローカルで分解し、`filename`と`filename*`を比較します。
+UTF-8と従来のISO-8859-1を厳密に復元し、対応する`filename*`を優先します。
+重複名・壊れたエンコードでは全結果を破棄し、未知の文字コードでは代替名を推測しません。
+パス区切り・予約名・制御／方向文字などに注意を出し、不可視文字をエスケープ表示します。
+
+8 KiB・32パラメーター・名前64文字・値1,024文字まで。軽い編集は即時、2,048文字超は
+800ms遅延・手動反映・待機中止に対応。5言語のVapor画面・静的ガイド・両テーマで利用できます。
+入力と結果はメモリ内のみで、JSON保存は明示操作時だけ。ブラウザーの保存名の再現や無害化・
+安全性保証は行いません。新規依存・計測・通信・公開設定の追加なし。
+DevToys公式一覧に専用ツールがないことを確認し既定オン。[仕様と制約](docs/content-disposition.md)。
+
+### Server-Timing解析（2026-10-22 JST）
+
+記録した応答の計測項目を、通信せずに名前・正確な小数の時間・説明・拡張パラメーターへ分解します。
+同名の計測項目は別々に保持し、重複パラメーターは最初の値を採用して後続を明示します。
+時間をNumberへ変換せず、未指定・未対応値を0にせず、重なり得る時間の合計や実性能を推測しません。
+8 KiB・32行・64項目・各16パラメーターまで。軽い編集は即時、2,048文字超は800ms遅延・手動・予約中止に対応します。
+送信側の厳密な構文を対象とし、ブラウザーのエラー回復は再現しません。5言語・テーマ・明示JSON出力に対応し、入力と結果はメモリ内だけに保持します。
+依存・計測・公開設定の追加はありません。DevToysの公式一覧に専用機能がないため既定オン。[仕様と制約](docs/server-timing.md)。
+
+### Cache-Control解析（2026-10-21 JST）
+
+応答のCache-Control値を1行、または同名ヘッダーを複数行貼り付け、各ディレクティブの
+意味・指定秒数・重複・不正引数を確認します。引用文字列内のカンマとエスケープを保ち、
+大きな秒数は文字列で正確に扱います。未知の拡張は動作を推測せず明示し、重複した値から
+有効値を選びません。キャッシュ可否・実際の再利用・安全性を断定する機能ではありません。
+
+UTF-8 8 KiB・物理行32行・128項目・名前64文字・値1,024文字まで。短い入力は即時、
+2,048文字超は800ms待機・手動反映・待機の中止に対応します。上限超過や構文エラーでは
+部分結果を返しません。5言語Vapor画面・テーマ・ローカルフォントを再利用し、
+入力・結果はメモリー内のみ。JSON出力は明示操作時だけで、依存・計測・通信は追加しません。
+DevToys公式バンドルに専用機能がないことを確認し既定オン。[仕様・制約と検証](docs/cache-control.md)。
+
+### OAuth PKCE生成（Issue #80、2026-10-20 JST）
+
+S256の`code_verifier`・`code_challenge`と、任意の独立した`state`をブラウザー内で生成します。
+生成はボタン操作時のみ。既存verifierの確認ではRFC 7636のASCII非予約文字43〜128文字を
+厳密に検査し、SHA-256のbase64url（パディングなし）を即時に計算します。
+公開RFCテスト例も用意していますが、秘密値としての再利用はできません。
+
+生成verifierは43〜128文字、stateは省略または16〜128文字。`crypto.getRandomValues`の
+6ビットから各文字を偏りなく生成し、最短verifierでも258ビットの乱数を使います。
+stateの文字数範囲はこのツールの方針で、OAuthのプロトコル上限ではありません。
+Web Cryptoが使えない場合に安全でない乱数へ代替しません。ハッシュは最大128バイト・5秒上限。
+中止は結果の破棄で、ブラウザー内部のdigest自体は停止できません。
+
+5言語Vapor画面・ライト／ダーク・個別コピー・キャンセル・上限超過の貼り付け拒否に対応。
+入力と結果はメモリー内のみで、URL・storage・ログ・通信には含めません。
+新規依存・計測・外部フォントは追加しません。認可エンドポイントに接続せず、
+stateのセッション関連付けや照合は呼び出し側OAuthクライアントの責任です。
+DevToys公式バンドルに専用PKCEワークフローがないことを確認し、既定オンにしています。
+[仕様・制約と検証](docs/pkce.md)。
 
 ### CORS応答条件チェック（Issue #56）
 
@@ -176,7 +288,7 @@ VueUse 15 の `useDebounceFn` と `useIntervalFn` を [共通実行処理](src/c
 
 ## データと通信
 
-入力と処理結果はメモリ内に保持します。ツールを切り替えるかページを再読み込みすると破棄されます。入力を URL、リクエスト本文、Cookie、localStorage、sessionStorage に書き込みません。アクセス解析、外部 API、実行時のフォント CDN は使用しません。
+入力と処理結果はメモリ内に保持します。ツールを切り替えるかページを再読み込みすると破棄されます。入力を URL、リクエスト本文、Cookie、localStorage、sessionStorage に書き込みません。サイト閲覧状況は Google Analytics 4（測定 ID: `G-9ZPQXVFKN7`）で計測します。ページ URL・閲覧環境・利用状況などが Google に送信され、計測用 Cookie 等が利用される場合があります。**ツールへの入力と処理結果は Google Analytics を含む外部サービスに送信しません。** ツールの処理に外部 API は使わず、実行時のフォント CDN も使用しません。
 
 一方、サイトを表示するための **HTML・JavaScript・CSS・WASM・画像・フォントの通常の GET** は GitHub Pages に発生します。フォントは言語と表示文字の範囲に応じて、あらかじめ生成した固定 URL のファイルを読み込みます。入力文面を送るサブセット API はありません。サイトと未取得の追加アセットを読み込むには接続が必要です。ソースやライセンスのリンクは、利用者が選んだときに開きます。
 
@@ -194,7 +306,7 @@ VueUse 15 の `useDebounceFn` と `useIntervalFn` を [共通実行処理](src/c
 
 以前の設定を読み込むと、新しい補完ツールを有効にし、既存ツールの無効設定・お気に入り・テーマ・言語を維持します。意図的に全ツールをオフにした設定はそのまま維持します。新しい DevToys 重複ツールを自動で有効にすることはありません。
 
-ストレージが使えない場合も、設定をメモリ内で扱って動作します。アプリには同一オリジンのアセットだけを許す CSP を設定し、CI では入力マーカーの通信への混入、外部リクエスト、WebSocket、入力のストレージ保存を検査します。具体的な検査範囲は [Testing and deployment](docs/testing.md) に記載しています。
+ストレージが使えない場合も、設定をメモリ内で扱って動作します。アプリには同一オリジンのアセットと GA4 用の指定通信先のみを許す CSP を設定し、CI では入力マーカーの通信への混入、テスト用ホストからの外部リクエスト、WebSocket、入力のストレージ保存を検査します。GA4 は公開ホストでのみ動作し、ローカル開発と CI のアクセスは計測しません。具体的な検査範囲は [Testing and deployment](docs/testing.md) に記載しています。
 
 ## 言語とフォント
 
@@ -349,7 +461,7 @@ XML DTD, network fetch or crawler is allowed.
 | #38 | CSV → SQL INSERT | Strict ASCII identifiers, CSV quoting, dialect quoting, explicit NULL marker, batches; output is **not executed** |
 | #41 | SQLite EXPLAIN QUERY PLAN | Four-column pipe/TSV or JSON input; counts SCAN/SEARCH/TEMP B-TREE and shows parent hierarchy; no database connection |
 | #49 | Structured JSONL log inspector | Counts levels/services; optional exact requestId/traceId filter and time ordering; missing times are reported |
-| #51 | Stack trace grouping | JS, Python, Java, .NET frame signatures. Anonymous, noncryptographic fingerprints; no source map resolution |
+| #51 | Stack trace grouping | JS, Python, Java, .NET frame signatures. Noncryptographic fingerprints omit paths/messages; no source map resolution |
 | #63 | robots.txt rule tester | Simulated user agent and path with Allow/Disallow, '*' and '$'. Not an exact crawler implementation; percent-encoded paths compared verbatim |
 | #64 | sitemap.xml inspector | urlset and sitemapindex XML, URL/host/duplicate counts and lastmod checks; no crawling |
 | #68 | ISO 8601 duration | Calendar years/months separated from fixed seconds, UTC reference arithmetic; local DST and ISO intervals out of scope |
@@ -359,8 +471,11 @@ For SQL generation, PostgreSQL uses explicit `E'…'` strings, SQLite uses doubl
 MySQL values use `CONVERT(0x… USING utf8mb4)` so backslashes and quote combinations do not
 depend on the connection's `SQL_MODE`. Invalid UTF-16 surrogate input is rejected.
 
-The standard limits are **64 KiB UTF-8 input**, **2,000 lines/records**, **100 preview rows** and
+The standard limits are **64 KiB UTF-8 input** (JSON Pointer restore: **128 KiB**),
+**2,000 lines/records or nodes where applicable**, **100 preview rows** and
 **128 KiB exported output**. Larger records or unsupported syntax fail explicitly rather than
 silently producing a complete-looking but truncated report. There are no new runtime dependencies;
 five UI languages, localized static guides and regression tests ship with these tools.
 
+The 2026-10-27 JST scheduled task completes this previously open PR before starting another.
+See [precise semantics, input bounds, privacy and review coverage](docs/backlog.md).

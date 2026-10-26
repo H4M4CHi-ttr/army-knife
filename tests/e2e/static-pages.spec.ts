@@ -39,6 +39,7 @@ async function preferences(page: Page, enabledTools: readonly ToolId[], locale: 
 }
 
 function inputSelector(id: ToolId): string {
+  if (id === "pkce") return "#pkce-mode";
   if (id === "cors") return "#cors-origin";
   if (id === "chmod") return "#chmod-mode";
   if (id === "json-pointer") return "#json-pointer-input";

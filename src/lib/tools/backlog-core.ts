@@ -1,5 +1,6 @@
 import { assertInputSize, ToolError } from "./errors";
 import { parseJsonSafely, type JsonValue } from "./json";
+import { recordedInstant } from "./backlog-dates";
 
 export const BACKLOG_LIMITS = { inputBytes: 64 * 1024, lines: 2000, rows: 100, outputBytes: 128 * 1024 } as const;
 export type BacklogKind = "ndjson" | "json-pointer" | "csv-insert" | "sqlite-plan" | "jsonl-logs" | "stack-trace" | "robots" | "sitemap" | "iso-duration" | "pg-dsn";
@@ -24,11 +25,12 @@ export type BacklogOptions = {
 export function guard(input: string): void { assertInputSize(input, BACKLOG_LIMITS.inputBytes); }
 export function fail(): never { throw new ToolError("INVALID_REQUEST"); }
 export function checkedRows(n: number): void {
-  if (n > BACKLOG_LIMITS.lines) throw new ToolError("TOO_MANY_ROWS");
+  if (n > BACKLOG_LIMITS.lines) throw new ToolError("BACKLOG_ROW_LIMIT");
 }
 export function report(metrics: Record<string, string | number>, rows: BacklogReport["rows"],
   exportText: string, warnings: string[] = []): BacklogReport {
-  assertInputSize(exportText, BACKLOG_LIMITS.outputBytes);
+  try { assertInputSize(exportText, BACKLOG_LIMITS.outputBytes); }
+  catch { throw new ToolError("BACKLOG_OUTPUT_LIMIT"); }
   return {
     metrics: Object.entries(metrics).map(([key, value]) => ({ key, value: String(value) })),
     rows: rows.slice(0, BACKLOG_LIMITS.rows),
@@ -71,7 +73,7 @@ export function inspectNdjson(input: string): BacklogReport {
   }
   const invalid = parsed.length - valid;
   const summary = [...counts].map(([type, count]) => type + ":" + count).join(", ");
-  const keySummary = [...keys].sort((a, b) => b[1] - a[1]).slice(0, 30)
+  const keySummary = [...keys].sort((a, b) => b[1] - a[1])
     .map(([key, n]) => ({ key, count: n }));
   const exportText = JSON.stringify({
     total: parsed.length, valid, invalid, types: Object.fromEntries(counts),
@@ -92,7 +94,7 @@ function decodePointer(value: string): string[] {
 }
 /** #36: typed RFC6901 nodes preserve empty containers and numeric object keys. */
 export function convertJsonPointer(input: string, mode: "flatten" | "restore" = "flatten"): BacklogReport {
-  guard(input);
+  assertInputSize(input, mode === "restore" ? BACKLOG_LIMITS.outputBytes : BACKLOG_LIMITS.inputBytes);
   const parsed = parseJsonSafely(input);
   let nodes: FlatNode[] = [];
   if (mode === "flatten") {
@@ -115,10 +117,12 @@ export function convertJsonPointer(input: string, mode: "flatten" | "restore" = 
           typeof item.pointer !== "string" ||
           !["value", "array", "object"].includes(String(item.kind)) ||
           seen.has(item.pointer) ||
-          (item.kind === "value" ? !Object.hasOwn(item, "value") : Object.hasOwn(item, "value")))
+          Object.keys(item).some(key => !["pointer", "kind", "value"].includes(key)) ||
+          (item.kind === "value" ? !Object.hasOwn(item, "value") ||
+            (item.value !== null && typeof item.value === "object") : Object.hasOwn(item, "value")))
         return fail();
       seen.add(item.pointer);
-      decodePointer(item.pointer);
+      if (decodePointer(item.pointer).length > 64) throw new ToolError("JSON_DEPTH_LIMIT");
       return item as unknown as FlatNode;
     });
     checkedRows(nodes.length);
@@ -213,7 +217,7 @@ export function csvToInsert(input: string, opts: BacklogOptions = {}): BacklogRe
     const record = rows[index];
     if (record.length !== headers.length) return fail();
     const tuple = "(" + record.map(v => {
-      if (/[\u0000]/.test(v)) return fail();
+      if (v.includes("\0")) return fail();
       try { encodeURIComponent(v); } catch { return fail(); } // Reject unpaired UTF-16 surrogates.
       if (nullToken && v === nullToken) return "NULL";
       if (dialect === "mysql") {
@@ -245,18 +249,20 @@ type SqliteNode = { id: number; parent: number; detail: string };
 export function inspectSqlitePlan(input: string): BacklogReport {
   guard(input);
   let rows: SqliteNode[] = [];
-  try {
-    const parsed: unknown = JSON.parse(input);
-    if (Array.isArray(parsed)) rows = parsed.map(value => {
-      if (Array.isArray(value) && value.length >= 4) return {
-        id: Number(value[0]), parent: Number(value[1]), detail: String(value[3]),
+  if (input.trimStart().startsWith("[")) {
+    const parsed = parseJsonSafely(input);
+    if (!Array.isArray(parsed) || !parsed.length) return fail();
+    rows = parsed.map(value => {
+      if (Array.isArray(value) && value.length === 4 &&
+          typeof value[0] === "number" && typeof value[1] === "number" && typeof value[3] === "string") return {
+        id: value[0], parent: value[1], detail: value[3],
       };
-      if (value && typeof value === "object" && "id" in value && "parent" in value && "detail" in value)
-        return { id: Number(value.id), parent: Number(value.parent), detail: String(value.detail) };
+      if (value && !Array.isArray(value) && typeof value === "object" &&
+          typeof value.id === "number" && typeof value.parent === "number" && typeof value.detail === "string")
+        return { id: value.id, parent: value.parent, detail: value.detail };
       return fail();
     });
-  } catch (e) { if (e instanceof ToolError) throw e; }
-  if (!rows.length) {
+  } else {
     rows = lines(input).filter(s => s.trim()).map(line => {
       const m = /^\s*(\d+)\s*[|\t]\s*(\d+)\s*[|\t]\s*(\d+)\s*[|\t]\s*(.*)\s*$/.exec(line);
       if (!m) return fail();
@@ -300,21 +306,28 @@ export function aggregateJsonlLogs(input: string, opts: BacklogOptions = {}): Ba
   for (const rec of records) {
     if (rec.error || !rec.value || Array.isArray(rec.value) || typeof rec.value !== "object") { invalid++; continue; }
     const v = rec.value as Record<string, JsonValue>;
-    const id = String(v.requestId ?? v.traceId ?? "");
+    const rawId = v.requestId ?? v.traceId;
+    if (rawId !== undefined && rawId !== null && typeof rawId !== "string" && typeof rawId !== "number") {
+      invalid++; continue;
+    }
+    const id = rawId === undefined || rawId === null ? "" : String(rawId);
     if (field && id !== field) { skipped++; continue; }
     const level = typeof v.level === "string" ? v.level.toUpperCase() : "(missing)";
     const service = typeof v.service === "string" ? v.service : "(missing)";
     levels.set(level, (levels.get(level) ?? 0) + 1);
     services.set(service, (services.get(service) ?? 0) + 1);
     const rawTime = v.timestamp ?? v.time ?? "";
-    const ms = typeof rawTime === "number" ? rawTime : typeof rawTime === "string" ? Date.parse(rawTime) : NaN;
+    const parsedMs = typeof rawTime === "number" && Number.isSafeInteger(rawTime) ? rawTime :
+      typeof rawTime === "string" ? recordedInstant(rawTime) : NaN;
+    const ms = new Date(parsedMs).getTime();
     if (!Number.isFinite(ms)) missingTimestamp++;
     timeline.push({ time: Number.isFinite(ms) ? new Date(ms).toISOString() : "", level, service, id, line: rec.line });
   }
   const counted = timeline.length;
   // Stable order: valid timestamps first, then original line as tie breaker.
-  timeline.sort((a,b) => (!a.time ? 1 : !b.time ? -1 : a.time.localeCompare(b.time)) || a.line - b.line);
-  const freq = (data: Map<string, number>) => [...data].sort((a,b) => b[1] - a[1]).slice(0, 30)
+  timeline.sort((a,b) => (a.time && b.time ? Date.parse(a.time) - Date.parse(b.time) :
+    a.time ? -1 : b.time ? 1 : 0) || a.line - b.line);
+  const freq = (data: Map<string, number>) => [...data].sort((a,b) => b[1] - a[1])
     .map(([name,count]) => ({ name, count }));
   const rows = timeline.map(p => ({ label: "L" + p.line + " " + (p.time || "—"),
     detail: p.level + " / " + p.service + (p.id ? " / " + p.id : "") }));

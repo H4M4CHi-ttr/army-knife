@@ -58,6 +58,21 @@ cross-origin server or claim a complete browser CORS conformance test.
 
 ## Browser coverage
 
+PR #149's ten inspectors have [dedicated parser, Vapor/Worker lifecycle and
+four-project browser coverage](backlog.md#verification-and-independent-review).
+It includes the five-locale/theme samples, strict JSON/date regressions,
+adversarial robots patterns, >64 KiB JSON Pointer restore, secret redaction,
+explicit downloads, cancelled pending work, rejected-input invalidation,
+reload clearing and the exact-dist-asset privacy audit. Screenshots use synthetic
+examples only. No WASM success is mocked or replaced for the full quality gate.
+
+The Content-Disposition inspector adds strict response-field and extended-value
+unit tests plus real Vapor execution/lifecycle tests. Its dedicated four-project
+browser suite covers all five locales, both themes, keyboard operation, exact
+filename* decoding/priority, errors and bounds, delayed/manual/cancel behavior,
+explicit JSON export, input clearing and the exact-dist-asset privacy audit.
+See [its specification and limits](content-disposition.md).
+
 The lightweight converter engines have dedicated pure TypeScript regression tests in `src/lib/tools/quick-converters.test.ts` for SI/IEC precision, CSS font/viewport contexts, exact signed radix conversion, Unicode normalization, Slug collisions, and U+/JS escape parsing including invalid scalar values. `tests/e2e/quick.spec.ts` covers all five locales in Chromium and Firefox across desktop/small viewports, explicit opt-in, errors, and no secret persistence or network-parameter leakage. Radix coverage includes a value above JavaScript's safe-integer range and invalid base digits.
 
 Base64 text conversion includes RFC 4648, Unicode, BOM, invalid UTF-8, alphabet/padding and size-limit unit tests. `tests/e2e/base64.spec.ts` covers fresh-install opt-in, standard and URL-safe conversions in all five locales across Chromium/Firefox desktop/small, noncanonical/error handling, Worker execution, output download and privacy checks.
@@ -103,7 +118,7 @@ The browser scenarios verify:
 - Both themes fit desktop and small viewports without page-level horizontal overflow. Screenshots are attached for human review.
 - The HTML accessibility checker keeps pasted markup inert, performs no request for embedded resource URLs, does not persist input, and allows long scans to be canceled.
 
-Every scenario also has a network audit. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
+Every scenario also has a network audit. Analytics is enabled only for the published `h4m4chi-ttr.github.io/army-knife/` host; the local Playwright test host never loads the Google tag. This audit checks tool-input privacy during local tests, not live GA4 event delivery. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
 
 The suite uses [Playwright Clock](https://playwright.dev/docs/clock) for deterministic countdown testing, [Playwright downloads](https://playwright.dev/docs/downloads), [network events](https://playwright.dev/docs/network), and a [managed test web server](https://playwright.dev/docs/test-webserver). The viewport projects exercise layout in Chromium and Firefox at small widths; they do not emulate mobile Safari or claim coverage of every device.
 
@@ -159,3 +174,61 @@ The separate deployment job depends on the entire quality job, runs only for `ma
 In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. The pinned [`configure-pages` action](https://github.com/actions/configure-pages/blob/v5.0.0/action.yml) has `enablement: false`; the workflow does not use an administrator token or attempt to enable Pages through an alternate path. A repository that has not enabled Pages will fail at configuration, leaving the quality report available for review. Once Pages is configured, rerun the workflow on `main`.
 
 The Pages artifact is created by [`upload-pages-artifact`](https://github.com/actions/upload-pages-artifact/blob/v4.0.0/action.yml) and published by [`deploy-pages`](https://github.com/actions/deploy-pages/blob/v4.0.5/action.yml). The job output exposes the resulting site URL. Dependency and font downloads happen during the build; the deployed application serves its scripts, WASM, styles, and fonts from the GitHub Pages site itself.
+
+## PKCE coverage (2026-10-20 JST)
+
+`src/lib/tools/pkce.test.ts` checks the RFC 7636 Appendix B vector, exact 43/128
+character boundaries, full unreserved alphabet, state omission/limits, malformed
+settings, cryptographic failures, aborts and the five-second watchdog. The Vapor
+view tests pin manual generation, immediate S256 checking, explicit per-field
+copy, invalidation and late-result disposal on edits/clear/cancel/unmount.
+`tests/e2e/pkce.spec.ts` covers five languages, light/dark, keyboard controls,
+actual native digest values, privacy, reload/navigation and oversized pastes in
+all Chromium/Firefox desktop/small projects. It audits the exact built asset graph
+and fails on private-marker leakage, unexpected network calls or browser errors.
+
+## Cache-Control coverage (2026-10-21 JST)
+
+`src/lib/tools/cache-control.test.ts` checks response field grammar, quoted commas
+and escapes, repeated directives/fields, exact decimal seconds, qualified fields,
+unknown/prototype-like names, malformed input and every input/structure bound.
+The Vapor view tests exercise immediate/deferred updates, the 800ms boundary,
+manual apply, pending cancellation, rejected-paste recovery and inert text.
+`tests/e2e/cache-control.spec.ts` runs all five languages, both themes and
+Chromium/Firefox desktop/small. It verifies keyboard operation, JSON copy/download,
+reload/navigation clearing and the exact-built-asset network/privacy audit. These
+tests exercise the offline inspector, not browser HTTP-cache conformance.
+
+## Git patch coverage (2026-10-24 JST)
+
+The [Git patch specification](git-patch.md) defines the supported two-way format
+and explicit failure of binary/combined/truncated input. Pure tests check hunk
+counts, exact large line numbers, zero/omitted ranges, metadata, CRLF and bounds.
+Real Vapor view tests cover selection, stale-result removal, delayed/manual/cancel
+operation, disposal, rejected pastes, inert markup and memory-only data. The
+four-project browser suite covers five languages, themes, keyboard controls,
+explicit whole-report export and the exact-dist-asset network privacy audit.
+
+## HTTP byte range coverage (2026-10-25 JST)
+
+The [byte range specification](http-range.md) defines exact inclusive interval
+resolution, suffix/zero semantics, strict grammar and bounds. Unit tests cover
+large decimal precision, clamping, mixed satisfiability and union vs member sums.
+Real Vapor tests cover dual-input invalidation, paste rejection, delayed/manual
+apply, cancel and disposal. The four-project browser suite checks five locales,
+themes, keyboard, narrow widths, explicit JSON exports, lifecycle clearing and
+the exact-distribution-asset network/privacy audit with synthetic values.
+
+## IDN / Punycode domain coverage (2026-10-26 JST)
+
+`src/lib/tools/idn.test.ts` covers RFC/Unicode vectors, separator and width mapping,
+emoji, normalized spelling, round trips, script advisory limitations, malformed
+ACE, IP/URL rejection, byte/label/domain limits and input-free error messages.
+`IdnTool.test.ts` exercises real Vapor updates, all-or-nothing invalidation,
+rejected paste, deferred/manual/cancel/dispose behavior and memory-only rendering.
+`tests/e2e/idn.spec.ts` runs the production route in all four browser projects:
+five locales, themes, keyboard, responsive screenshots, exact JSON export,
+malformed inputs, bounds, delayed/manual/cancel and navigation/reload clearing.
+Its exact-dist-asset audit checks external requests, query/body/header leakage,
+WebSockets and browser errors. Synthetic domains are rendered only as text.
+This verifies the offline inspector, not domain safety or a DNS service.

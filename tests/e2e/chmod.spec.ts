@@ -282,6 +282,7 @@ test("permission inputs disappear on navigation and reload while only deliberate
     "favorites",
     "knownTools",
     "locale",
+    "searchMode",
     "theme",
     "version",
   ]);

@@ -1,6 +1,7 @@
 import { guard, lines, checkedRows, report, fail, type BacklogOptions, type BacklogReport } from "./backlog-core";
+import { monthDays, recordedInstant } from "./backlog-dates";
 
-/** #51: diagnostic grouping; stable non-reversible hash rather than file paths or PII. */
+/** #51: heuristic, noncryptographic fingerprints exclude source paths and message text. */
 export function groupStackTraces(input: string, opts: BacklogOptions = {}): BacklogReport {
   guard(input);
   const parser = opts.parser || "auto";
@@ -27,12 +28,13 @@ export function groupStackTraces(input: string, opts: BacklogOptions = {}): Back
       current.frames.push(normalized.replace(/\b\d+\b/g, "#").slice(0, 180));
       continue;
     }
-    if (/^(?:Traceback \(most recent call last\):|Caused by:)/i.test(line)) continue;
-    if (/^\S.*(?:Error|Exception|Traceback|Fault)(?:\b|:)/i.test(line.trim()) ||
-        (line.match(/^[\w.]+(?:Error|Exception):/) && current.frames.length)) {
+    if (/^Traceback \(most recent call last\):/i.test(line.trim())) { flush(); continue; }
+    const header = line.trim().replace(/^Caused by:\s*/i, "");
+    const exception = /^((?:[A-Za-z_$][\w.$]*(?:Error|Exception|Fault))|Error|Exception|Fault)(?::|$)/.exec(header);
+    if (exception) {
       if (current.exception && current.frames.length) flush();
       // Deliberately discard potentially sensitive exception messages.
-      current.exception = (line.trim().match(/[\w.]+(?:Error|Exception|Fault)/)?.[0] || "Exception").slice(0, 120);
+      current.exception = exception[1].slice(0, 120);
     }
   }
   flush();
@@ -54,12 +56,29 @@ export function groupStackTraces(input: string, opts: BacklogOptions = {}): Back
     ["heuristic", "sourceMapsUnavailable"]);
 }
 type RobotRule = { directive: "allow" | "disallow"; pattern: string; order: number };
-type RobotGroup = { agents: string[]; rules: RobotRule[] };
+type RobotGroup = { agents: string[]; rules: RobotRule[]; sawRule: boolean };
+/** Anchored glob DP, O(pattern length × path length), with no regex backtracking. */
+function matchesRobotPattern(pattern: string, path: string): boolean {
+  const terminal = pattern.endsWith("$");
+  const source = terminal ? pattern.slice(0, -1) : pattern;
+  let row = new Uint8Array(path.length + 1);
+  row[0] = 1;
+  for (const char of source.split("")) {
+    if (char === "*") {
+      for (let j = 1; j <= path.length; j++) row[j] ||= row[j - 1];
+    } else {
+      const next = new Uint8Array(path.length + 1);
+      for (let j = 1; j <= path.length; j++) next[j] = row[j - 1] && path[j - 1] === char ? 1 : 0;
+      row = next;
+    }
+  }
+  return terminal ? Boolean(row[path.length]) : row.some(Boolean);
+}
 /** #63: offline robots evaluation against RFC9309-oriented rules, with disclosed gaps. */
 export function inspectRobots(input: string, opts: BacklogOptions = {}): BacklogReport {
   guard(input);
-  const path = opts.path || "/";
-  const agent = opts.agent || "*";
+  const path = opts.path ?? "/";
+  const agent = opts.agent ?? "*";
   if (!path.startsWith("/") || path.length > 2048 || agent.length > 200 || !agent.trim()) return fail();
   const groups: RobotGroup[] = [];
   let current: RobotGroup | null = null;
@@ -73,12 +92,13 @@ export function inspectRobots(input: string, opts: BacklogOptions = {}): Backlog
     const tag = m[1].toLowerCase(), value = m[2];
     if (tag === "user-agent") {
       if (!value) { invalid++; continue; }
-      if (!current || current.rules.length) { current = { agents: [], rules: [] }; groups.push(current); }
+      if (!current || current.sawRule) { current = { agents: [], rules: [], sawRule: false }; groups.push(current); }
       current.agents.push(value.toLowerCase());
       continue;
     }
     if (!current) { invalid++; continue; }
-    if (tag === "disallow" && !value) continue;
+    current.sawRule = true;
+    if (!value) continue;
     current.rules.push({ directive: tag as RobotRule["directive"], pattern: value, order: order++ });
   }
   const lower = agent.toLowerCase();
@@ -91,15 +111,10 @@ export function inspectRobots(input: string, opts: BacklogOptions = {}): Backlog
     if (score === specificity) selected.push(group);
   }
   const rules = selected.flatMap(group => group.rules);
-  function matches(value: string) {
-    const terminal = value.endsWith("$");
-    const source = terminal ? value.slice(0, -1) : value;
-    const body = source.split("*").map(bit => bit.replace(/[.*+?^$\u007b\u007d()|[\]\\]/g, "\\$&")).join(".*");
-    return new RegExp("^" + body + (terminal ? "$" : "")).test(path);
-  }
-  const matching = rules.filter(r => matches(r.pattern))
-    .sort((a,b) => b.pattern.replace(/[*$]/g, "").length - a.pattern.replace(/[*$]/g, "").length ||
-      (a.directive === "allow" ? -1 : 1));
+  const weight = (pattern: string) => (pattern.endsWith("$") ? pattern.slice(0, -1) : pattern).replaceAll("*", "").length;
+  const matching = rules.filter(r => matchesRobotPattern(r.pattern, path))
+    .sort((a,b) => weight(b.pattern) - weight(a.pattern) ||
+      (a.directive === b.directive ? a.order - b.order : a.directive === "allow" ? -1 : 1));
   const winner = matching[0];
   const allowed = !winner || winner.directive === "allow";
   const warnings = [...(invalid ? ["invalidRows"] : []), ...(path.includes("%") ? ["urlEncoding"] : []), "heuristic"];
@@ -118,7 +133,7 @@ export function inspectSitemap(input: string): BacklogReport {
   const ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
   const isIndex = root.localName === "sitemapindex";
   if (root.namespaceURI !== ns || (!isIndex && root.localName !== "urlset")) return fail();
-  const entries = [...root.children].filter(e => e.localName === (isIndex ? "sitemap" : "url") && e.namespaceURI === ns);
+  const entries = [...root.children];
   checkedRows(entries.length);
   const domains = new Map<string, number>();
   const seen = new Set<string>(), rows: BacklogReport["rows"] = [];
@@ -128,19 +143,30 @@ export function inspectSitemap(input: string): BacklogReport {
   for (const [i, element] of entries.entries()) {
     const loc = textChild(element, "loc");
     const lastmod = textChild(element, "lastmod");
+    const fields = [...element.children];
+    const supportedFields = isIndex ? ["loc", "lastmod"] : ["loc", "lastmod", "priority", "changefreq"];
+    const names = fields.map(field => field.localName);
+    let invalidEntry = element.localName !== (isIndex ? "sitemap" : "url") || element.namespaceURI !== ns ||
+      fields.some(field => field.namespaceURI !== ns || !supportedFields.includes(field.localName) || field.children.length > 0) ||
+      names.filter(name => name === "loc").length !== 1 || new Set(names).size !== names.length;
     let host = "";
     try {
       const url = new URL(loc);
-      if (!["http:", "https:"].includes(url.protocol) || url.username || url.password) invalid++;
+      if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || !/^https?:\/\//i.test(loc) ||
+          Array.from(loc).some(char => char.charCodeAt(0) <= 32 || char.charCodeAt(0) === 127) || loc.length > 2048) invalidEntry = true;
       else host = url.hostname;
-    } catch { invalid++; }
+    } catch { invalidEntry = true; }
     if (seen.has(loc)) duplicated++;
     else seen.add(loc);
-    if (lastmod && (!/^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2}))?$/.test(lastmod) ||
-      Number.isNaN(Date.parse(lastmod)))) invalid++;
+    if (names.includes("lastmod") && (!lastmod || Number.isNaN(recordedInstant(lastmod, true)))) invalidEntry = true;
+    const priority = textChild(element, "priority");
+    const changefreq = textChild(element, "changefreq");
+    if (names.includes("priority") && !/^(?:0(?:\.\d+)?|1(?:\.0+)?)$/.test(priority)) invalidEntry = true;
+    if (names.includes("changefreq") && !["always", "hourly", "daily", "weekly", "monthly", "yearly", "never"].includes(changefreq)) invalidEntry = true;
+    if (invalidEntry) invalid++;
     if (!lastmod) missingDate++;
     if (host) domains.set(host, (domains.get(host) ?? 0) + 1);
-    rows.push({ label: "#" + (i + 1), detail: loc.slice(0, 500) });
+    rows.push({ label: "#" + (i + 1), detail: loc });
   }
   const linesOut = ["loc,lastmod", ...entries.map(e => {
     const quote = (s: string) => '"' + s.replace(/"/g, '""') + '"';
@@ -151,11 +177,6 @@ export function inspectSitemap(input: string): BacklogReport {
     rows, linesOut.join("\n"), invalid ? ["invalidRows"] : []);
 }
 type DurationParts = { years: number; months: number; weeks: number; days: number; hours: number; minutes: number; seconds: number };
-function utcMonthDays(year: number, month: number): number {
-  const date = new Date(0);
-  date.setUTCFullYear(year, month, 0);
-  return date.getUTCDate();
-}
 /** #68: calendar months/years are never equated to a fixed number of seconds. */
 export function inspectDuration(input: string, opts: BacklogOptions = {}): BacklogReport {
   guard(input);
@@ -172,21 +193,22 @@ export function inspectDuration(input: string, opts: BacklogOptions = {}): Backl
     hours: nums[4], minutes: nums[5], seconds: nums[6],
   };
   const multiplier = negative ? -1 : 1;
+  const [secondsPart, fractionPart = ""] = (match[7] || "0").split(".");
+  const secondsMs = Number(secondsPart) * 1000 + Number(fractionPart.padEnd(3, "0"));
   const timeMs = multiplier * ((p.weeks * 7 + p.days) * 86400000 +
-    p.hours * 3600000 + p.minutes * 60000 + p.seconds * 1000);
+    p.hours * 3600000 + p.minutes * 60000 + secondsMs);
   if (!Number.isSafeInteger(timeMs)) return fail();
   const reference = opts.reference || "";
   let result = "";
   if (reference.trim()) {
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(reference)) return fail();
-    const when = new Date(reference);
+    const when = new Date(recordedInstant(reference));
     if (Number.isNaN(when.getTime())) return fail();
     const after = new Date(when.getTime());
     const day = after.getUTCDate();
     const nextMonths = multiplier * (p.years * 12 + p.months);
     after.setUTCDate(1);
     after.setUTCMonth(after.getUTCMonth() + nextMonths);
-    after.setUTCDate(Math.min(day, utcMonthDays(after.getUTCFullYear(), after.getUTCMonth() + 1)));
+    after.setUTCDate(Math.min(day, monthDays(after.getUTCFullYear(), after.getUTCMonth() + 1)));
     after.setTime(after.getTime() + timeMs);
     if (Number.isNaN(after.getTime())) return fail();
     result = after.toISOString();
@@ -252,7 +274,9 @@ export function inspectPgDsn(input: string): BacklogReport {
     fields = Object.create(null) as Record<string,string>;
     try {
       fields.user = decodeURIComponent(url.username);
-      fields.password = decodeURIComponent(url.password);
+      const authority = trimmed.slice(trimmed.indexOf("//") + 2).split(/[/?#]/, 1)[0];
+      const userInfo = authority.includes("@") ? authority.slice(0, authority.lastIndexOf("@")) : "";
+      if (userInfo.includes(":")) fields.password = decodeURIComponent(url.password);
       fields.host = url.hostname;
       fields.port = url.port;
       fields.dbname = decodeURIComponent(url.pathname.replace(/^\//, ""));
@@ -263,7 +287,7 @@ export function inspectPgDsn(input: string): BacklogReport {
     } catch { return fail(); }
   } else fields = parseKeywordDsn(trimmed);
   if (!Object.keys(fields).length) return fail();
-  const privateKey = /password|passfile|secret|token|key|credential/i;
+  const privateKey = /password|passfile|secret|token|key|credential|^options$/i;
   const masked: Record<string, string> = Object.create(null) as Record<string, string>;
   const notes: string[] = [];
   for (const [key,value] of Object.entries(fields)) {

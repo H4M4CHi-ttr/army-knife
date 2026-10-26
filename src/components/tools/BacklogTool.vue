@@ -12,6 +12,8 @@ import { inspectBacklog, inspectBacklogWorker } from "@/lib/tools/backlog-runner
 const props = defineProps<{ kind: BacklogKind }>();
 const { t } = useAppI18n();
 const input = ref("");
+const rejected = ref(false);
+const revision = ref(0);
 const mode = ref<"flatten" | "restore">("flatten");
 const dialect = ref<"postgres" | "mysql" | "sqlite">("postgres");
 const table = ref("records");
@@ -40,10 +42,10 @@ const options = computed<BacklogOptions>(() => ({
   agent: agent.value, path: path.value, reference: reference.value,
 }));
 const source = computed(() => [props.kind, input.value, mode.value, dialect.value, table.value,
-  nullToken.value, groupSize.value, field.value, parser.value, agent.value, path.value, reference.value]);
+  nullToken.value, groupSize.value, field.value, parser.value, agent.value, path.value, reference.value, rejected.value]);
 const { result, error, control, apply, cancel, setAuto } = useToolExecution<BacklogReport>({
   source,
-  canRun: () => Boolean(input.value.trim()),
+  canRun: () => Boolean(input.value.trim()) && !rejected.value,
   mode: () => input.value.length <= 2048 ? "instant" : "deferred",
   execute: signal => {
     const request = { kind: props.kind, input: input.value, options: options.value };
@@ -54,9 +56,12 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<Back
 });
 function loadExample() {
   if (props.kind === "json-pointer") mode.value = "flatten";
+  revision.value++;
+  rejected.value = false;
   input.value = samples[props.kind];
 }
-function clear() { input.value = ""; }
+function accept(value: string) { rejected.value = false; input.value = value; }
+function clear() { revision.value++; rejected.value = false; input.value = ""; }
 </script>
 
 <template>
@@ -119,11 +124,13 @@ function clear() { input.value = ""; }
       </div>
     </div>
     <CodeInput
-      v-model="input" :input-id="kind + '-input'"
-      :label="t('backlog.sourceLabel')" :max-bytes="BACKLOG_LIMITS.inputBytes" :rows="10"
+      :key="revision" :model-value="input" :input-id="kind + '-input'"
+      :label="t('backlog.sourceLabel')" :max-bytes="kind === 'json-pointer' && mode === 'restore' ? BACKLOG_LIMITS.outputBytes : BACKLOG_LIMITS.inputBytes" :rows="10"
+      @update:model-value="accept" @rejected="rejected = true"
     />
     <p class="hint">{{ t("tool." + kind + ".hint") }}</p>
     <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />
+    <Button v-if="control.pending" variant="outline" data-testid="backlog-cancel" @click="cancel">{{ t("actions.cancel") }}</Button>
     <p v-if="error" role="alert" class="error-panel">{{ t("errors." + error) }}</p>
     <section v-if="result" class="result-panel" aria-live="polite" data-testid="backlog-results">
       <div class="result-header">
