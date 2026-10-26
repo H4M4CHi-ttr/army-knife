@@ -1,5 +1,16 @@
 # DevToys overlap policy
 
+## Ten complementary inspectors (PR #149, completed 2026-10-27 JST)
+
+NDJSON line inspection, typed JSON Pointer flatten/restore, CSV-to-SQL INSERT,
+SQLite plan inspection, structured JSONL aggregation, stack grouping, offline
+robots rules, sitemap inspection, ISO duration/calendar addition and masked
+PostgreSQL DSNs default **on**. The [official bundled list](https://devtoys.app/)
+was checked on 2026-10-27 JST; general JSON/SQL/XML formatters, JSONPath, text
+comparison and date conversion differ from these dedicated workflows.
+Community extensions are outside this comparison. Existing overlap defaults are
+unchanged. [Exact scope, bounds and approximations](backlog.md).
+
 ## Design / filename tools (2026-10-12)
 
 Cubic-bezier easing, CSS gradient builder, SVG placeholder generator, batch path-string conversion and HSL palette generation are **all opt-in**. Their relationship to bundled DevToys versions and extensions has not been conclusively reverified, so the conservative DevToys-overlap policy is used; no absence claim is made. Each is client-only without added packages.

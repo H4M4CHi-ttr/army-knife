@@ -42,6 +42,7 @@ function inputSelector(id: ToolId): string {
   if (id === "pkce") return "#pkce-mode";
   if (id === "cors") return "#cors-origin";
   if (id === "chmod") return "#chmod-mode";
+  if (id === "json-pointer") return "#json-pointer-input";
   if (id.startsWith("json-")) return "#json-left";
   if (id === "sets") return "#sets-left";
   if (id === "env") return "#env-left";

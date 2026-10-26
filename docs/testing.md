@@ -58,6 +58,14 @@ cross-origin server or claim a complete browser CORS conformance test.
 
 ## Browser coverage
 
+PR #149's ten inspectors have [dedicated parser, Vapor/Worker lifecycle and
+four-project browser coverage](backlog.md#verification-and-independent-review).
+It includes the five-locale/theme samples, strict JSON/date regressions,
+adversarial robots patterns, >64 KiB JSON Pointer restore, secret redaction,
+explicit downloads, cancelled pending work, rejected-input invalidation,
+reload clearing and the exact-dist-asset privacy audit. Screenshots use synthetic
+examples only. No WASM success is mocked or replaced for the full quality gate.
+
 The Content-Disposition inspector adds strict response-field and extended-value
 unit tests plus real Vapor execution/lifecycle tests. Its dedicated four-project
 browser suite covers all five locales, both themes, keyboard operation, exact

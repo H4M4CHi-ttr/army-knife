@@ -88,6 +88,16 @@ const icons = {
   magic: FileKey2,
   "user-agent": ScanText,
   "set-cookie": Link2,
+  "ndjson": Braces,
+  "json-pointer": Braces,
+  "csv-insert": Braces,
+  "sqlite-plan": Braces,
+  "jsonl-logs": Braces,
+  "stack-trace": GitMerge,
+  "robots": Network,
+  "sitemap": Workflow,
+  "iso-duration": CalendarClock,
+  "pg-dsn": FileKey2,
 };
 </script>
 <template><component :is="icons[id]" aria-hidden="true" :stroke-width="1.7" /></template>

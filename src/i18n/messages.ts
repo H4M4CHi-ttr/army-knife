@@ -24,6 +24,7 @@ import { designToolMessages } from "./design-tool-messages.ts";
 import { designLabels } from "./design-labels.ts";
 import { quickMessages } from "./quick.ts";
 import { htmlAccessibilityMessages } from "./html-accessibility.ts";
+import { backlogMessages } from "./backlog.ts";
 
 import { pkceMessages } from "./pkce.ts";
 import { serverTimingMessages } from "./server-timing.ts";
@@ -57,6 +58,7 @@ export const messages = {
     ...designLabels.en,
     ...quickMessages["en"],
     ...htmlAccessibilityMessages.en,
+    ...backlogMessages["en"],
     ...searchMessages.en,
     ...toolMessagesEn,
     "contrast.largeHint":
@@ -86,6 +88,7 @@ export const messages = {
     ...designLabels.ja,
     ...quickMessages["ja"],
     ...htmlAccessibilityMessages.ja,
+    ...backlogMessages["ja"],
     ...searchMessages.ja,
     ...toolMessagesJa,
     "contrast.largeHint":
@@ -115,6 +118,7 @@ export const messages = {
     ...designLabels["zh-CN"],
     ...quickMessages["zh-CN"],
     ...htmlAccessibilityMessages["zh-CN"],
+    ...backlogMessages["zh-CN"],
     ...searchMessages["zh-CN"],
     ...toolZhCN,
     "contrast.largeHint":
@@ -144,6 +148,7 @@ export const messages = {
     ...designLabels["zh-TW"],
     ...quickMessages["zh-TW"],
     ...htmlAccessibilityMessages["zh-TW"],
+    ...backlogMessages["zh-TW"],
     ...searchMessages["zh-TW"],
     ...toolZhTW,
     "contrast.largeHint":
@@ -173,6 +178,7 @@ export const messages = {
     ...designLabels.ko,
     ...quickMessages["ko"],
     ...htmlAccessibilityMessages.ko,
+    ...backlogMessages["ko"],
     ...searchMessages.ko,
     ...toolKo,
     "contrast.largeHint":

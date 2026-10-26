@@ -10,6 +10,16 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 
 | ツール                  | 主な機能                                                                    | 処理                | 初期状態 |
 | ----------------------- | --------------------------------------------------------------------------- | ------------------- | -------- |
+| NDJSON/JSONL検査 | 行ごとのJSON構文・型・キー分布と不正行を確認 | 即時 / Worker | オン |
+| JSON Pointerフラット化・復元 | 空コンテナと配列を保つ型付きRFC 6901ノードを相互変換 | 即時 / Worker | オン |
+| CSV → SQL INSERT生成 | 文字列・NULLを分けて3方言のINSERTを生成、SQL実行なし | 即時 / Worker | オン |
+| SQLite実行計画検査 | 記録済みSCAN・SEARCH・一時B-treeと親子関係を確認 | 即時 / Worker | オン |
+| JSONL構造化ログ集計 | レベル・サービス・requestId・時系列を集計 | 即時 / Worker | オン |
+| スタックトレース集約 | メッセージ・パスを除外し類似フレーム列を推定集約 | 即時 / Worker | オン |
+| robots.txtルールテスター | 仮のUser-Agent・パスに対するルールを通信なしで比較 | 即時 / Worker | オン |
+| sitemap.xml検査 | URL件数・重複・ドメイン・不正項目を確認、巡回なし | 即時 / 遅延・手動 | オン |
+| ISO 8601期間検査 | 暦の月数と固定秒を分けてUTC基準日へ加算 | 即時 / Worker | オン |
+| PostgreSQL接続文字列検査 | DSNを通信せず分解し、秘密フィールドとoptionsをマスク | 即時 / Worker | オン |
 | IDN・Punycodeドメイン検査 | Unicode／ASCIIラベル・コードポイント・限定的な文字体系混在注意を通信せず比較 | TypeScript | オン |
 | HTTPバイト範囲検査 | Rangeの閉区間・末尾指定・範囲外・重複を正確な整数で確認 | TypeScript / BigInt | オン |
 | Git patch検査 | 記録済み差分のファイル・hunk・追加削除行・rename情報を通信せず確認 | 即時 / 遅延・手動 | ON |
@@ -434,3 +444,38 @@ pnpm test            # includes local worker limit and cancellation tests
 ```
 The browser timing artifact is a diagnostic measurement rather than a fixed
 pass/fail latency threshold because browsers and CI runners vary.
+
+## 10 local-first inspectors and converters (October 2026)
+
+The following developer tools execute entirely in the browser. They do not submit pasted text,
+files, credentials or results to remote services. The toolbar can load synthetic examples and
+copy/download reports explicitly. These tools use the existing Vue 3.6 Vapor execution controls,
+including immediate small-input updates, delayed/manual larger-input updates and cancellable workers.
+Sitemap XML uses the browser's inert `DOMParser` on the UI thread (64 KiB maximum); no external
+XML DTD, network fetch or crawler is allowed.
+
+| Issue | Tool | Main behavior and limitations |
+| --- | --- | --- |
+| #35 | NDJSON / JSONL inspector | Per-line validity, type/key distribution; invalid lines do not discard valid rows |
+| #36 | JSON Pointer flatten/restore | Typed RFC 6901 node list preserves empty objects, arrays and numeric keys |
+| #38 | CSV → SQL INSERT | Strict ASCII identifiers, CSV quoting, dialect quoting, explicit NULL marker, batches; output is **not executed** |
+| #41 | SQLite EXPLAIN QUERY PLAN | Four-column pipe/TSV or JSON input; counts SCAN/SEARCH/TEMP B-TREE and shows parent hierarchy; no database connection |
+| #49 | Structured JSONL log inspector | Counts levels/services; optional exact requestId/traceId filter and time ordering; missing times are reported |
+| #51 | Stack trace grouping | JS, Python, Java, .NET frame signatures. Noncryptographic fingerprints omit paths/messages; no source map resolution |
+| #63 | robots.txt rule tester | Simulated user agent and path with Allow/Disallow, '*' and '$'. Not an exact crawler implementation; percent-encoded paths compared verbatim |
+| #64 | sitemap.xml inspector | urlset and sitemapindex XML, URL/host/duplicate counts and lastmod checks; no crawling |
+| #68 | ISO 8601 duration | Calendar years/months separated from fixed seconds, UTC reference arithmetic; local DST and ISO intervals out of scope |
+| #112 | PostgreSQL DSN inspector | PostgreSQL URL and keyword-value syntax with secrets redacted in every output; no connection attempt |
+
+For SQL generation, PostgreSQL uses explicit `E'…'` strings, SQLite uses doubled quotes, and
+MySQL values use `CONVERT(0x… USING utf8mb4)` so backslashes and quote combinations do not
+depend on the connection's `SQL_MODE`. Invalid UTF-16 surrogate input is rejected.
+
+The standard limits are **64 KiB UTF-8 input** (JSON Pointer restore: **128 KiB**),
+**2,000 lines/records or nodes where applicable**, **100 preview rows** and
+**128 KiB exported output**. Larger records or unsupported syntax fail explicitly rather than
+silently producing a complete-looking but truncated report. There are no new runtime dependencies;
+five UI languages, localized static guides and regression tests ship with these tools.
+
+The 2026-10-27 JST scheduled task completes this previously open PR before starting another.
+See [precise semantics, input bounds, privacy and review coverage](docs/backlog.md).
