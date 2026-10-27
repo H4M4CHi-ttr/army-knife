@@ -45,6 +45,11 @@ P-256/P-384/P-521), EdDSA (Ed25519/Ed448) and ECDH-ES with optional
 all supported public keys. All other identifiers are unassessed. This table
 describes declared families, not recommended algorithms or browser support;
 in particular, matching legacy RSA1_5 is not an endorsement of that algorithm.
+Known operations are also checked against subtype capabilities without requiring
+`alg`: Ed25519/Ed448 sign, X25519/X448 agree on keys, and NIST EC can sign or
+agree on keys. Direct encryption/wrapping and agreement operations remain
+distinct; unknown operations are unassessed. Private-key operations declared on
+public-only material get a separate notice.
 
 ## Bounds and lifecycle
 

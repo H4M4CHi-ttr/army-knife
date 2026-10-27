@@ -22,7 +22,13 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution({
 });
 const output = computed(() => result.value ? JSON.stringify(result.value, null, 2) : "");
 function accept(value: string) { rejected.value = false; input.value = value; }
-function replace(value: string) { revision.value++; rejected.value = false; input.value = value; }
+function replace(value: string) {
+  const restart = value === input.value && !rejected.value;
+  revision.value++;
+  rejected.value = false;
+  input.value = value;
+  if (restart) void apply();
+}
 function visible(value: string | string[] | null): string {
   if (value === null) return t("jwk.absent");
   return JSON.stringify(value).replace(/[\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g, c => "\\u" + c.charCodeAt(0).toString(16).padStart(4, "0"));

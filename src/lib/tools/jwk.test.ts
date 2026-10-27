@@ -115,6 +115,24 @@ describe("public JWK/JWKS structure and thumbprints", () => {
     expect(r.keys[0]!.warnings).toEqual(expect.arrayContaining(["usageMismatch", "privateOperation", "unknownOperation"]));
     expect((await inspect({ ...ed, use: "future" })).keys[0]!.warnings).toContain("unknownUse");
   });
+  it.each([
+    { ...ed, use: "enc", key_ops: ["encrypt"] },
+    { ...ed, crv: "X25519", use: "sig", key_ops: ["verify"] },
+    { ...ed, crv: "X25519", alg: "ECDH-ES", key_ops: ["encrypt"] },
+    { ...ed, crv: "X25519", key_ops: ["wrapKey"] },
+    { kty: "EC", crv: "P-256", x: b64(Array<number>(32).fill(0)), y: b64(Array<number>(32).fill(0)), key_ops: ["encrypt"] },
+  ])("reports deterministic subtype/operation contradictions without relying on alg: %s", async key => {
+    expect((await inspect(key)).keys[0]!.warnings).toContain("usageMismatch");
+  });
+  it("does not conflate signing, direct encryption and key agreement operations", async () => {
+    for (const key of [{ ...ed, use: "sig", key_ops: ["verify"] },
+      { ...rsa, alg: "RSA-OAEP-256", use: "enc", key_ops: ["encrypt", "wrapKey"] },
+      { ...ed, crv: "X25519", alg: "ECDH-ES", use: "enc", key_ops: ["deriveBits"] }])
+      expect((await inspect(key)).keys[0]!.warnings).not.toContain("usageMismatch");
+  });
+  it.each(["kid", "alg", "use", "key_ops"])("rejects isolated surrogates consistently in metadata %s", async field => {
+    await expect(inspect({ ...ed, [field]: field === "key_ops" ? ["\ud800"] : "\ud800" })).rejects.toMatchObject({ code: "JWK_METADATA" });
+  });
   it("sanitizes Web Crypto failures", async () => {
     vi.stubGlobal("crypto", { subtle: { digest: () => Promise.reject(new Error("PRIVATE_SENTINEL")) } });
     await expect(inspect(ed)).rejects.toMatchObject({ code: "JWK_CRYPTO", message: "JWK_CRYPTO" });

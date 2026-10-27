@@ -85,4 +85,15 @@ describe("JWK Vapor workflow", () => {
     await wrapper.get('[data-testid="jwk-sample"]').trigger("click"); await waitResult();
     expect(wrapper.find('[role="alert"]').exists()).toBe(false);
   });
+  it("restarts an identical sample after cancel and discards the previous late digest", async () => {
+    let finish!: (value: ArrayBuffer) => void;
+    vi.spyOn(webcrypto.subtle, "digest").mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    await wrapper.get('[data-testid="jwk-sample"]').trigger("click");
+    await wrapper.get('[data-testid="jwk-cancel"]').trigger("click");
+    await wrapper.get('[data-testid="jwk-sample"]').trigger("click"); await waitResult();
+    expect(result().text()).toContain("kPrK_qmxVWaYVA9wwBF6Iuo3vVzz7TxHCTwXBygrS4k");
+    finish(new ArrayBuffer(32)); await flushPromises();
+    expect(wrapper.get('[data-testid="apply-control"]').attributes("data-status")).toBe("applied");
+    expect(result().text()).toContain("kPrK_qmxVWaYVA9wwBF6Iuo3vVzz7TxHCTwXBygrS4k");
+  });
 });

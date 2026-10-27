@@ -117,6 +117,8 @@ test("real file import preserves RSA integers and empty sets are explicit", asyn
   await expect(result).toContainText("9007199254740993"); await expect(result).toContainText("2048");
   await page.locator("#jwk-input").fill('{"keys":[]}'); await expect(result).toContainText("contains no keys");
   await expect(page.getByTestId("jwk-key")).toHaveCount(0);
+  await page.locator("#jwk-input").fill(JSON.stringify({ ...key, crv: "X25519", use: "sig", key_ops: ["verify"] }));
+  await expect(result).toContainText("incompatible purposes or operations");
   await page.goto("./ja/tools/jwk/"); await expect(page.locator("#jwk-input")).toHaveValue("");
   await expect(result).toHaveCount(0);
 });

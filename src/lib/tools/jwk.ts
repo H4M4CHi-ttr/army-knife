@@ -56,20 +56,24 @@ function integer(bytes: Uint8Array): bigint {
   for (const byte of bytes) result = (result << 8n) | BigInt(byte);
   return result;
 }
+function validString(value: unknown, max: number, allowEmpty = true): value is string {
+  return typeof value === "string" && (allowEmpty || value.length > 0) && value.length <= max &&
+    !/[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/u.test(value);
+}
 function metadata(key: ObjectValue, name: string): string | null {
   if (!Object.hasOwn(key, name)) return null;
   const value = key[name];
-  if (typeof value !== "string" || value.length > JWK_LIMITS.metadataCharacters ||
-    /[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/u.test(value)) throw new ToolError("JWK_METADATA");
+  if (!validString(value, JWK_LIMITS.metadataCharacters)) throw new ToolError("JWK_METADATA");
   return value;
 }
 
+type Purpose = "sig" | "enc" | "agreement";
 /** Only these exact JOSE families are assessed. No crypto import/validation. */
-function algorithm(key: JwkKeyReport): "sig" | "enc" | null {
+function algorithm(key: JwkKeyReport): Purpose | null {
   const alg = key.alg;
   if (alg === null) return null;
   let matches: boolean;
-  let purpose: "sig" | "enc" = "sig";
+  let purpose: Purpose = "sig";
   if (/^(RS|PS)(256|384|512)$/.test(alg)) matches = key.kty === "RSA";
   else if (/^RSA-OAEP(?:-(256|384|512))?$/.test(alg) || alg === "RSA1_5") {
     matches = key.kty === "RSA"; purpose = "enc";
@@ -77,7 +81,7 @@ function algorithm(key: JwkKeyReport): "sig" | "enc" | null {
     matches = key.kty === "EC" && key.curve === ({ ES256: "P-256", ES384: "P-384", ES512: "P-521" } as Record<string, string>)[alg];
   } else if (alg === "EdDSA") matches = key.kty === "OKP" && ["Ed25519", "Ed448"].includes(key.curve!);
   else if (/^ECDH-ES(?:\+A(128|192|256)KW)?$/.test(alg)) {
-    matches = key.kty === "EC" || (key.kty === "OKP" && ["X25519", "X448"].includes(key.curve!)); purpose = "enc";
+    matches = key.kty === "EC" || (key.kty === "OKP" && ["X25519", "X448"].includes(key.curve!)); purpose = "agreement";
   } else if (alg === "none" || /^HS(256|384|512)$/.test(alg)) matches = false;
   else { key.algorithmAssessment = "unassessed"; return null; }
   key.algorithmAssessment = matches ? "familyMatch" : "mismatch";
@@ -94,7 +98,7 @@ function inspectKey(value: JsonValue, index: number): JwkKeyReport {
     canonical: "", thumbprint: "", ignoredMembers: 0, warnings: [] };
   if (Object.hasOwn(key, "key_ops")) {
     if (!Array.isArray(key.key_ops) || key.key_ops.length > JWK_LIMITS.operations ||
-      key.key_ops.some(op => typeof op !== "string" || !op || op.length > 32) ||
+      key.key_ops.some(op => !validString(op, 32, false)) ||
       new Set(key.key_ops).size !== key.key_ops.length) throw new ToolError("JWK_METADATA");
     result.keyOps = key.key_ops as string[];
   }
@@ -130,11 +134,20 @@ function inspectKey(value: JsonValue, index: number): JwkKeyReport {
   const ops = result.keyOps ?? [];
   if (ops.some(op => !knownOperations.includes(op))) result.warnings.push("unknownOperation");
   if (ops.some(op => privateOperations.includes(op))) result.warnings.push("privateOperation");
-  const sigOps = ops.some(op => ["sign", "verify"].includes(op));
-  const encOps = ops.some(op => knownOperations.includes(op) && !["sign", "verify"].includes(op));
-  if ((purpose && result.use !== null && ["sig", "enc"].includes(result.use) && purpose !== result.use) ||
-    ((result.use === "sig" || purpose === "sig") && encOps) ||
-    ((result.use === "enc" || purpose === "enc") && sigOps) || (sigOps && encOps)) result.warnings.push("usageMismatch");
+  const operationPurposes: Purpose[] = ops.filter(op => knownOperations.includes(op)).map(op =>
+    ["sign", "verify"].includes(op) ? "sig" : ["deriveKey", "deriveBits"].includes(op) ? "agreement" : "enc");
+  // EC and X25519/X448 agree on keys; they do not perform direct encrypt/wrap
+  // operations. Ed25519/Ed448 only sign. These contradictions are knowable even
+  // with no alg, without importing a key or claiming mathematical validity.
+  const capabilities: Purpose[] = result.kty === "RSA" ? ["sig", "enc"] : result.kty === "EC" ? ["sig", "agreement"] :
+    [result.curve!.startsWith("Ed") ? "sig" : "agreement"];
+  const usePurpose = result.use === "sig" ? "sig" : result.use === "enc" ? "enc" : null;
+  const broad = (value: Purpose) => value === "sig" ? "sig" : "enc";
+  if ((usePurpose && !capabilities.some(value => broad(value) === usePurpose)) ||
+    (usePurpose && purpose && usePurpose !== broad(purpose)) ||
+    operationPurposes.some(value => !capabilities.includes(value) ||
+      (purpose !== null && value !== purpose) || (usePurpose !== null && broad(value) !== usePurpose)) ||
+    new Set(operationPurposes).size > 1) result.warnings.push("usageMismatch");
   return result;
 }
 
