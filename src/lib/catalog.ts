@@ -1,4 +1,5 @@
 export type ToolId =
+  | "jwk"
   | "idn"
   | "http-range"
   | "git-patch"
@@ -75,6 +76,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "jwk", category: "network", wasm: false, devtoys: false,
+    keywords: "jwk jwks public key json web key thumbprint rsa ec okp kid rotation sha256 公開鍵 鍵切替 公钥 公開金鑰 공개 키", color: "rose" },
   { id: "ndjson", category: "data", wasm: false, devtoys: false,
     keywords: "jsonl ndjson parser per-line validity json keys line error JSONL JSON行", color: "green" },
   { id: "json-pointer", category: "data", wasm: false, devtoys: false,
