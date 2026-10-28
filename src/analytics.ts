@@ -6,11 +6,13 @@ if (
   window.location.hostname === "h4m4chi-ttr.github.io" &&
   window.location.pathname.startsWith("/army-knife/")
 ) {
-  const analyticsWindow = window as Window & { dataLayer?: unknown[][] };
+  const analyticsWindow = window as Window & { dataLayer?: unknown[] };
   const dataLayer = (analyticsWindow.dataLayer ||= []);
 
-  function gtag(...args: unknown[]): void {
-    dataLayer.push(args);
+  // gtag.js consumes the Arguments object used by Google's official snippet,
+  // not the plain Array produced by a rest parameter.
+  function gtag(..._args: unknown[]): void {
+    dataLayer.push(arguments);
   }
 
   const script = document.createElement("script");
@@ -21,3 +23,6 @@ if (
   gtag("js", new Date());
   gtag("config", MEASUREMENT_ID);
 }
+
+// Explicit module boundary for the TypeScript module-based bootstrap tests.
+export {};
