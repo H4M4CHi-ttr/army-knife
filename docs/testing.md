@@ -26,7 +26,7 @@ The font source archives and generated output are cached together under a key th
 
 ## Quality gate
 
-The quality job has a 25-minute timeout and performs these steps in order:
+The quality job has a 30-minute timeout so the complete browser suite and report upload fit after the build gates. It performs these steps in order:
 
 1. Install locked JavaScript dependencies and the pinned Python font dependencies.
 2. Build fonts and run `python scripts/build-fonts.py --check` against the resulting assets.
