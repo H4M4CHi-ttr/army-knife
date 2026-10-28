@@ -44,6 +44,7 @@ import { combineClassifierRankings } from "@/lib/search/classifier-runtime";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
 const IdnTool = defineAsyncComponent(() => import("@/components/tools/IdnTool.vue"));
+const JwkTool = defineAsyncComponent(() => import("@/components/tools/JwkTool.vue"));
 const HttpRangeTool = defineAsyncComponent(() => import("@/components/tools/HttpRangeTool.vue"));
 const GitPatchTool = defineAsyncComponent(() => import("@/components/tools/GitPatchTool.vue"));
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
@@ -853,6 +854,7 @@ onBeforeUnmount(() => {
             />
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <JwkTool v-else-if="selectedTool.id === 'jwk'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <IdnTool v-else-if="selectedTool.id === 'idn'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HttpRangeTool v-else-if="selectedTool.id === 'http-range'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GitPatchTool v-else-if="selectedTool.id === 'git-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />

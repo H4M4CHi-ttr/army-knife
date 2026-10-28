@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  jwk: KeyRound,
   idn: Languages,
   "http-range": Ruler,
   "git-patch": GitCompareArrows,

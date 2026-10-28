@@ -1,4 +1,5 @@
 import { idnGuide } from "./idn-guide.ts";
+import { jwkGuide } from "./jwk-guide.ts";
 import { httpRangeGuide } from "./http-range-guide.ts";
 import { patchGuide } from "./git-patch-guide.ts";
 import { serverTimingGuide } from "./server-timing-guide.ts";
@@ -154,6 +155,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  jwk: jwkGuide,
   idn: idnGuide,
   "http-range": httpRangeGuide,
   "git-patch": patchGuide,
