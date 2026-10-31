@@ -26,7 +26,7 @@ The font source archives and generated output are cached together under a key th
 
 ## Quality gate
 
-The quality job has a 25-minute timeout and performs these steps in order:
+The quality job has a 30-minute timeout so the complete browser suite and report upload fit after the build gates. It performs these steps in order:
 
 1. Install locked JavaScript dependencies and the pinned Python font dependencies.
 2. Build fonts and run `python scripts/build-fonts.py --check` against the resulting assets.
@@ -57,6 +57,17 @@ browser errors. These tests check the offline analyzer; they do not contact a
 cross-origin server or claim a complete browser CORS conformance test.
 
 ## Browser coverage
+
+The public [JWK/JWKS inspector](jwk.md) adds published RFC 8037 thumbprint,
+canonical base64url/unsigned integer, exact RSA exponent, EC/OKP length,
+private-material rejection, metadata, duplicate ID/material, algorithm-family,
+deadline and cancellation tests. Its real Vapor tests cover delayed/manual
+execution, rejected-input invalidation, explicit copy and late digest disposal.
+`tests/e2e/jwk.spec.ts` checks all five locales, both themes, keyboard and narrow
+layout, real JSON download/file import, exact integers, private-input rejection,
+reload/locale clearing and exact-dist-asset request/privacy auditing in the four
+specified Chromium/Firefox projects. Synthetic screenshots contain public test
+vectors only. Structural acceptance never means cryptographic validity.
 
 PR #149's ten inspectors have [dedicated parser, Vapor/Worker lifecycle and
 four-project browser coverage](backlog.md#verification-and-independent-review).
