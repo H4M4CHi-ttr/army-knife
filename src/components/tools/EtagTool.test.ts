@@ -119,4 +119,29 @@ describe("ETag Vapor workflow", () => {
     expect(copy.mock.calls[0]![0]).toContain("\\u0080");
     expect(JSON.parse(copy.mock.calls[0]![0]).current.opaque).toBe(opaque);
   });
+  it.each(["sample", "clear", "disable header", "disable representation"] as const)("discards an unfinished file read across %s", async transition => {
+    await sample();
+    const field = transition === "disable representation" ? "current" : "if-match";
+    let finish!: (bytes: ArrayBuffer) => void;
+    const file = new File(['"PRIVATE_ETAG_LATE"'], "recorded.txt", { type: "text/plain" });
+    // Hold only the file I/O boundary; execute the real CodeInput and Vapor view.
+    vi.spyOn(file, "arrayBuffer").mockImplementation(() => new Promise(resolve => { finish = resolve; }));
+    const picker = wrapper.get(`#etag-${field}-file`);
+    Object.defineProperty(picker.element, "files", { configurable: true, value: [file] });
+    await picker.trigger("change");
+    expect(wrapper.find('[data-testid="large-input-loading"]').exists()).toBe(true);
+    if (transition === "sample") await sample();
+    else if (transition === "clear") await wrapper.get('[data-testid="etag-clear"]').trigger("click");
+    else await wrapper.get(transition === "disable header" ? '[data-testid="etag-enable-match"]' : '[data-testid="etag-exists"]').setValue(false);
+    finish(new TextEncoder().encode('"PRIVATE_ETAG_LATE"').buffer);
+    await flushPromises();
+    expect(wrapper.find('[data-testid="large-input-loading"]').exists()).toBe(false);
+    if (transition === "disable header") await wrapper.get('[data-testid="etag-enable-match"]').setValue(true);
+    if (transition === "disable representation") await wrapper.get('[data-testid="etag-exists"]').setValue(true);
+    expect(wrapper.get<HTMLTextAreaElement>(`#etag-${field}`).element.value).toBe(transition === "clear" ? "" : '"revision-2"');
+    if (transition === "clear") expect(result().exists()).toBe(false);
+    else expect(wrapper.get('[data-testid="etag-status"]').text()).toBe("304");
+    expect(wrapper.text()).not.toContain("PRIVATE_ETAG_LATE");
+    expect(copy).not.toHaveBeenCalled();
+  });
 });
