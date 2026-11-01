@@ -1,3 +1,4 @@
+import { etagMessages } from "./etag.ts";
 import { idnMessages } from "./idn.ts";
 import { jwkMessages } from "./jwk.ts";
 import { httpRangeMessages } from "./http-range.ts";
@@ -36,6 +37,7 @@ import { searchMessages } from "./search.ts";
 
 export const messages = {
   en: {
+    ...etagMessages.en,
     ...jwkMessages.en,
     ...idnMessages["en"],
     ...httpRangeMessages["en"],
@@ -67,6 +69,7 @@ export const messages = {
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
   },
   ja: {
+    ...etagMessages.ja,
     ...jwkMessages.ja,
     ...idnMessages["ja"],
     ...httpRangeMessages["ja"],
@@ -98,6 +101,7 @@ export const messages = {
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
   },
   "zh-CN": {
+    ...etagMessages["zh-CN"],
     ...jwkMessages["zh-CN"],
     ...idnMessages["zh-CN"],
     ...httpRangeMessages["zh-CN"],
@@ -129,6 +133,7 @@ export const messages = {
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
   },
   "zh-TW": {
+    ...etagMessages["zh-TW"],
     ...jwkMessages["zh-TW"],
     ...idnMessages["zh-TW"],
     ...httpRangeMessages["zh-TW"],
@@ -160,6 +165,7 @@ export const messages = {
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
   },
   ko: {
+    ...etagMessages.ko,
     ...jwkMessages.ko,
     ...idnMessages["ko"],
     ...httpRangeMessages["ko"],

@@ -58,6 +58,15 @@ cross-origin server or claim a complete browser CORS conformance test.
 
 ## Browser coverage
 
+The [ETag precondition inspector](etag.md) adds literal strong/weak, six-method,
+present-empty/absent, wildcard, unknown, precedence, grammar/octet and limit
+unit tests. Real Vapor tests check activation, stale-report invalidation,
+pending/manual/cancel flow and exact explicit export. `tests/e2e/etag.spec.ts`
+covers five locales, themes, keyboard and narrow layouts, real file import and
+JSON download, rejected input, memory-only clearing and an exact-dist-asset
+network/privacy audit in all four specified Chromium/Firefox projects.
+Its 304/412 values describe the bounded model, not live server behavior.
+
 The public [JWK/JWKS inspector](jwk.md) adds published RFC 8037 thumbprint,
 canonical base64url/unsigned integer, exact RSA exponent, EC/OKP length,
 private-material rejection, metadata, duplicate ID/material, algorithm-family,

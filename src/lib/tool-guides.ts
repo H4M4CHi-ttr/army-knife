@@ -1,3 +1,4 @@
+import { etagGuide } from "./etag-guide.ts";
 import { idnGuide } from "./idn-guide.ts";
 import { jwkGuide } from "./jwk-guide.ts";
 import { httpRangeGuide } from "./http-range-guide.ts";
@@ -155,6 +156,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  etag: etagGuide,
   jwk: jwkGuide,
   idn: idnGuide,
   "http-range": httpRangeGuide,

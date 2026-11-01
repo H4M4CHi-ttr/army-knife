@@ -190,6 +190,14 @@ The project uses VoidZero's **Vite+**, not only Vite. Its [local CLI documentati
 - **Git merge/diff3 conflict inspector: On.** Passive parsing and independent copying; never applies a patch, resolves a conflict or performs Git operations.
 - These conservative decisions use the documented bundled DevToys snapshot above, without claiming absence of third-party extensions. Inputs are memory-only; preferences are the only persistent app data.
 
+## ETag preconditions
+
+The [official bundled list](https://devtoys.app/) was checked on 2026-11-02 JST.
+Generic hashes and text comparison do not inspect recorded ETag conditions or
+strong/weak If-Match / If-None-Match precedence. This complementary tool defaults
+**on**; third-party extensions are outside the comparison. Its [bounded model,
+unknown states and non-goals](etag.md) do not predict a live HTTP response.
+
 ## OAuth PKCE S256
 
 The [PKCE specification](pkce.md) describes strictly bounded native Web Crypto
