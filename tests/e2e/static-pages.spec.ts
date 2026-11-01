@@ -39,6 +39,7 @@ async function preferences(page: Page, enabledTools: readonly ToolId[], locale: 
 }
 
 function inputSelector(id: ToolId): string {
+  if (id === "etag") return "#etag-current";
   if (id === "pkce") return "#pkce-mode";
   if (id === "cors") return "#cors-origin";
   if (id === "chmod") return "#chmod-mode";
@@ -183,21 +184,20 @@ test.describe("JavaScript disabled", () => {
   });
 });
 
-test("all registered tools mount when explicitly enabled on their normal paths", async ({
-  page,
-}) => {
-  await preferences(
-    page,
-    tools.map((tool) => tool.id),
-  );
-  for (const tool of tools) {
-    const response = await page.goto(toolPath("en", tool.id));
-    expect(response?.status(), tool.id).toBe(200);
-    await expect(page.locator(inputSelector(tool.id))).toBeVisible();
-    await expect(page.locator("#page-guide")).toHaveAttribute("data-tool", tool.id);
-    await expect(page).toHaveURL(new RegExp(`${toolPath("en", tool.id)}$`));
-  }
-});
+// Bound each test's work as the inventory grows; every registered tool is visited.
+for (let start = 0; start < tools.length; start += 10) {
+  const batch = tools.slice(start, start + 10);
+  test(`all registered tools mount when explicitly enabled on their normal paths (${start + 1}–${start + batch.length})`, async ({ page }) => {
+    await preferences(page, tools.map((tool) => tool.id));
+    for (const tool of batch) {
+      const response = await page.goto(toolPath("en", tool.id));
+      expect(response?.status(), tool.id).toBe(200);
+      await expect(page.locator(inputSelector(tool.id))).toBeVisible();
+      await expect(page.locator("#page-guide")).toHaveAttribute("data-tool", tool.id);
+      await expect(page).toHaveURL(new RegExp(`${toolPath("en", tool.id)}$`));
+    }
+  });
+}
 
 test("disabled preferences keep the static explanation and prevent tool launch even on reload", async ({
   page,
