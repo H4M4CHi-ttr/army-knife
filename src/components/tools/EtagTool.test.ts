@@ -1,0 +1,122 @@
+import { flushPromises, mount, type VueWrapper } from "@vue/test-utils";
+import { defineComponent, h, vaporInteropPlugin } from "vue";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
+import EtagTool from "./EtagTool.vue";
+import { i18n } from "@/i18n";
+import { defaultPreferences, settings } from "@/lib/preferences";
+
+let wrapper: VueWrapper;
+const copy = vi.fn(async (_text: string) => {});
+const result = () => wrapper.find('[data-testid="etag-result"]');
+beforeEach(() => {
+  copy.mockClear();
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: copy } });
+  localStorage.clear(); sessionStorage.clear();
+  Object.assign(settings.preferences, defaultPreferences("en")); i18n.global.locale.value = "en";
+  wrapper = mount(defineComponent({ render: () => h("div", [h(EtagTool)]) }), { global: { plugins: [vaporInteropPlugin, i18n] } });
+});
+afterEach(() => { if (wrapper?.exists()) wrapper.unmount(); vi.restoreAllMocks(); vi.useRealTimers(); });
+const sample = () => wrapper.get('[data-testid="etag-sample"]').trigger("click");
+
+describe("ETag Vapor workflow", () => {
+  it("renders the real strong/weak model and reacts to method and current-tag changes", async () => {
+    expect(result().exists()).toBe(false);
+    expect(wrapper.get<HTMLTextAreaElement>("#etag-if-match").element.disabled).toBe(true);
+    await sample();
+    expect(wrapper.get('[data-testid="etag-status"]').text()).toBe("304");
+    expect(wrapper.get('[data-testid="etag-header-ifMatch"]').text()).toContain("Condition passes");
+    expect(wrapper.get('[data-testid="etag-header-ifNoneMatch"]').text()).toContain("Condition fails");
+    expect(result().findAll('[data-testid="etag-tag"]')).toHaveLength(3);
+    await wrapper.get('[data-testid="etag-method"]').setValue("PUT");
+    expect(wrapper.get('[data-testid="etag-status"]').text()).toBe("412");
+    expect(wrapper.find('[data-testid="etag-applied-exception"]').exists()).toBe(false);
+    await wrapper.get("#etag-current").setValue('W/"revision-2"');
+    expect(wrapper.get('[data-testid="etag-header-ifNoneMatch"]').text()).toContain("Skipped");
+    expect(wrapper.get('[data-testid="etag-applied-exception"]').text()).toContain("already succeeded");
+    await wrapper.get('[data-testid="etag-clear"]').trigger("click");
+    expect(result().exists()).toBe(false);
+  });
+  it("distinguishes enabled empty fields, absent headers and missing current data", async () => {
+    await wrapper.get('[data-testid="etag-enable-match"]').setValue(true);
+    expect(wrapper.get('[data-testid="etag-status"]').text()).toBe("412");
+    expect(result().text()).toContain("Empty tag list");
+    await wrapper.get('[data-testid="etag-enable-match"]').setValue(false);
+    expect(result().exists()).toBe(false);
+    await wrapper.get('[data-testid="etag-enable-none"]').setValue(true);
+    expect(wrapper.get('[data-testid="etag-decision"]').text()).toContain("Continue");
+    await wrapper.get("#etag-if-none-match").setValue('"v2"');
+    expect(wrapper.get('[data-testid="etag-decision"]').text()).toContain("Unassessed");
+    expect(wrapper.find('[data-testid="etag-incomplete"]').exists()).toBe(true);
+    await wrapper.get('[data-testid="etag-exists"]').setValue(false);
+    expect(wrapper.get('[data-testid="etag-decision"]').text()).toContain("Continue");
+    expect(wrapper.get<HTMLTextAreaElement>("#etag-current").element.disabled).toBe(true);
+  });
+  it("omits inactive retained values from exports and never saves input", async () => {
+    await sample();
+    await wrapper.get("#etag-current").setValue('"PRIVATE_ETAG_UNUSED"');
+    await wrapper.get('[data-testid="etag-exists"]').setValue(false);
+    await wrapper.get('[data-testid="etag-enable-match"]').setValue(false);
+    expect(wrapper.get<HTMLTextAreaElement>("#etag-current").element.value).toBe('"PRIVATE_ETAG_UNUSED"');
+    expect(result().text()).not.toContain("PRIVATE_ETAG_UNUSED");
+    expect(copy).not.toHaveBeenCalled();
+    await result().get('.output-actions button').trigger("click"); await flushPromises();
+    const text = copy.mock.calls[0]![0], data = JSON.parse(text);
+    expect(data).toMatchObject({ current: null, currentIgnored: true, decision: "proceed", ifMatch: { kind: "absent", tags: [] } });
+    expect(text).not.toContain("PRIVATE_ETAG_UNUSED");
+    expect(JSON.stringify({ ...localStorage, ...sessionStorage })).not.toContain("PRIVATE_ETAG_UNUSED");
+  });
+  it("clears stale exports on malformed input and rejected paste, including activation changes", async () => {
+    await sample();
+    await wrapper.get("#etag-if-match").setValue("PRIVATE_ETAG_INVALID");
+    expect(result().exists()).toBe(false); expect(wrapper.find('.output-actions').exists()).toBe(false);
+    expect(wrapper.get('[role="alert"]').text()).not.toContain("PRIVATE_ETAG_INVALID");
+    await wrapper.get("#etag-if-match").setValue('"revision-2"');
+    expect(result().exists()).toBe(true);
+    const event = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "clipboardData", { value: { getData: () => "x".repeat(8193) } });
+    wrapper.get("#etag-if-match").element.dispatchEvent(event); await flushPromises();
+    expect(event.defaultPrevented).toBe(true); expect(result().exists()).toBe(false);
+    await wrapper.get('[data-testid="etag-enable-match"]').setValue(false);
+    expect(result().exists()).toBe(true);
+    await wrapper.get('[data-testid="etag-enable-match"]').setValue(true);
+    expect(result().exists()).toBe(false);
+    await sample(); expect(result().exists()).toBe(true);
+  });
+  it("waits 800ms, cancels and applies manually without retaining old results", async () => {
+    vi.useFakeTimers(); await sample();
+    const source = '"revision-2"' + " ".repeat(2100);
+    await wrapper.get("#etag-if-none-match").setValue(source);
+    expect(wrapper.get('[data-testid="apply-control"]').attributes("data-status")).toBe("pending");
+    expect(result().exists()).toBe(false);
+    await vi.advanceTimersByTimeAsync(799); expect(result().exists()).toBe(false);
+    await vi.advanceTimersByTimeAsync(1); expect(result().exists()).toBe(true);
+    await wrapper.get("#etag-if-none-match").setValue(source + " ");
+    await wrapper.get('[data-testid="etag-cancel"]').trigger("click");
+    await vi.advanceTimersByTimeAsync(1000); expect(result().exists()).toBe(false);
+    await wrapper.get('[data-testid="auto-apply-toggle"]').setValue(false);
+    await wrapper.get("#etag-if-none-match").setValue(source + "  ");
+    await vi.advanceTimersByTimeAsync(1000); expect(result().exists()).toBe(false);
+    await wrapper.get('[data-testid="apply-now"]').trigger("click");
+    expect(wrapper.get('[data-testid="etag-status"]').text()).toBe("304");
+  });
+  it("loads the sample after pending cancellation and cancels on disposal", async () => {
+    vi.useFakeTimers(); await sample();
+    await wrapper.get("#etag-if-none-match").setValue('"revision-2"' + " ".repeat(2100));
+    await wrapper.get('[data-testid="etag-cancel"]').trigger("click");
+    await sample(); expect(wrapper.get('[data-testid="etag-status"]').text()).toBe("304");
+    await wrapper.get("#etag-if-none-match").setValue('"revision-2"' + " ".repeat(2200));
+    wrapper.unmount(); await vi.advanceTimersByTimeAsync(1000);
+    expect(copy).not.toHaveBeenCalled();
+  });
+  it("renders octets and markup as escaped JSON strings and exports their exact values explicitly", async () => {
+    const opaque = "PRIVATE_\u0080<img/src=x>", raw = `"${opaque}"`;
+    await wrapper.get("#etag-current").setValue(raw);
+    await wrapper.get('[data-testid="etag-enable-none"]').setValue(true);
+    await wrapper.get("#etag-if-none-match").setValue(raw);
+    expect(result().text()).toContain("\\u0080"); expect(result().text()).not.toContain("\u0080");
+    expect(wrapper.find("img").exists()).toBe(false); expect(wrapper.find("a").exists()).toBe(false);
+    await result().get('.output-actions button').trigger("click"); await flushPromises();
+    expect(copy.mock.calls[0]![0]).toContain("\\u0080");
+    expect(JSON.parse(copy.mock.calls[0]![0]).current.opaque).toBe(opaque);
+  });
+});

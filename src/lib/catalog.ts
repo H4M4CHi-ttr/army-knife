@@ -1,4 +1,5 @@
 export type ToolId =
+  | "etag"
   | "jwk"
   | "idn"
   | "http-range"
@@ -76,6 +77,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "etag", category: "network", wasm: false, devtoys: false,
+    keywords: "etag if-match if-none-match conditional request 304 412 strong weak cache update 条件付き 強比較 弱比較 条件请求 條件請求 조건부 요청", color: "blue" },
   { id: "jwk", category: "network", wasm: false, devtoys: false,
     keywords: "jwk jwks public key json web key thumbprint rsa ec okp kid rotation sha256 公開鍵 鍵切替 公钥 公開金鑰 공개 키", color: "rose" },
   { id: "ndjson", category: "data", wasm: false, devtoys: false,
