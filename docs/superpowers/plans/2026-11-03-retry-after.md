@@ -16,6 +16,7 @@ messages and static guides expose the tool without loading analysis in guides.
 
 - 8 KiB field / 64-byte reference / 40-digit delay / years 0001–9999.
 - Explicit UTC reference; strict IMF-fixdate only; no leap seconds.
+- Field dates follow IMF years 1900–9999; reference/output years remain 0001–9999.
 - Immediate through 2,048 characters, otherwise 800ms/manual/cancel.
 - Five locales; no input persistence, network processing or new dependencies.
 - Draft PR first; final-head gates and ordinary merge; existing Pages verification.

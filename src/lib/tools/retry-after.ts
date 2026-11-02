@@ -51,6 +51,8 @@ export function inspectRetryAfter(input: string, reference: string): RetryAfterR
     if (/^[A-Za-z]+, \d{2}-[A-Za-z]{3}-\d{2} /.test(value) || /^[A-Za-z]{3} [A-Za-z]{3} [ \d]\d /.test(value)) fail("RETRY_AFTER_DATE_UNSUPPORTED");
     const date = /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT$/.exec(value);
     if (!date) fail();
+    // RFC 9110 imports IMF's year semantics (RFC 5322 section 3.3).
+    if (Number(date[4]) < 1900) fail();
     if (date[7] === "60") fail("RETRY_AFTER_DATE_UNSUPPORTED");
     const parsed = utc(Number(date[4]), months.indexOf(date[3]!), Number(date[2]), Number(date[5]), Number(date[6]), Number(date[7]), 0, "RETRY_AFTER_SYNTAX");
     if (weekdays[parsed.getUTCDay()] !== date[1]) fail();

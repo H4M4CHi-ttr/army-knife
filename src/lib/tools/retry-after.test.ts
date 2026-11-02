@@ -39,6 +39,11 @@ describe("recorded Retry-After arithmetic", () => {
     expect(inspectRetryAfter("0", "9999-12-31T23:59:59.999Z").targetUtc).toBe("9999-12-31T23:59:59.999Z");
     expect(inspectRetryAfter("1", "9999-12-31T23:59:59Z").targetUtc).toBeNull();
   });
+  it("enforces IMF's 1900 lower year while keeping the reference calendar independent", () => {
+    expect(code("Mon, 01 Jan 0001 00:00:00 GMT")).toBe("RETRY_AFTER_SYNTAX");
+    expect(code("Sun, 01 Jan 1899 00:00:00 GMT")).toBe("RETRY_AFTER_SYNTAX");
+    expect(inspectRetryAfter("Mon, 01 Jan 1900 00:00:00 GMT", "1899-12-31T23:59:59Z")).toMatchObject({ waitMilliseconds: "1000", minimumWholeSeconds: "1", targetUtc: "1900-01-01T00:00:00.000Z" });
+  });
   it.each(["", "-1", "+1", "1.5", "1e3", "0x10", "１", "120, 240", "Retry-After : 120", "Date: 120", "120\n", "120\r\nRetry-After: 2", "120\u00a0", "120\u202e", "120\0", "\uFEFF120", "Tue, 03 nov 2026 00:00:00 GMT", "tue, 03 Nov 2026 00:00:00 GMT", "Tue, 03 Nov 2026 00:00:00 UTC", "Mon, 03 Nov 2026 00:00:00 GMT", "Thu, 29 Feb 2023 00:00:00 GMT", "Tue, 31 Nov 2026 00:00:00 GMT", "Tue, 03 Nov 2026 24:00:00 GMT", "Tue, 03 Nov 0000 00:00:00 GMT", "Sun, 06 Nov 1994 08:49:37 GMT, 120"])("rejects the whole malformed/unsupported field: %s", input => {
     expect(code(input)).toBe("RETRY_AFTER_SYNTAX");
   });

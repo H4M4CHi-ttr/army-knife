@@ -21,11 +21,12 @@ the autonomous daily development request, not separate user design approvals.
   negative/fractional/exponent delays and non-ASCII whitespace are rejected.
 - Non-negative decimal delay-seconds, at most 40 digits, normalized exactly.
 - Strict sender-format IMF-fixdate with case-sensitive English weekday/month
-  names and GMT. Verify calendar and weekday. Years 0001–9999; obsolete HTTP-date
+  names and GMT. Verify calendar and weekday. Field years 1900–9999 (RFC 5322);
+  obsolete HTTP-date
   formats and leap seconds are explicitly unsupported, not classified as
   universally invalid HTTP. This is not a full HTTP recipient implementation.
 - Required reference: explicit UTC `YYYY-MM-DDTHH:mm:ss[.SSS]Z`, 1–3 fractional
-  digits optional, same year/calendar bounds; no implicit current clock, local
+  digits optional, years 0001–9999 and strict calendar; no implicit current clock, local
   time or timezone inference. It represents response receipt, not server Date.
 - Exact remaining milliseconds and minimum whole seconds (positive fractions
   rounded up). Past dates clamp the remaining duration to zero and are marked

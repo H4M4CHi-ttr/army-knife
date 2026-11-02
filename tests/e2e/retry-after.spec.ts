@@ -96,7 +96,7 @@ test("Retry-After explicit JSON, inert input and memory-only lifecycle", async (
 test("Retry-After rejects malformed, obsolete and over-limit input without stale exports", async ({ page }) => {
   await page.goto("./en/tools/retry-after/"); await page.getByTestId("retry-sample").click();
   const result = page.getByTestId("retry-result");
-  for (const text of ["-1", "Mon, 03 Nov 2026 00:00:00 GMT", "Tue, 31 Nov 2026 00:00:00 GMT", "120, 240", "120\nRetry-After: 10", "9".repeat(41)]) {
+  for (const text of ["-1", "Mon, 03 Nov 2026 00:00:00 GMT", "Tue, 31 Nov 2026 00:00:00 GMT", "Sun, 01 Jan 1899 00:00:00 GMT", "120, 240", "120\nRetry-After: 10", "9".repeat(41)]) {
     await page.locator("#retry-after-input").fill(text);
     await expect(result).toHaveCount(0); await expect(page.locator(".output-actions")).toHaveCount(0);
     await expect(page.getByRole("alert")).toBeVisible();

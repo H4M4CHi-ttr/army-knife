@@ -17,7 +17,8 @@ instead leaves **119750 ms**, or **120 whole seconds**, from that same receipt.
   BigInt preserves precision; JSON durations are strings. A target beyond years
   0001–9999 is explicitly unavailable while the exact duration remains available.
 - Date input uses strict, case-sensitive IMF-fixdate: English weekday/month,
-  fixed spaces and `GMT`. Calendar date and weekday must agree. Obsolete RFC 850
+  fixed spaces and `GMT`, years 1900–9999 per IMF semantics. Calendar date and
+  weekday must agree. Obsolete RFC 850
   and asctime forms, leap seconds and year zero are unsupported. The error makes
   clear that unsupported old dates are not necessarily invalid HTTP.
 - This deliberately inspects sender format, **not** every valid HTTP recipient
@@ -67,3 +68,4 @@ production, license/static-page and browser gates remain required.
 
 Sources: [RFC 9110 Retry-After](https://www.rfc-editor.org/rfc/rfc9110.html#section-10.2.3),
 [HTTP date formats](https://www.rfc-editor.org/rfc/rfc9110.html#section-5.6.7).
+[IMF calendar semantics](https://www.rfc-editor.org/rfc/rfc5322.html#section-3.3).
