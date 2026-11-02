@@ -89,7 +89,8 @@ test("Retry-After explicit JSON, inert input and memory-only lifecycle", async (
   expect(JSON.stringify(state)).not.toContain(PRIVATE);
   await page.reload(); await expect(page.locator("#retry-after-input")).toHaveValue(""); await expect(result).toHaveCount(0);
   await page.getByTestId("retry-sample").click();
-  await page.getByTestId("settings-button").click(); await page.getByTestId("locale-select").selectOption("ja"); await page.getByTestId("settings-close").click();
+  await page.getByTestId("settings-button").click(); await page.getByTestId("locale-select").selectOption("ja");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator("#retry-after-input")).toHaveValue(""); await expect(result).toHaveCount(0);
 });
 
@@ -127,7 +128,8 @@ test("Retry-After 800ms waiting, cancel, manual apply and disposal", async ({ pa
   const source = "120" + " ".repeat(2100);
   await input.fill(source); await expect(result).toHaveCount(0);
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "pending");
-  await expect(page.locator(".apply-progress")).toBeVisible();
+  await expect(page.getByTestId("execution-status")).toHaveText("Applying after you pause");
+  await expect(page.getByTestId("apply-now")).toContainText("0.8s");
   await page.clock.runFor(799); await expect(result).toHaveCount(0);
   await page.clock.runFor(1); await expect(page.getByTestId("retry-milliseconds")).toHaveText("120000");
   await input.fill(source + " "); await page.getByTestId("retry-cancel").focus(); await page.keyboard.press("Enter");
