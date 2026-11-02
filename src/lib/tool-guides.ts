@@ -1,4 +1,5 @@
 import { etagGuide } from "./etag-guide.ts";
+import { retryAfterGuide } from "./retry-after-guide.ts";
 import { idnGuide } from "./idn-guide.ts";
 import { jwkGuide } from "./jwk-guide.ts";
 import { httpRangeGuide } from "./http-range-guide.ts";
@@ -157,6 +158,7 @@ function localized(
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
   etag: etagGuide,
+  "retry-after": retryAfterGuide,
   jwk: jwkGuide,
   idn: idnGuide,
   "http-range": httpRangeGuide,

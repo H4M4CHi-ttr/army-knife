@@ -1,4 +1,5 @@
 export type ToolId =
+  | "retry-after"
   | "etag"
   | "jwk"
   | "idn"
@@ -77,6 +78,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "retry-after", category: "network", wasm: false, devtoys: false,
+    keywords: "http retry-after delay seconds receipt 429 503 rate limit backoff imf-fixdate utc 再試行 待機 受信 重试 重試 재시도 대기", color: "blue" },
   { id: "etag", category: "network", wasm: false, devtoys: false,
     keywords: "etag if-match if-none-match conditional request 304 412 strong weak cache update 条件付き 強比較 弱比較 条件请求 條件請求 조건부 요청", color: "blue" },
   { id: "jwk", category: "network", wasm: false, devtoys: false,

@@ -1,4 +1,5 @@
 import { etagMessages } from "./etag.ts";
+import { retryAfterMessages } from "./retry-after.ts";
 import { idnMessages } from "./idn.ts";
 import { jwkMessages } from "./jwk.ts";
 import { httpRangeMessages } from "./http-range.ts";
@@ -38,6 +39,7 @@ import { searchMessages } from "./search.ts";
 export const messages = {
   en: {
     ...etagMessages.en,
+    ...retryAfterMessages.en,
     ...jwkMessages.en,
     ...idnMessages["en"],
     ...httpRangeMessages["en"],
@@ -70,6 +72,7 @@ export const messages = {
   },
   ja: {
     ...etagMessages.ja,
+    ...retryAfterMessages.ja,
     ...jwkMessages.ja,
     ...idnMessages["ja"],
     ...httpRangeMessages["ja"],
@@ -102,6 +105,7 @@ export const messages = {
   },
   "zh-CN": {
     ...etagMessages["zh-CN"],
+    ...retryAfterMessages["zh-CN"],
     ...jwkMessages["zh-CN"],
     ...idnMessages["zh-CN"],
     ...httpRangeMessages["zh-CN"],
@@ -134,6 +138,7 @@ export const messages = {
   },
   "zh-TW": {
     ...etagMessages["zh-TW"],
+    ...retryAfterMessages["zh-TW"],
     ...jwkMessages["zh-TW"],
     ...idnMessages["zh-TW"],
     ...httpRangeMessages["zh-TW"],
@@ -166,6 +171,7 @@ export const messages = {
   },
   ko: {
     ...etagMessages.ko,
+    ...retryAfterMessages.ko,
     ...jwkMessages.ko,
     ...idnMessages["ko"],
     ...httpRangeMessages["ko"],
