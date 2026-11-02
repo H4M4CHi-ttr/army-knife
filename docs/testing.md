@@ -58,6 +58,13 @@ cross-origin server or claim a complete browser CORS conformance test.
 
 ## Browser coverage
 
+The [Retry-After inspector](retry-after.md) adds exact 40-digit delay, fractional
+receipt, calendar/weekday, past/equal, unsupported-date and size-limit vectors.
+Real Vapor tests cover rejected-edit invalidation and execution lifecycle.
+Its dedicated four-project browser suite covers five locales, both themes,
+keyboard/narrow layouts, explicit exact JSON, delayed/manual/cancel behavior,
+memory-only clearing and exact-dist-asset privacy with synthetic screenshots.
+
 The [ETag precondition inspector](etag.md) adds literal strong/weak, six-method,
 present-empty/absent, wildcard, unknown, precedence, grammar/octet and limit
 unit tests. Real Vapor tests check activation, stale-report invalidation,

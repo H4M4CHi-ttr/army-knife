@@ -1,5 +1,13 @@
 # DevToys overlap policy
 
+## Retry-After inspector (2026-11-03 JST)
+
+Recorded delay-seconds / strict sender-format IMF-fixdate inspection against
+explicit receipt time defaults **on**. No dedicated retry-timing workflow was
+found in the [official bundled list](https://devtoys.app/) checked on 2026-11-03
+JST; generic date conversion does not perform this header workflow. Community
+extensions are outside this comparison. [Exact scope and bounds](retry-after.md).
+
 ## Ten complementary inspectors (PR #149, completed 2026-10-27 JST)
 
 NDJSON line inspection, typed JSON Pointer flatten/restore, CSV-to-SQL INSERT,
