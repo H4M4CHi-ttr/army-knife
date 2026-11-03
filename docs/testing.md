@@ -58,6 +58,14 @@ cross-origin server or claim a complete browser CORS conformance test.
 
 ## Browser coverage
 
+The [Docker image reference inspector](image-reference.md) adds default/explicit
+registry, repository/tag grammar, alias/case, exact port text, IPv6, digest
+precedence and input/structure boundary tests. Real Vapor tests check immediate
+updates, all-or-nothing invalidation, localized errors, explicit export and
+disposal. Its four-project browser suite covers five languages, themes,
+keyboard/narrow layouts, exact JSON, rejected paste, saved auto-apply off,
+navigation/reload clearing and exact-distribution network/privacy audits.
+
 The [Retry-After inspector](retry-after.md) adds exact 40-digit delay, fractional
 receipt, calendar/weekday, past/equal, unsupported-date and size-limit vectors.
 Real Vapor tests cover rejected-edit invalidation and execution lifecycle.
