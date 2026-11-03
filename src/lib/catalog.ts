@@ -1,4 +1,5 @@
 export type ToolId =
+  | "image-reference"
   | "retry-after"
   | "etag"
   | "jwk"
@@ -78,6 +79,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "image-reference", category: "network", wasm: false, devtoys: false,
+    keywords: "docker image container reference registry repository tag digest sha256 sha512 oci pull イメージ 参照 コンテナ 镜像 映像 容器 이미지 참조 컨테이너", color: "blue" },
   { id: "retry-after", category: "network", wasm: false, devtoys: false,
     keywords: "http retry-after delay seconds receipt 429 503 rate limit backoff imf-fixdate utc 再試行 待機 受信 重试 重試 재시도 대기", color: "blue" },
   { id: "etag", category: "network", wasm: false, devtoys: false,

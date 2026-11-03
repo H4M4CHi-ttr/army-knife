@@ -1,5 +1,13 @@
 # DevToys overlap policy
 
+## Docker image reference inspector (2026-11-04 JST)
+
+Offline named Docker reference decomposition, explicit Hub/library/latest
+defaults and digest selection precedence default **on**. No dedicated workflow
+was found in the [official bundled list](https://devtoys.app/) checked on
+2026-11-04 JST. Hash generators do not inspect named registry references.
+Community extensions are outside this comparison. [Scope and bounds](image-reference.md).
+
 ## Retry-After inspector (2026-11-03 JST)
 
 Recorded delay-seconds / strict sender-format IMF-fixdate inspection against
