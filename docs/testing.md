@@ -1,5 +1,18 @@
 # Testing and deployment
 
+## Trace Context coverage (2026-11-05 JST)
+
+The [bounded Trace Context specification](trace-context.md) defines recorded
+Level 1 version 00 values, exact hexadecimal IDs, bit-mask interpretation and
+ordered opaque vendor entries. Pure tests cover all 256 flag bytes, nonzero
+IDs, unsupported versions, key/value grammar, duplicate and empty members and
+exact raw byte/count limits. Real Vapor tests cover dual-input invalidation,
+rejected edits, inert text, explicit copy, translations and memory disposal.
+`tests/e2e/trace-context.spec.ts` runs five locales and both themes in all four
+Chromium/Firefox desktop/390px projects, verifies actual JSON downloads and
+navigation/reload/locale clearing, and audits exact-dist-asset requests for
+input leakage. These checks do not test a live tracing backend or propagation.
+
 The repository's [GitHub Actions workflow](../.github/workflows/ci.yml) tests the production build on every pull request, push to `main`, and manual workflow run. A successful run on `main` deploys that same build to GitHub Pages. Pull requests and manual runs on other branches run the complete quality gate without deploying.
 
 ## Reproducible build inputs

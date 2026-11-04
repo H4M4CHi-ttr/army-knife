@@ -1,4 +1,5 @@
 export type ToolId =
+  | "trace-context"
   | "image-reference"
   | "retry-after"
   | "etag"
@@ -79,6 +80,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "trace-context", category: "network", wasm: false, devtoys: false,
+    keywords: "w3c trace context traceparent tracestate opentelemetry otel distributed tracing sampled span parent id トレース 分散 追跡 链路 追蹤 분산 추적", color: "purple" },
   { id: "image-reference", category: "network", wasm: false, devtoys: false,
     keywords: "docker image container reference registry repository tag digest sha256 sha512 oci pull イメージ 参照 コンテナ 镜像 映像 容器 이미지 참조 컨테이너", color: "blue" },
   { id: "retry-after", category: "network", wasm: false, devtoys: false,

@@ -1,4 +1,5 @@
 import { etagGuide } from "./etag-guide.ts";
+import { traceContextGuide } from "./trace-context-guide.ts";
 import { retryAfterGuide } from "./retry-after-guide.ts";
 import { imageReferenceGuide } from "./image-reference-guide.ts";
 import { idnGuide } from "./idn-guide.ts";
@@ -158,6 +159,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  "trace-context": traceContextGuide,
   "image-reference": imageReferenceGuide,
   etag: etagGuide,
   "retry-after": retryAfterGuide,

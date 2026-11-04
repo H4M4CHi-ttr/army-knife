@@ -1,4 +1,5 @@
 import { etagMessages } from "./etag.ts";
+import { traceContextMessages } from "./trace-context.ts";
 import { imageReferenceMessages } from "./image-reference.ts";
 import { retryAfterMessages } from "./retry-after.ts";
 import { idnMessages } from "./idn.ts";
@@ -40,6 +41,7 @@ import { searchMessages } from "./search.ts";
 export const messages = {
   en: {
     ...imageReferenceMessages.en,
+    ...traceContextMessages.en,
     ...etagMessages.en,
     ...retryAfterMessages.en,
     ...jwkMessages.en,
@@ -74,6 +76,7 @@ export const messages = {
   },
   ja: {
     ...imageReferenceMessages.ja,
+    ...traceContextMessages.ja,
     ...etagMessages.ja,
     ...retryAfterMessages.ja,
     ...jwkMessages.ja,
@@ -108,6 +111,7 @@ export const messages = {
   },
   "zh-CN": {
     ...imageReferenceMessages["zh-CN"],
+    ...traceContextMessages["zh-CN"],
     ...etagMessages["zh-CN"],
     ...retryAfterMessages["zh-CN"],
     ...jwkMessages["zh-CN"],
@@ -142,6 +146,7 @@ export const messages = {
   },
   "zh-TW": {
     ...imageReferenceMessages["zh-TW"],
+    ...traceContextMessages["zh-TW"],
     ...etagMessages["zh-TW"],
     ...retryAfterMessages["zh-TW"],
     ...jwkMessages["zh-TW"],
@@ -176,6 +181,7 @@ export const messages = {
   },
   ko: {
     ...imageReferenceMessages.ko,
+    ...traceContextMessages.ko,
     ...etagMessages.ko,
     ...retryAfterMessages.ko,
     ...jwkMessages.ko,
