@@ -39,6 +39,7 @@ async function preferences(page: Page, enabledTools: readonly ToolId[], locale: 
 }
 
 function inputSelector(id: ToolId): string {
+  if (id === "trace-context") return "#trace-parent-input";
   if (id === "etag") return "#etag-current";
   if (id === "pkce") return "#pkce-mode";
   if (id === "cors") return "#cors-origin";
