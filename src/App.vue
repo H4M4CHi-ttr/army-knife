@@ -45,6 +45,7 @@ import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, t
 
 const IdnTool = defineAsyncComponent(() => import("@/components/tools/IdnTool.vue"));
 const ImageReferenceTool = defineAsyncComponent(() => import("@/components/tools/ImageReferenceTool.vue"));
+const TraceContextTool = defineAsyncComponent(() => import("@/components/tools/TraceContextTool.vue"));
 const RetryAfterTool = defineAsyncComponent(() => import("@/components/tools/RetryAfterTool.vue"));
 const EtagTool = defineAsyncComponent(() => import("@/components/tools/EtagTool.vue"));
 const JwkTool = defineAsyncComponent(() => import("@/components/tools/JwkTool.vue"));
@@ -858,6 +859,7 @@ onBeforeUnmount(() => {
             <DummyTextTool v-else-if="selectedTool.id === 'dummy-text'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ImageReferenceTool v-else-if="selectedTool.id === 'image-reference'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <TraceContextTool v-else-if="selectedTool.id === 'trace-context'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <RetryAfterTool v-else-if="selectedTool.id === 'retry-after'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <EtagTool v-else-if="selectedTool.id === 'etag'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <JwkTool v-else-if="selectedTool.id === 'jwk'" :key="`${selectedTool.id}:${preferences.locale}`" />

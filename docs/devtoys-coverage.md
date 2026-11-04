@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## W3C Trace Context inspector (2026-11-05 JST)
+
+Recorded version 00 traceparent ID/flag inspection and ordered opaque tracestate
+entries default **on**. No dedicated Trace Context workflow appears in the
+[official bundled list](https://devtoys.app/) checked 2026-11-05 JST. General JWT,
+hex and text tools differ; existing JSONL traceId aggregation does not parse
+propagation headers. Community extensions are outside this comparison.
+[Scope and bounds](trace-context.md).
+
 ## Docker image reference inspector (2026-11-04 JST)
 
 Offline named Docker reference decomposition, explicit Hub/library/latest

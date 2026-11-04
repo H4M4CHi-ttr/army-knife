@@ -10,6 +10,7 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 
 | ツール                  | 主な機能                                                                    | 処理                | 初期状態 |
 | ----------------------- | --------------------------------------------------------------------------- | ------------------- | -------- |
+| W3C Trace Context検査 | 記録済みtraceparentのID・sampledビットと順序付きtracestate項目を通信なしで確認 | TypeScript / 即時 | オン |
 | Dockerイメージ参照検査 | レジストリ・パス・タグ・digestを分解し、省略値とdigest優先を通信なしで確認 | TypeScript / 即時 | オン |
 | HTTP Retry-After検査 | 記録した再試行秒数・IMF-fixdateを明示した受信時刻と比較し、正確な待機時間とUTC日時を確認 | 即時 / 遅延・手動 | オン |
 | ETag条件付きリクエスト検査 | 記録済みETagとIf-Match／If-None-Matchの強比較・弱比較・304／412モデルを通信せず確認 | 即時 / 遅延・手動 | オン |
@@ -79,6 +80,16 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 | UUID・ULID生成と検査 | UUID v4/v7・ULIDを暗号学的乱数で生成、時刻情報検査 | TypeScript | オフ |
 | パスワード・ランダムトークン生成 | 指定文字集合・除外・長さ・件数を指定して安全な乱数生成 | TypeScript | オフ |
 | Open Graph/Twitter Cardメタタグ生成 | HTML属性をエスケープしたOGP・SNS用メタタグ、ローカル模擬プレビュー | TypeScript | オン |
+
+### W3C Trace Context検査（2026-11-05 JST）
+
+分散トレーシングの記録済みtraceparentからTrace ID・Parent ID・sampledビットを
+抽出し、tracestateのvendor項目を順序と不透明な値を保って確認します。
+IDの先頭ゼロを保ち、他のフラグビットを明示。トレース送信・照会・ID生成は行いません。
+W3C Level 1・version 00のみ対応し、将来版・不正入力では部分結果を返しません。
+加工前UTF-8でtraceparent 128バイト、tracestate 512バイト・空要素を含む32枠まで。
+5言語・両テーマ・即時反映・明示JSON出力に対応し、入力・結果はメモリ内のみです。
+DevToys公式バンドルに専用用途がないため既定オン。[仕様と制約](docs/trace-context.md)。
 
 ### Dockerイメージ参照検査（2026-11-04 JST）
 

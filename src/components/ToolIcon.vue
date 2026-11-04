@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  "trace-context": Workflow,
   "image-reference": Tag,
   "retry-after": CalendarClock,
   etag: Tag,
