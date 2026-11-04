@@ -61,7 +61,7 @@ function replace(example: boolean) {
     <p v-if="result.otherFlags !== '00'" class="notice" data-testid="trace-other">{{ t("trace.other", { flags: result.otherFlags }) }}</p>
     <h3>{{ t("trace.entries") }}</h3>
     <div v-if="result.entries.length" class="table-scroll">
-      <table data-testid="trace-entries">
+      <table class="data-table" data-testid="trace-entries">
         <thead><tr><th scope="col">{{ t("trace.position") }}</th><th scope="col">{{ t("trace.key") }}</th><th scope="col">{{ t("trace.value") }}</th></tr></thead>
         <tbody><tr v-for="entry in result.entries" :key="entry.key"><td>{{ entry.position }}</td><td><code>{{ entry.key }}</code></td><td><code>{{ entry.value }}</code></td></tr></tbody>
       </table>
