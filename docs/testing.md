@@ -1,5 +1,17 @@
 # Testing and deployment
 
+## HTTP Link coverage (2026-11-06 JST)
+
+The [bounded Link structure inspector](http-link.md) preserves unresolved targets,
+quoted separators, ordered/opaque attributes and first-rel precedence. Parser
+tests exercise escapes, missing/repeated rel, null/empty values, malformed
+structure and exact byte/link/slot/parameter limits. Real Vapor tests cover
+inert rendering, invalidation, 800ms/manual/cancel flow, explicit copy, translations
+and disposal. `tests/e2e/http-link.spec.ts` checks five locales, both themes,
+keyboard/narrow layout, actual exact JSON downloads, rejected paste, manual-mode
+persistence, navigation/reload/locale clearing and exact-dist privacy in all four
+Chromium/Firefox desktop/small projects. There is no live API or URI validation.
+
 ## Trace Context coverage (2026-11-05 JST)
 
 The [bounded Trace Context specification](trace-context.md) defines recorded

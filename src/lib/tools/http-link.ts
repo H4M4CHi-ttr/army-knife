@@ -17,13 +17,16 @@ const fail = (code = "LINK_SYNTAX"): never => { throw new ToolError(code); };
 // Lexical URI characters only. Full URI grammar, resolution and dereferencing
 // deliberately belong outside this structure inspector.
 function referenceCharacters(value: string) {
-  return /^[A-Za-z0-9._~:/?#\[\]@!$&'()*+,;=%-]*$/.test(value) && !/%(?![0-9a-fA-F]{2})/.test(value);
+  return /^[A-Za-z0-9._~:/?#[\]@!$&'()*+,;=%-]*$/.test(value) && !/%(?![0-9a-fA-F]{2})/.test(value);
 }
 
 /** Inspect one combined recorded field value; never interpret it as markup. */
 export function inspectHttpLink(input: string): HttpLinkReport {
   assertInputSize(input, HTTP_LINK_LIMITS.bytes);
-  if (/[^\x09\x20-\x7e\x80-\xff]/.test(input)) fail();
+  for (const char of input) {
+    const byte = char.charCodeAt(0);
+    if (byte !== 9 && (byte < 32 || byte === 127 || byte > 255)) fail();
+  }
   let cursor = 0, slots = 0, emptyMembers = 0;
   const links: HttpLinkReport["links"] = [];
   const whitespace = () => { while (input[cursor] === " " || input[cursor] === "\t") cursor++; };
