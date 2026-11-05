@@ -1,4 +1,5 @@
 export type ToolId =
+  | "http-link"
   | "trace-context"
   | "image-reference"
   | "retry-after"
@@ -80,6 +81,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "http-link", category: "network", wasm: false, devtoys: false,
+    keywords: "http link header pagination rel next prev last first preload stylesheet anchor パジネーション ページネーション リンク 関係 分页 分頁 链接 連結 페이지 링크", color: "blue" },
   { id: "trace-context", category: "network", wasm: false, devtoys: false,
     keywords: "w3c trace context traceparent tracestate opentelemetry otel distributed tracing sampled span parent id トレース 分散 追跡 链路 追蹤 분산 추적", color: "purple" },
   { id: "image-reference", category: "network", wasm: false, devtoys: false,

@@ -1,5 +1,13 @@
 # DevToys overlap policy
 
+## HTTP Link header inspector (2026-11-06 JST)
+
+Recorded pagination targets, first-rel relations and ordered opaque Link
+parameters default **on**. No dedicated Link header workflow appears in the
+[official bundled list](https://devtoys.app/) checked 2026-11-06 JST. General URL
+conversion/editing does not separate Link field structure. Community extensions
+are outside this comparison. [Exact scope and bounds](http-link.md).
+
 ## W3C Trace Context inspector (2026-11-05 JST)
 
 Recorded version 00 traceparent ID/flag inspection and ordered opaque tracestate
