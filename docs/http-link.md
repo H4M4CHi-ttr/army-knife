@@ -83,6 +83,13 @@ read-only review found no actionable defects and independently passed 42 targete
 tests and 12 extra parser probes. Full standard CI must still pass on the final PR
 head before merge; its final result is recorded in the PR.
 
+The first full CI attempt, run `42121133084`, was **cancelled by the 30-minute
+quality-job cap**, with 910/924 browser cases passed and no assertion failures.
+It was not a successful verification. The workflow now budgets 40 minutes for
+all checks and artifact preservation. Individual browser tests still use the
+existing 45-second limit, two CI workers, retry policy and four projects; the
+final commit must pass the whole standard workflow.
+
 Initial local failures were diagnosed rather than accepted: the boundary browser
 test needed the existing fixed/paused Playwright clock pattern; Firefox required
 writable XDG paths and an approved execution path permitting its own sandbox's
