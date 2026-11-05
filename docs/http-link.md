@@ -74,3 +74,25 @@ keyboard/narrow layouts, real exact JSON downloads, memory lifecycle and
 exact-dist-asset network/privacy auditing in all four configured browser projects.
 The standard CI also runs all existing Rust/WASM, app, distribution, license and
 browser checks. This does not test a live API or claim URI/RFC consumer conformance.
+
+Local verification: 1,436 frontend tests, 43 native Rust tests, Clippy, actual
+Rust-built WASM smoke tests, typecheck, 47-SFC Vapor verification, 22 script tests,
+production build and the 360-page distribution/license checks passed. The new
+four-project browser suite passed **32/32**, with no skips or retries. Independent
+read-only review found no actionable defects and independently passed 42 targeted
+tests and 12 extra parser probes. Full standard CI must still pass on the final PR
+head before merge; its final result is recorded in the PR.
+
+Initial local failures were diagnosed rather than accepted: the boundary browser
+test needed the existing fixed/paused Playwright clock pattern; Firefox required
+writable XDG paths and an approved execution path permitting its own sandbox's
+`/proc/self/uid_map` writes. No browser sandbox, TLS verification, test assertion
+or quality gate was disabled. Unchanged published fonts were reused only after
+matching the committed source lock, verifying all 1,221 checksums and running the
+pinned font manifest/cmap/name/license checker. Rust/WASM were compiled locally.
+
+Synthetic screenshots reviewed for clipping, overlap and mobile overflow:
+[English desktop](screenshots/http-link-en-light-desktop.png),
+[English small](screenshots/http-link-en-light-small.png),
+[Japanese desktop](screenshots/http-link-ja-dark-desktop.png),
+[Japanese small](screenshots/http-link-ja-dark-small.png).

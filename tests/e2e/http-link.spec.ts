@@ -110,7 +110,9 @@ test("Link rejects malformed input and oversized edits without stale export", as
 });
 
 test("Link delays, resets, cancels and applies manually", async ({ page }) => {
-  await page.goto("./en/tools/http-link/"); await page.clock.install();
+  await page.clock.install({ time: new Date("2026-11-06T00:00:00Z") });
+  await page.goto("./en/tools/http-link/");
+  await page.clock.pauseAt(new Date("2026-11-06T01:00:00Z"));
   const long = HTTP_LINK_SAMPLE + " ".repeat(2100);
   await page.locator("#http-link-input").fill(long);
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "pending");
