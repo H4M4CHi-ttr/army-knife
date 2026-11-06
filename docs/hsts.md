@@ -66,3 +66,28 @@ The implementation uses the existing shared UI and execution lifecycle.
 Check quote-aware delimiters and unescaping, case-insensitive duplicates for
 unknown names, zero versus inherited/preloaded state, exact large durations,
 invalid or rejected edits clearing old exports, and inert extension rendering.
+
+## Verification and independent review
+
+The addition has 40 pure parser cases, five real Vapor workflow cases and
+32 dedicated browser cases (five locales plus export/error/execution workflows
+across Chromium/Firefox and desktop/390px). The dedicated browser run passed
+all 32 with no retries or skips. Local Firefox initially could not create its
+profile under the read-only configuration directory; a writable XDG directory
+and an approved execution outside the outer process sandbox resolved that
+environment failure without disabling Firefox's own sandbox or any test.
+
+An independent read-only reviewer inspected all 18 initial changed files and
+shared lifecycle/input/output/routing code at `478f849`. It reported no critical,
+important or minor issues and passed 1,101 separate parser probes. The content
+verdict is conditional on the full quality gates, not a GitHub approval. English
+light and Japanese dark screenshots at desktop and narrow widths were reviewed
+for wrapping, clipping and control overlap; only synthetic examples are used.
+See [desktop light](screenshots/hsts-en-light-desktop.png),
+[narrow light](screenshots/hsts-en-light-small.png),
+[desktop dark](screenshots/hsts-ja-dark-desktop.png) and
+[narrow dark](screenshots/hsts-ja-dark-small.png).
+
+The PR records final-commit CI and deployment results. The repository's existing
+complete quality gate remains authoritative; no checks or timeouts are changed
+by this tool addition.
