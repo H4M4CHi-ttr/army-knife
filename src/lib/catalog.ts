@@ -1,4 +1,5 @@
 export type ToolId =
+  | "hsts"
   | "http-link"
   | "trace-context"
   | "image-reference"
@@ -81,6 +82,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "hsts", category: "network", wasm: false, devtoys: false,
+    keywords: "http hsts strict transport security header max-age includesubdomains preload https lifetime ヘッダー 有効期間 子ドメイン 标头 子域 標頭 子網域 헤더 하위 도메인", color: "blue" },
   { id: "http-link", category: "network", wasm: false, devtoys: false,
     keywords: "http link header pagination rel next prev last first preload stylesheet anchor パジネーション ページネーション リンク 関係 分页 分頁 链接 連結 페이지 링크", color: "blue" },
   { id: "trace-context", category: "network", wasm: false, devtoys: false,

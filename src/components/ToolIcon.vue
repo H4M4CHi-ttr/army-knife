@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  hsts: LockKeyhole,
   "http-link": Link2,
   "trace-context": Workflow,
   "image-reference": Tag,

@@ -1,5 +1,18 @@
 # Testing and deployment
 
+## HSTS coverage (2026-11-07 JST)
+
+The [recorded HSTS inspector](hsts.md) uses a bounded ASCII field-value model.
+Pure tests cover RFC examples, quoted digits/delimiters, all-name duplicate
+rejection, opaque extensions, exact BigInt duration, zero and raw byte/digit/
+directive/slot boundaries. Real Vapor tests cover all-or-nothing invalidation,
+inert values, explicit exact JSON copy, rejected paste, five locales and
+800ms/manual/cancel/disposal. `tests/e2e/hsts.spec.ts` checks the production
+route in all four Chromium/Firefox desktop/390px projects: five languages,
+both themes, keyboard, exact JSON download, memory-only lifecycle and the
+exact-dist-asset request/privacy audit. Synthetic screenshots are attached.
+These tests do not install a browser policy or query a host/preload service.
+
 ## HTTP Link coverage (2026-11-06 JST)
 
 The [bounded Link structure inspector](http-link.md) preserves unresolved targets,
