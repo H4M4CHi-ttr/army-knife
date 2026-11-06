@@ -1,5 +1,15 @@
 # DevToys overlap policy
 
+## Recorded HSTS field inspector (2026-11-07 JST)
+
+Exact declared max-age duration, includeSubDomains, duplicate directives and
+ordered opaque extensions default **on**. No dedicated HSTS inspection workflow
+appears in the [official bundled list](https://devtoys.app/) checked 2026-11-07
+JST. General text/date tools and the existing Cache-Control/CORS/cookie views
+do not perform this workflow. Community extensions are outside this comparison.
+The preload marker never implies membership; no live site is contacted.
+[Exact ASCII subset, semantics and bounds](hsts.md).
+
 ## HTTP Link header inspector (2026-11-06 JST)
 
 Recorded pagination targets, first-rel relations and ordered opaque Link
