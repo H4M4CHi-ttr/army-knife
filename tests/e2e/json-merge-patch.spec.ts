@@ -45,6 +45,7 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await expect(json).toContainText('"Published"');
     expect(JSON.parse((await json.textContent())!)).toEqual({ title: "Published", owner: { name: "Aoi" }, tags: ["new"], archived: false });
     await expect(page.getByTestId("merge-patch-mode")).toHaveText(m["mergePatch.merge"]);
+    await json.focus(); await expect(json).toBeFocused();
     for (const value of ["null", "false", "0", '""', "[]"]) {
       await page.locator("#merge-patch-patch").fill(value);
       await expect(json).toHaveText(value);

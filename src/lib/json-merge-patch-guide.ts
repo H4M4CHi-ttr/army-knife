@@ -1,7 +1,7 @@
 import type { ToolGuide } from "./tool-guides";
 import type { Locale } from "./preferences";
-import { mergePatchMessages } from "../i18n/json-merge-patch";
-import { MERGE_PATCH_TARGET_SAMPLE, MERGE_PATCH_SAMPLE } from "./tools/json-merge-patch-sample";
+import { mergePatchMessages } from "../i18n/json-merge-patch.ts";
+import { MERGE_PATCH_TARGET_SAMPLE, MERGE_PATCH_SAMPLE } from "./tools/json-merge-patch-sample.ts";
 
 function guide(locale: Locale): ToolGuide {
   const m = mergePatchMessages[locale];

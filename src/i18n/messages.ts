@@ -1,4 +1,4 @@
-import { mergePatchMessages } from "./json-merge-patch";
+import { mergePatchMessages } from "./json-merge-patch.ts";
 import { etagMessages } from "./etag.ts";
 import { traceContextMessages } from "./trace-context.ts";
 import { httpLinkMessages } from "./http-link.ts";

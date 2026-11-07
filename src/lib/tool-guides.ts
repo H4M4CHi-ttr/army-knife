@@ -1,4 +1,4 @@
-import { mergePatchGuide } from "./json-merge-patch-guide";
+import { mergePatchGuide } from "./json-merge-patch-guide.ts";
 import { etagGuide } from "./etag-guide.ts";
 import { traceContextGuide } from "./trace-context-guide.ts";
 import { httpLinkGuide } from "./http-link-guide.ts";

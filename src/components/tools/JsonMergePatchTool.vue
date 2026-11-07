@@ -56,7 +56,7 @@ function replace(example: boolean) {
       <OutputActions :text="result.json" filename="army-knife-merged.json" type="application/json;charset=utf-8" />
     </div>
     <p class="hint" data-testid="merge-patch-mode">{{ t("mergePatch." + result.mode) }}</p>
-    <pre class="merge-patch-output" data-testid="merge-patch-json"><code>{{ result.json }}</code></pre>
+    <pre class="merge-patch-output" data-testid="merge-patch-json" tabindex="0" role="region" :aria-label="t('mergePatch.output')"><code>{{ result.json }}</code></pre>
   </section>
   <EmptyResult v-else />
 </template>
