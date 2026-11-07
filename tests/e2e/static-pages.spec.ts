@@ -39,6 +39,7 @@ async function preferences(page: Page, enabledTools: readonly ToolId[], locale: 
 }
 
 function inputSelector(id: ToolId): string {
+  if (id === "json-merge-patch") return "#merge-patch-target";
   if (id === "trace-context") return "#trace-parent-input";
   if (id === "http-link") return "#http-link-input";
   if (id === "etag") return "#etag-current";

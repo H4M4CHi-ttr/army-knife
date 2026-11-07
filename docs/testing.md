@@ -1,5 +1,19 @@
 # Testing and deployment
 
+## JSON Merge Patch coverage (2026-11-08 JST)
+
+The [RFC 7396 local preview](json-merge-patch.md) covers recursive object merging,
+null member deletion, unchanged keys, non-object/array replacement and root null.
+Pure cases cover dangerous property names, duplicate decoded keys, precision
+rejection and raw byte/depth/node/formatted-output limits. Real Vapor cases
+check both inputs' invalidation and independent rejected-edit state, falsy root
+outputs, inert rendering, explicit merged-document copy, five locales and the
+combined-input 800ms/manual/cancel/disposal lifecycle. Dedicated production E2E
+runs in all four Chromium/Firefox desktop/390px projects with five locales,
+both themes, keyboard, actual JSON download, memory-only clearing and an
+exact-distribution request/privacy audit. Synthetic screenshots are attached.
+These checks do not issue HTTP PATCH requests or simulate a particular server.
+
 ## HSTS coverage (2026-11-07 JST)
 
 The [recorded HSTS inspector](hsts.md) uses a bounded ASCII field-value model.

@@ -1,4 +1,5 @@
 export type ToolId =
+  | "json-merge-patch"
   | "hsts"
   | "http-link"
   | "trace-context"
@@ -82,6 +83,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "json-merge-patch", category: "data", wasm: false, devtoys: false,
+    keywords: "json merge patch rfc7396 application/merge-patch+json null delete array replace マージ パッチ 削除 配列 合并 合併 补丁 修補 병합 패치 삭제 배열", color: "green" },
   { id: "hsts", category: "network", wasm: false, devtoys: false,
     keywords: "http hsts strict transport security header max-age includesubdomains preload https lifetime ヘッダー 有効期間 子ドメイン 标头 子域 標頭 子網域 헤더 하위 도메인", color: "blue" },
   { id: "http-link", category: "network", wasm: false, devtoys: false,

@@ -44,8 +44,8 @@ The small bounded computation uses TypeScript, without new dependencies or
 Worker/WASM changes. The Vapor view, static guide, five locales, existing fonts,
 both themes, keyboard interaction and narrow layouts follow the existing app.
 Rejected edits invalidate old exports until the same input is replaced with an
-accepted edit. Both inputs clear on sample/clear, navigation, locale change and
-reload. Input and result remain in memory, except explicit copy/download. No
+accepted edit. Sample/clear replace both inputs; navigation, locale change and
+reload clear them. Input and result remain in memory, except explicit copy/download. No
 new request, telemetry, storage, URL data, font source, WebMCP or deployment
 setting is added.
 

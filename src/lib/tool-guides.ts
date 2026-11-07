@@ -1,3 +1,4 @@
+import { mergePatchGuide } from "./json-merge-patch-guide";
 import { etagGuide } from "./etag-guide.ts";
 import { traceContextGuide } from "./trace-context-guide.ts";
 import { httpLinkGuide } from "./http-link-guide.ts";
@@ -162,6 +163,7 @@ function localized(
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
   "http-link": httpLinkGuide,
+  "json-merge-patch": mergePatchGuide,
   hsts: hstsGuide,
   "trace-context": traceContextGuide,
   "image-reference": imageReferenceGuide,

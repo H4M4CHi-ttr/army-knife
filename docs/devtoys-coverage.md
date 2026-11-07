@@ -1,5 +1,15 @@
 # DevToys overlap policy
 
+## JSON Merge Patch preview (2026-11-08 JST)
+
+Applying an RFC 7396 patch to a target, including null member deletion and
+whole-array replacement, defaults **on**. No dedicated Merge Patch workflow
+appears in the [official bundled list](https://devtoys.app/) checked 2026-11-08
+JST. JSON formatting, JSONPath and general text comparison do not perform this
+transformation. Community extensions are outside this comparison. The existing
+JSON comparison and Pointer tools remain separate workflows.
+[Bounded semantics, precision and privacy](json-merge-patch.md).
+
 ## Recorded HSTS field inspector (2026-11-07 JST)
 
 Exact declared max-age duration, includeSubDomains, duplicate directives and
