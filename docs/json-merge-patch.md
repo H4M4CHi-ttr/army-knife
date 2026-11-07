@@ -66,3 +66,31 @@ setting is added.
 
 Repository baseline: main 146ab98. AGENTS.md and .agents/skills are absent in
 this checkout; the mounted codex-cloud-empty repository is not modified.
+
+## Independent review and verification
+
+An independent read-only reviewer inspected all 18 initial changed files, the
+follow-up at e06abb3 and the shared JSON parser, execution, input/output and
+routing code. It reported no remaining material findings. Its separate
+Map-based oracle/adversarial checks passed 6,020 deterministic cases, including
+recursive/scalar behavior, idempotence, prototype keys and precision rejection.
+It also passed 54 focused pure/Vapor/i18n cases and loaded the static-page graph
+directly in Node, checking all five catalog/guide locales. This is a content
+review, not a GitHub approval, and remains conditional on complete quality gates.
+The final hint-only delta was reviewed in all five languages and names the
+fields rather than their position, so it also describes the stacked layout.
+
+The dedicated production suite passed all 32 Chromium/Firefox desktop/390px
+cases with no retries or skips. Local Firefox initially crashed before page
+creation because the outer process sandbox made /proc/self/uid_map read-only.
+An approved run outside that outer sandbox passed with Firefox's own sandbox
+unchanged; no test or browser security preference was disabled. English light
+and Japanese dark screenshots were checked at desktop and narrow widths for
+wrapping, clipping and control overlap, using synthetic data only:
+[desktop light](screenshots/json-merge-patch-en-light-desktop.png),
+[narrow light](screenshots/json-merge-patch-en-light-small.png),
+[desktop dark](screenshots/json-merge-patch-ja-dark-desktop.png),
+[narrow dark](screenshots/json-merge-patch-ja-dark-small.png).
+
+The repository's existing final-commit CI and main Pages run remain the complete
+release gates. No workflow, timeout, retry, test or publishing setting is changed.

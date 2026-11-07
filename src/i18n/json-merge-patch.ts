@@ -3,7 +3,7 @@ import type { Locale } from "../lib/preferences";
 const en = {
   "tool.json-merge-patch.name": "JSON Merge Patch preview",
   "tool.json-merge-patch.description": "Preview RFC 7396 object merging, null member deletion and whole-array replacement using a target and patch, without sending requests.",
-  "tool.json-merge-patch.hint": "Enter the target JSON on the left and Merge Patch JSON on the right. Small edits apply immediately; larger edits use delayed/manual controls.",
+  "tool.json-merge-patch.hint": "Enter a target JSON document and a Merge Patch JSON document in their labeled fields. Small edits apply immediately; larger edits use delayed/manual controls.",
   "mergePatch.target": "Target JSON",
   "mergePatch.patch": "Merge Patch JSON",
   "mergePatch.output": "Merged document (JSON)",
@@ -25,7 +25,7 @@ type Messages = Record<keyof typeof en, string>;
 const ja: Messages = {
   "tool.json-merge-patch.name": "JSON Merge Patchプレビュー",
   "tool.json-merge-patch.description": "対象とパッチからRFC 7396のオブジェクト結合・nullによるキー削除・配列の全置換を、通信せず確認します。",
-  "tool.json-merge-patch.hint": "左に対象JSON、右にMerge Patch JSONを入力。小さい編集は即時反映し、長い入力は遅延・手動適用できます。",
+  "tool.json-merge-patch.hint": "対象JSONとMerge Patch JSONをそれぞれの欄へ入力。小さい編集は即時反映し、長い入力は遅延・手動適用できます。",
   "mergePatch.target": "対象JSON",
   "mergePatch.patch": "Merge Patch JSON",
   "mergePatch.output": "適用後の文書（JSON）",
@@ -46,7 +46,7 @@ const ja: Messages = {
 const zhCN: Messages = {
   "tool.json-merge-patch.name": "JSON Merge Patch 预览",
   "tool.json-merge-patch.description": "使用目标与补丁预览 RFC 7396 对象合并、null 成员删除和数组整体替换，不发送请求。",
-  "tool.json-merge-patch.hint": "左侧输入目标 JSON，右侧输入 Merge Patch JSON。短输入立即应用，长输入支持延迟或手动应用。",
+  "tool.json-merge-patch.hint": "在对应字段中输入目标 JSON 和 Merge Patch JSON。短输入立即应用，长输入支持延迟或手动应用。",
   "mergePatch.target": "目标 JSON",
   "mergePatch.patch": "Merge Patch JSON",
   "mergePatch.output": "合并后的文档（JSON）",
@@ -67,7 +67,7 @@ const zhCN: Messages = {
 const zhTW: Messages = {
   "tool.json-merge-patch.name": "JSON Merge Patch 預覽",
   "tool.json-merge-patch.description": "使用目標與修補文件預覽 RFC 7396 物件合併、null 成員刪除和陣列整體取代，不傳送請求。",
-  "tool.json-merge-patch.hint": "左側輸入目標 JSON，右側輸入 Merge Patch JSON。短輸入立即套用，長輸入支援延遲或手動套用。",
+  "tool.json-merge-patch.hint": "在對應欄位輸入目標 JSON 和 Merge Patch JSON。短輸入立即套用，長輸入支援延遲或手動套用。",
   "mergePatch.target": "目標 JSON",
   "mergePatch.patch": "Merge Patch JSON",
   "mergePatch.output": "合併後的文件（JSON）",
@@ -88,7 +88,7 @@ const zhTW: Messages = {
 const ko: Messages = {
   "tool.json-merge-patch.name": "JSON Merge Patch 미리보기",
   "tool.json-merge-patch.description": "대상과 패치로 RFC 7396 객체 병합, null 멤버 삭제와 배열 전체 교체를 요청 전송 없이 미리 확인합니다.",
-  "tool.json-merge-patch.hint": "왼쪽에 대상 JSON, 오른쪽에 Merge Patch JSON을 입력하세요. 짧은 입력은 즉시 반영되며 긴 입력은 지연/수동 적용할 수 있습니다.",
+  "tool.json-merge-patch.hint": "각 이름이 표시된 입력란에 대상 JSON과 Merge Patch JSON을 입력하세요. 짧은 입력은 즉시 반영되며 긴 입력은 지연/수동 적용할 수 있습니다.",
   "mergePatch.target": "대상 JSON",
   "mergePatch.patch": "Merge Patch JSON",
   "mergePatch.output": "병합된 문서 (JSON)",
