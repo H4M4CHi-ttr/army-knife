@@ -74,3 +74,39 @@ telemetry, fonts, URL data, persistence, WebMCP or publishing settings are added
 
 Baseline main: af03557. No AGENTS.md or .agents/skills exists in this checkout.
 The mounted codex-cloud-empty repository and unrelated PR #145 are untouched.
+
+## Independent review
+
+A separate read-only reviewer inspected the complete parser, real Vapor view,
+shared input/execution/output lifecycle, routing/catalog, five locales/guides,
+unit/browser tests and documentation. It found no remaining material findings.
+Its 14,271 independent probes passed: all 1,001 q values, quote/escape roundtrips,
+12,000 generated specificity/parameter-frontier oracle cases, ambiguous ties,
+absent semantics and raw/count boundaries. The reviewer also passed all 69
+focused parser/Vapor/i18n cases. This is a content review, not a GitHub approval,
+and does not substitute for the final-head full quality and deployment gates.
+
+## Local release evidence
+
+The final production view passed all 32 dedicated Chromium/Firefox cases at
+desktop and 390px, without retries or skips. The first outer-sandbox run had
+16 Firefox page-creation crashes caused by read-only /proc/self/uid_map.
+An approved execution outside that outer sandbox passed with Firefox's own
+sandbox and all tests unchanged. Visual review found a narrow q-column wrap;
+column widths and the English range heading were corrected, the production
+build was rebuilt, and the full dedicated suite passed again with a numeric
+single-line assertion. Final synthetic images were inspected for q readability,
+wrapping, clipping and overlapping controls:
+[desktop light](screenshots/http-accept-en-light-desktop.png),
+[narrow light](screenshots/http-accept-en-light-small.png),
+[desktop dark](screenshots/http-accept-ja-dark-desktop.png),
+[narrow dark](screenshots/http-accept-ja-dark-small.png).
+
+Local gates passed: 1,594 unit tests (72 files), Rust 43 tests and Clippy, actual
+WASM build/smoke test, type checking, Vapor's 50 application SFCs, 22 verifier/
+license-script tests, lint, production build and distribution verification.
+The asset graph contains 375 localized pages and the existing five font locales.
+Lint reports ten pre-existing warnings in unchanged files; the build retains
+its pre-existing large-i18n-chunk warning. No check or test setting was changed.
+Final-head CI and the existing main Pages run are recorded in the PR and are
+required before release completion.

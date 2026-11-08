@@ -1,4 +1,5 @@
 export type ToolId =
+  | "http-accept"
   | "json-merge-patch"
   | "hsts"
   | "http-link"
@@ -83,6 +84,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "http-accept", category: "network", wasm: false, devtoys: false,
+    keywords: "http accept content type media negotiation quality q wildcard 406 preference メディア 交渉 優先 照合 协商 協商 媒体 媒體 협상 미디어", color: "blue" },
   { id: "json-merge-patch", category: "data", wasm: false, devtoys: false,
     keywords: "json merge patch rfc7396 application/merge-patch+json null delete array replace マージ パッチ 削除 配列 合并 合併 补丁 修補 병합 패치 삭제 배열", color: "green" },
   { id: "hsts", category: "network", wasm: false, devtoys: false,

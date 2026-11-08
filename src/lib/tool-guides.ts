@@ -1,3 +1,4 @@
+import { acceptGuide } from "./http-accept-guide.ts";
 import { mergePatchGuide } from "./json-merge-patch-guide.ts";
 import { etagGuide } from "./etag-guide.ts";
 import { traceContextGuide } from "./trace-context-guide.ts";
@@ -162,6 +163,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  "http-accept": acceptGuide,
   "http-link": httpLinkGuide,
   "json-merge-patch": mergePatchGuide,
   hsts: hstsGuide,

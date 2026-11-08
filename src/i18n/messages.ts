@@ -1,3 +1,4 @@
+import { acceptMessages } from "./http-accept.ts";
 import { mergePatchMessages } from "./json-merge-patch.ts";
 import { etagMessages } from "./etag.ts";
 import { traceContextMessages } from "./trace-context.ts";
@@ -45,6 +46,7 @@ export const messages = {
   en: {
     ...mergePatchMessages.en,
     ...hstsMessages.en,
+    ...acceptMessages.en,
     ...httpLinkMessages.en,
     ...imageReferenceMessages.en,
     ...traceContextMessages.en,
@@ -83,6 +85,7 @@ export const messages = {
   ja: {
     ...mergePatchMessages.ja,
     ...hstsMessages.ja,
+    ...acceptMessages.ja,
     ...httpLinkMessages.ja,
     ...imageReferenceMessages.ja,
     ...traceContextMessages.ja,
@@ -121,6 +124,7 @@ export const messages = {
   "zh-CN": {
     ...mergePatchMessages["zh-CN"],
     ...hstsMessages["zh-CN"],
+    ...acceptMessages["zh-CN"],
     ...httpLinkMessages["zh-CN"],
     ...imageReferenceMessages["zh-CN"],
     ...traceContextMessages["zh-CN"],
@@ -159,6 +163,7 @@ export const messages = {
   "zh-TW": {
     ...mergePatchMessages["zh-TW"],
     ...hstsMessages["zh-TW"],
+    ...acceptMessages["zh-TW"],
     ...httpLinkMessages["zh-TW"],
     ...imageReferenceMessages["zh-TW"],
     ...traceContextMessages["zh-TW"],
@@ -197,6 +202,7 @@ export const messages = {
   ko: {
     ...mergePatchMessages.ko,
     ...hstsMessages.ko,
+    ...acceptMessages.ko,
     ...httpLinkMessages.ko,
     ...imageReferenceMessages.ko,
     ...traceContextMessages.ko,
