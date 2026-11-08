@@ -48,6 +48,7 @@ const ImageReferenceTool = defineAsyncComponent(() => import("@/components/tools
 const TraceContextTool = defineAsyncComponent(() => import("@/components/tools/TraceContextTool.vue"));
 const HttpLinkTool = defineAsyncComponent(() => import("@/components/tools/HttpLinkTool.vue"));
 const JsonMergePatchTool = defineAsyncComponent(() => import("@/components/tools/JsonMergePatchTool.vue"));
+const HttpAcceptTool = defineAsyncComponent(() => import("@/components/tools/HttpAcceptTool.vue"));
 const HstsTool = defineAsyncComponent(() => import("@/components/tools/HstsTool.vue"));
 const RetryAfterTool = defineAsyncComponent(() => import("@/components/tools/RetryAfterTool.vue"));
 const EtagTool = defineAsyncComponent(() => import("@/components/tools/EtagTool.vue"));
@@ -864,6 +865,7 @@ onBeforeUnmount(() => {
             <ImageReferenceTool v-else-if="selectedTool.id === 'image-reference'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <JsonMergePatchTool v-else-if="selectedTool.id === 'json-merge-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HstsTool v-else-if="selectedTool.id === 'hsts'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <HttpAcceptTool v-else-if="selectedTool.id === 'http-accept'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HttpLinkTool v-else-if="selectedTool.id === 'http-link'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <TraceContextTool v-else-if="selectedTool.id === 'trace-context'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <RetryAfterTool v-else-if="selectedTool.id === 'retry-after'" :key="`${selectedTool.id}:${preferences.locale}`" />

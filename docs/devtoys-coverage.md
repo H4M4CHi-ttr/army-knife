@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## HTTP Accept negotiation preview (2026-11-09 JST)
+
+Recorded Accept q/specificity/exclusion matching against explicit offered
+Content-Types defaults **on**. No dedicated negotiation workflow appears in the
+[official bundled list](https://devtoys.app/) checked 2026-11-09 JST. The MIME
+dictionary and URL tools do not model negotiation. Community extensions are
+outside this comparison. No server is contacted.
+[Exact literal-parameter model, privacy and limits](http-accept.md).
+
 ## JSON Merge Patch preview (2026-11-08 JST)
 
 Applying an RFC 7396 patch to a target, including null member deletion and

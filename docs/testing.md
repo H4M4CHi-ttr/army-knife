@@ -1,5 +1,17 @@
 # Testing and deployment
 
+## HTTP Accept coverage (2026-11-09 JST)
+
+The [bounded negotiation preview](http-accept.md) checks exact q grammar and all
+1,001 thousandths, specificity before q, explicit exclusion, absent/empty fields,
+quoted delimiters, literal parameter matching, ambiguity and raw/count limits.
+Real Vapor tests check both inputs, independent rejected edits, inert rendering,
+exact explicit JSON copy, five locales and combined-input delayed/manual/cancel
+execution and disposal. Dedicated Chromium/Firefox desktop/390px E2E covers
+five locales, both themes, keyboard, JSON download, memory-only clearing and
+exact-dist-asset request/privacy audits, with synthetic screenshots. This is
+a local model; no live server behavior or HTTP 406 response is verified.
+
 ## JSON Merge Patch coverage (2026-11-08 JST)
 
 The [RFC 7396 local preview](json-merge-patch.md) covers recursive object merging,
