@@ -39,7 +39,7 @@ function replace(example: boolean) {
     </div>
     <label class="accept-absent"><input v-model="absent" type="checkbox" data-testid="accept-absent" />{{ t("accept.absent") }}</label>
     <div class="accept-inputs">
-      <CodeInput :key="`accept:${revision}`" :model-value="accept" :label="t('accept.input')" input-id="accept-input" :rows="6" :file="false" :disabled="absent" :max-bytes="ACCEPT_LIMITS.bytes" :placeholder="ACCEPT_SAMPLE" @update:model-value="accept = $event; acceptRejected = false" @rejected="acceptRejected = true" />
+      <CodeInput :key="`accept:${revision}`" :model-value="accept" :label="t('accept.input')" input-id="http-accept-input" :rows="6" :file="false" :disabled="absent" :max-bytes="ACCEPT_LIMITS.bytes" :placeholder="ACCEPT_SAMPLE" @update:model-value="accept = $event; acceptRejected = false" @rejected="acceptRejected = true" />
       <CodeInput :key="`offers:${revision}`" :model-value="offered" :label="t('accept.offers')" input-id="accept-offers" :rows="6" :file="false" :max-bytes="ACCEPT_LIMITS.bytes" :placeholder="ACCEPT_OFFERS_SAMPLE" @update:model-value="offered = $event; offersRejected = false" @rejected="offersRejected = true" />
     </div>
     <div class="run-bar">

@@ -110,3 +110,11 @@ Lint reports ten pre-existing warnings in unchanged files; the build retains
 its pre-existing large-i18n-chunk warning. No check or test setting was changed.
 Final-head CI and the existing main Pages run are recorded in the PR and are
 required before release completion.
+
+The primary input uses the shared `#${toolId}-input` launch contract. The first
+full local run exposed a naming mismatch; the view and dedicated selectors
+were corrected, leaving the shared launch tests unchanged. An independent
+registration review found no other gaps and passed 73 related tests. After
+rebuilding, all 32 dedicated cases plus the four unchanged first-batch launch
+cases passed (36 total, no retry/skip), and the complete 1,594 unit/Vapor/build
+checks passed again. The final-head complete CI remains the release gate.

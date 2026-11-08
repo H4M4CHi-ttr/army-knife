@@ -44,15 +44,15 @@ for (const locale of ['ja', 'en', 'zh-CN', 'zh-TW', 'ko'] as const) {
     await page.getByTestId('accept-sample').focus(); await page.keyboard.press('Enter');
     await expect(page.getByTestId('accept-selected')).toHaveText('application/json');
     await expect(page.getByTestId('accept-offer-1')).toContainText(m['accept.excluded']);
-    await page.locator('#accept-input').fill('TEXT/PLAIN;Q=0.001;CHARSET="UTF-8", */*;q=0.9');
+    await page.locator('#http-accept-input').fill('TEXT/PLAIN;Q=0.001;CHARSET="UTF-8", */*;q=0.9');
     await page.locator('#accept-offers').fill('text/plain;charset=utf-8\nimage/png');
     await expect(page.getByTestId('accept-offer-1')).toContainText('0.001');
     expect(await page.getByTestId('accept-offer-1').locator('td').nth(1).locator('code').evaluate(element => element.getClientRects().length)).toBe(1);
     await expect(page.getByTestId('accept-selected')).toHaveText('image/png');
-    await page.locator('#accept-input').fill(''); await expect(page.getByTestId('accept-none')).toBeVisible();
+    await page.locator('#http-accept-input').fill(''); await expect(page.getByTestId('accept-none')).toBeVisible();
     await expect(result).toContainText(m['accept.no406']);
     await page.getByTestId('accept-absent').focus(); await page.keyboard.press('Space');
-    await expect(page.locator('#accept-input')).toBeDisabled();
+    await expect(page.locator('#http-accept-input')).toBeDisabled();
     await expect(page.getByTestId('accept-selected')).toHaveText('text/plain;charset=utf-8');
     await page.getByTestId('accept-sample').click();
     for (const theme of ['light', 'dark'] as const) {
@@ -65,13 +65,13 @@ for (const locale of ['ja', 'en', 'zh-CN', 'zh-TW', 'ko'] as const) {
       await testInfo.attach(`http-accept-${locale}-${theme}`, { body: await page.screenshot({ fullPage: true, path }), contentType: 'image/png' });
     }
     await page.getByTestId('accept-clear').focus(); await page.keyboard.press('Enter');
-    await expect(result).toHaveCount(0); await expect(page.locator('#accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
+    await expect(result).toHaveCount(0); await expect(page.locator('#http-accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
   });
 }
 
 test('Accept exact explicit JSON download, inert values and memory-only lifecycle', async ({ page }) => {
   await page.goto('./en/tools/http-accept/');
-  await page.locator('#accept-input').fill('text/plain;q=0.001, */*;q=0');
+  await page.locator('#http-accept-input').fill('text/plain;q=0.001, */*;q=0');
   await page.locator('#accept-offers').fill('text/plain\nimage/png');
   const pending = page.waitForEvent('download');
   await page.getByTestId('accept-result').getByRole('button', { name: 'Download', exact: true }).click();
@@ -88,33 +88,33 @@ test('Accept exact explicit JSON download, inert values and memory-only lifecycl
     ], rankedOfferIndexes: [1], selectedOfferIndex: 1,
   });
   const hostile = `text/plain;profile="<script>${PRIVATE}</script><img src=https://example.invalid/${PRIVATE}>"`;
-  await page.locator('#accept-input').fill(hostile); await page.locator('#accept-offers').fill(hostile);
+  await page.locator('#http-accept-input').fill(hostile); await page.locator('#accept-offers').fill(hostile);
   await expect(page.getByTestId('accept-result')).toContainText(PRIVATE);
   await expect(page.getByTestId('accept-result').locator('script, img, a')).toHaveCount(0);
   expect(JSON.stringify(await page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage }, url: location.href, cookie: document.cookie })))).not.toContain(PRIVATE);
-  await page.reload(); await expect(page.locator('#accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
+  await page.reload(); await expect(page.locator('#http-accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
   await expect(page.getByTestId('accept-result')).toHaveCount(0);
   await page.getByTestId('accept-sample').click(); await page.locator('.back-link').click(); await page.getByTestId('tool-card-http-accept').click();
-  await expect(page.locator('#accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
+  await expect(page.locator('#http-accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
   await page.getByTestId('accept-sample').click(); await page.getByTestId('settings-button').click(); await page.getByTestId('locale-select').selectOption('ja');
   await expect(page.getByRole('dialog')).toHaveCount(0); await expect(page.getByTestId('accept-result')).toHaveCount(0);
-  await expect(page.locator('#accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
+  await expect(page.locator('#http-accept-input')).toHaveValue(''); await expect(page.locator('#accept-offers')).toHaveValue('');
 });
 
 test('Accept rejects malformed, conflicting and oversized input without stale exports', async ({ page }) => {
   await page.goto('./en/tools/http-accept/');
   for (const value of ['Accept: text/plain', 'text/plain\n', 'text/plain;x="unclosed', 'text/plain;q=0.0001', 'application/*+json', 'text/plain;x=y;X=y', 'text/plain,text/plain;q=0', 'text/plain' + ','.repeat(64)]) {
-    await page.getByTestId('accept-sample').click(); await page.locator('#accept-offers').fill('text/plain'); await page.locator('#accept-input').fill(value);
+    await page.getByTestId('accept-sample').click(); await page.locator('#accept-offers').fill('text/plain'); await page.locator('#http-accept-input').fill(value);
     await expect(page.getByTestId('accept-result')).toHaveCount(0); await expect(page.locator('.output-actions')).toHaveCount(0); await expect(page.getByRole('alert')).toBeVisible();
   }
-  for (const id of ['accept-input', 'accept-offers']) {
+  for (const id of ['http-accept-input', 'accept-offers']) {
     await page.getByTestId('accept-sample').click();
     await page.locator(`#${id}`).evaluate(element => {
       const event = new Event('paste', { bubbles: true, cancelable: true });
       Object.defineProperty(event, 'clipboardData', { value: { getData: () => 'x'.repeat(8193) } }); element.dispatchEvent(event);
     });
     await expect(page.getByTestId('accept-result')).toHaveCount(0); await expect(page.locator('.output-actions')).toHaveCount(0);
-    await page.locator(id === 'accept-input' ? '#accept-offers' : '#accept-input').fill('text/plain');
+    await page.locator(id === 'http-accept-input' ? '#accept-offers' : '#http-accept-input').fill('text/plain');
     await expect(page.getByTestId('accept-result')).toHaveCount(0);
   }
   await page.getByTestId('accept-sample').click(); await expect(page.getByTestId('accept-selected')).toHaveText('application/json');
@@ -124,18 +124,18 @@ test('Accept combined-input debounce, cancel, manual apply, preference-only pers
   await page.clock.install({ time: new Date('2026-11-09T00:00:00Z') }); await page.goto('./en/tools/http-accept/');
   await page.clock.pauseAt(new Date('2026-11-09T01:00:00Z'));
   const long = ACCEPT_SAMPLE + ' '.repeat(2100);
-  await page.locator('#accept-offers').fill('text/plain'); await page.locator('#accept-input').fill(long);
+  await page.locator('#accept-offers').fill('text/plain'); await page.locator('#http-accept-input').fill(long);
   await expect(page.getByTestId('apply-control')).toHaveAttribute('data-status', 'pending');
-  await page.clock.runFor(400); await page.locator('#accept-input').fill(long + ' ');
+  await page.clock.runFor(400); await page.locator('#http-accept-input').fill(long + ' ');
   await page.clock.runFor(799); await expect(page.getByTestId('accept-result')).toHaveCount(0);
   await page.clock.runFor(1); await expect(page.getByTestId('accept-selected')).toHaveText('text/plain');
-  await page.locator('#accept-input').fill(long); await page.getByTestId('accept-cancel').click();
+  await page.locator('#http-accept-input').fill(long); await page.getByTestId('accept-cancel').click();
   await page.clock.runFor(1000); await expect(page.getByTestId('accept-result')).toHaveCount(0);
   await page.getByTestId('apply-now').click(); await expect(page.getByTestId('accept-selected')).toHaveText('text/plain');
-  await page.locator('#accept-input').fill(long + ' '); await page.getByTestId('auto-apply-toggle').uncheck();
+  await page.locator('#http-accept-input').fill(long + ' '); await page.getByTestId('auto-apply-toggle').uncheck();
   await page.clock.runFor(1000); await expect(page.getByTestId('accept-result')).toHaveCount(0);
   await page.getByTestId('apply-now').click(); await expect(page.getByTestId('accept-selected')).toHaveText('text/plain');
-  await page.reload(); await page.locator('#accept-offers').fill('text/plain'); await page.locator('#accept-input').fill(long);
+  await page.reload(); await page.locator('#accept-offers').fill('text/plain'); await page.locator('#http-accept-input').fill(long);
   await expect(page.getByTestId('apply-control')).toHaveAttribute('data-status', 'manual');
   await page.getByTestId('accept-sample').click(); await expect(page.getByTestId('accept-selected')).toHaveText('application/json');
 });
