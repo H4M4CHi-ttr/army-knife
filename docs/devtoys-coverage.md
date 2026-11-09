@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## Forwarded proxy record inspector (2026-11-10 JST)
+
+Recorded Forwarded element/parameter grouping defaults **on**. No dedicated
+workflow appears in the [official bundled list](https://devtoys.app/) checked
+2026-11-10 JST. General text comparison and existing HAR/CORS/Trace Context
+views differ. Community extensions are outside this comparison.
+[Structure-only scope, trust limits and privacy](forwarded.md).
+
+
 ## HTTP Accept negotiation preview (2026-11-09 JST)
 
 Recorded Accept q/specificity/exclusion matching against explicit offered

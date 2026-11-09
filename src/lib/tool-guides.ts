@@ -1,3 +1,4 @@
+import { forwardedGuide } from "./forwarded-guide.ts";
 import { acceptGuide } from "./http-accept-guide.ts";
 import { mergePatchGuide } from "./json-merge-patch-guide.ts";
 import { etagGuide } from "./etag-guide.ts";
@@ -166,6 +167,7 @@ export const toolGuides = {
   "http-accept": acceptGuide,
   "http-link": httpLinkGuide,
   "json-merge-patch": mergePatchGuide,
+  forwarded: forwardedGuide,
   hsts: hstsGuide,
   "trace-context": traceContextGuide,
   "image-reference": imageReferenceGuide,

@@ -1,4 +1,5 @@
 export type ToolId =
+  | "forwarded"
   | "http-accept"
   | "json-merge-patch"
   | "hsts"
@@ -84,6 +85,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "forwarded", category: "network", wasm: false, devtoys: false,
+    keywords: "http forwarded proxy reverse for by host proto header chain record プロキシ 記録 代理 记录 記錄 프록시 기록", color: "blue" },
   { id: "http-accept", category: "network", wasm: false, devtoys: false,
     keywords: "http accept content type media negotiation quality q wildcard 406 preference メディア 交渉 優先 照合 协商 協商 媒体 媒體 협상 미디어", color: "blue" },
   { id: "json-merge-patch", category: "data", wasm: false, devtoys: false,
