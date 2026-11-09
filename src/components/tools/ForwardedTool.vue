@@ -59,7 +59,7 @@ function meaning(name: string) {
       <div class="table-scroll">
         <table class="data-table">
           <caption>{{ t("forwarded.parameters") }}</caption>
-          <thead><tr><th scope="col">{{ t("forwarded.name") }}</th><th scope="col">{{ t("forwarded.value") }}</th><th scope="col">{{ t("forwarded.meaning") }}</th></tr></thead>
+          <thead><tr><th scope="col">{{ t("forwarded.name") }}</th><th scope="col">{{ t("forwarded.value") }}</th><th scope="col">{{ t("forwarded.meaningLabel") }}</th></tr></thead>
           <tbody><tr v-for="(parameter, index) in element.parameters" :key="index"><td><code>{{ parameter.name }}</code></td><td><code>{{ JSON.stringify(parameter.value) }}</code></td><td>{{ meaning(parameter.name) }}</td></tr></tbody>
         </table>
       </div>
