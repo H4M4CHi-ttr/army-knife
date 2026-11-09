@@ -1,5 +1,24 @@
 # Testing and deployment
 
+## Forwarded coverage (2026-11-10 JST)
+
+The [recorded structure inspector](forwarded.md) covers exact grouping,
+quoted delimiters/pairs, original order, empty positions, opaque/prototype-like
+names, duplicates, strict ASCII and raw byte/count boundaries. Actual Vapor
+tests check five locales, inert output, explicit JSON, rejected edits and
+instant/800ms/manual/cancel/disposal behavior. Four-project production E2E
+checks all five languages/themes, keyboard/mobile, exact download, memory-only
+lifecycle and exact-dist-asset privacy. Synthetic screenshots are attached.
+No node/host/scheme semantic validation or trusted client inference is made.
+
+After the existing Pages deployment succeeds, the contents-read-only
+`verify-public` job runs `pnpm exec playwright test --config playwright.public.config.ts`.
+It checks actual published operation in all four Chromium/Firefox projects,
+five locales and both themes, attaches screenshots, and verifies private-marker
+absence from requests/storage/URL. The site's pre-existing Analytics remains;
+the stricter same-origin asset audit applies to the local production tests.
+
+
 ## HTTP Accept coverage (2026-11-09 JST)
 
 The [bounded negotiation preview](http-accept.md) checks exact q grammar and all

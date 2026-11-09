@@ -1,3 +1,4 @@
+import { forwardedMessages } from "./forwarded.ts";
 import { acceptMessages } from "./http-accept.ts";
 import { mergePatchMessages } from "./json-merge-patch.ts";
 import { etagMessages } from "./etag.ts";
@@ -45,6 +46,7 @@ import { searchMessages } from "./search.ts";
 export const messages = {
   en: {
     ...mergePatchMessages.en,
+    ...forwardedMessages.en,
     ...hstsMessages.en,
     ...acceptMessages.en,
     ...httpLinkMessages.en,
@@ -84,6 +86,7 @@ export const messages = {
   },
   ja: {
     ...mergePatchMessages.ja,
+    ...forwardedMessages.ja,
     ...hstsMessages.ja,
     ...acceptMessages.ja,
     ...httpLinkMessages.ja,
@@ -123,6 +126,7 @@ export const messages = {
   },
   "zh-CN": {
     ...mergePatchMessages["zh-CN"],
+    ...forwardedMessages["zh-CN"],
     ...hstsMessages["zh-CN"],
     ...acceptMessages["zh-CN"],
     ...httpLinkMessages["zh-CN"],
@@ -162,6 +166,7 @@ export const messages = {
   },
   "zh-TW": {
     ...mergePatchMessages["zh-TW"],
+    ...forwardedMessages["zh-TW"],
     ...hstsMessages["zh-TW"],
     ...acceptMessages["zh-TW"],
     ...httpLinkMessages["zh-TW"],
@@ -201,6 +206,7 @@ export const messages = {
   },
   ko: {
     ...mergePatchMessages.ko,
+    ...forwardedMessages.ko,
     ...hstsMessages.ko,
     ...acceptMessages.ko,
     ...httpLinkMessages.ko,

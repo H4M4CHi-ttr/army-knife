@@ -125,6 +125,9 @@ jobs:
       - name: Install Chromium, Firefox, and their system dependencies
         run: pnpm exec playwright install --with-deps chromium firefox
 
+      - name: Validate public browser test collection without contacting the site
+        run: pnpm exec playwright test --config playwright.public.config.ts --list
+
       - name: Test the production app in both browsers and both viewport sizes
         id: browser-tests
         run: pnpm test:e2e
@@ -173,3 +176,46 @@ jobs:
         uses: actions/deploy-pages@v4.0.5
         with:
           timeout: "240000"
+
+  verify-public:
+    name: Verify the published Forwarded tool
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CI: "true"
+    steps:
+      - name: Check out the deployed revision
+        uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up the pinned browser test tools
+        uses: voidzero-dev/setup-vp@v1.21.2
+        with:
+          version: "1.1.0"
+          node-version: "24.19.0"
+          run-install: false
+          cache: true
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install the exact JavaScript dependency graph
+        run: vp install --frozen-lockfile
+
+      - name: Install the specified browsers
+        run: pnpm exec playwright install --with-deps chromium firefox
+
+      - name: Exercise the existing public Pages destination
+        run: pnpm exec playwright test --config playwright.public.config.ts
+
+      - name: Preserve public operation screenshots and traces
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: public-browser-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            public-playwright-report
+            public-test-results
+          if-no-files-found: error
+          retention-days: 14

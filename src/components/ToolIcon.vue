@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  forwarded: Workflow,
   "http-accept": GitCompareArrows,
   "json-merge-patch": GitMerge,
   hsts: LockKeyhole,
