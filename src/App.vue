@@ -43,6 +43,7 @@ import { ClassifierClient } from "@/lib/search/classifier-client";
 import { combineClassifierRankings } from "@/lib/search/classifier-runtime";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
+const PgLsnTool = defineAsyncComponent(() => import("@/components/tools/PgLsnTool.vue"));
 const ForwardedTool = defineAsyncComponent(() => import("@/components/tools/ForwardedTool.vue"));
 const IdnTool = defineAsyncComponent(() => import("@/components/tools/IdnTool.vue"));
 const ImageReferenceTool = defineAsyncComponent(() => import("@/components/tools/ImageReferenceTool.vue"));
@@ -865,6 +866,7 @@ onBeforeUnmount(() => {
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ImageReferenceTool v-else-if="selectedTool.id === 'image-reference'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <JsonMergePatchTool v-else-if="selectedTool.id === 'json-merge-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PgLsnTool v-else-if="selectedTool.id === 'pg-lsn'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ForwardedTool v-else-if="selectedTool.id === 'forwarded'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HstsTool v-else-if="selectedTool.id === 'hsts'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HttpAcceptTool v-else-if="selectedTool.id === 'http-accept'" :key="`${selectedTool.id}:${preferences.locale}`" />

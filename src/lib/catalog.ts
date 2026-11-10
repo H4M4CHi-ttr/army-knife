@@ -1,4 +1,5 @@
 export type ToolId =
+  | "pg-lsn"
   | "forwarded"
   | "http-accept"
   | "json-merge-patch"
@@ -85,6 +86,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "pg-lsn", category: "data", wasm: false, devtoys: false,
+    keywords: "postgres postgresql wal lsn log sequence number replication recovery segment byte distance データベース 複製 復旧 バイト 距離 复制 複寫 恢复 復原 字节 位元組 복제 복구 바이트 거리", color: "purple" },
   { id: "forwarded", category: "network", wasm: false, devtoys: false,
     keywords: "http forwarded proxy reverse for by host proto header chain record プロキシ 記録 代理 记录 記錄 프록시 기록", color: "blue" },
   { id: "http-accept", category: "network", wasm: false, devtoys: false,

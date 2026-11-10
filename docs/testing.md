@@ -1,5 +1,19 @@
 # Testing and deployment
 
+## PostgreSQL WAL LSN coverage (2026-11-11 JST)
+
+`src/lib/tools/pg-lsn.test.ts` checks exact 64-bit arithmetic, adjacent values
+above Number.MAX_SAFE_INTEGER, high-half rollover, signed/equal/zero cases,
+all supported segment sizes, raw UTF-8 bounds and input-free syntax errors.
+`PgLsnTool.test.ts` mounts real Vapor and checks dual-input/segment updates,
+immediate operation with auto-apply off, either rejected paste, stale exports,
+explicit JSON, all five locales and remount clearing.
+`tests/e2e/pg-lsn.spec.ts` runs Chromium/Firefox desktop/small with five locales,
+themes, keyboard, responsive screenshots, exact downloads, bounds/lifecycle
+and exact-dist-asset network/privacy auditing. `tests/public/pg-lsn.spec.ts`
+exercises the same existing Pages destination after deployment. These checks
+verify offline arithmetic, not a live database or replication condition.
+
 ## Forwarded coverage (2026-11-10 JST)
 
 The [recorded structure inspector](forwarded.md) covers exact grouping,
