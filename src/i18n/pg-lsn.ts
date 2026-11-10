@@ -26,7 +26,7 @@ const en = {
   "lsn.rejected": "An edit exceeded the input limit. Replace that field or load the sample before exporting a result.",
   "lsn.exportHelp": "Copy or download the complete exact JSON report explicitly. Both positions and the selected size are included.",
   "lsn.exampleResult": "A = 0/FF000000, B = 1/01000000: B − A is 33,554,432 bytes (32 MiB). With 16 MiB segments, A is segment 255 and B is 257, both at offset 0.",
-  "lsn.privacy": "Inputs and results stay in memory and clear on navigation, language change or reload. No database, URL or file is contacted. Export happens only on request.",
+  "lsn.privacy": "Inputs and results stay in memory and clear on navigation, language change or reload. No database or remote resource is contacted. UTF-8 files explicitly dropped into an input are read locally. Export happens only on request.",
   "errors.PG_LSN_SYNTAX": "Use two hexadecimal halves of 1–8 digits separated by /. Only outer ASCII spaces and tabs are accepted.",
   "errors.PG_LSN_SEGMENT_SIZE": "Choose a power-of-two segment size from 1 to 1024 MiB.",
 };
@@ -57,7 +57,7 @@ const ja: Messages = {
   "lsn.rejected": "入力上限を超える編集を拒否しました。該当欄を置き換えるかサンプルを読み込んでから結果を出力してください。",
   "lsn.exportHelp": "完全な正確なJSONレポートを明示操作でコピー・保存できます。両位置と指定サイズを含みます。",
   "lsn.exampleResult": "A = 0/FF000000、B = 1/01000000の場合、B − Aは33,554,432バイト（32 MiB）。16 MiBセグメントではAが255、Bが257で、両方とも位置0です。",
-  "lsn.privacy": "入力・結果はメモリ内のみで、画面移動・言語変更・再読み込み時に破棄します。データベース・URL・ファイルへアクセスせず、出力は明示操作時だけ行います。",
+  "lsn.privacy": "入力・結果はメモリ内のみで、画面移動・言語変更・再読み込み時に破棄します。データベース・外部URLへ接続せず、入力欄へ明示ドロップしたUTF-8ファイルはローカルで読み込みます。出力は明示操作時だけ行います。",
   "errors.PG_LSN_SYNTAX": "1〜8桁の16進数を/で区切って2組入力してください。外側のASCII空白・タブのみ使用できます。",
   "errors.PG_LSN_SEGMENT_SIZE": "1〜1024 MiBの2の累乗のセグメントサイズを選んでください。",
 };
@@ -76,7 +76,7 @@ const zhCN: Messages = {
   "lsn.rejected": "编辑超过输入上限。请替换该字段或加载示例后再导出结果。",
   "lsn.exportHelp": "明确操作后可复制或下载完整精确JSON报告，包含两个位置和所选大小。",
   "lsn.exampleResult": "A = 0/FF000000，B = 1/01000000：B − A为33,554,432字节（32 MiB）。16 MiB段中，A位于段255，B位于段257，两者偏移均为0。",
-  "lsn.privacy": "输入和结果仅保留在内存中，导航、语言切换或刷新时清除。不访问数据库、URL或文件，仅在明确操作后导出。",
+  "lsn.privacy": "输入和结果仅保留在内存中，导航、语言切换或刷新时清除。不连接数据库或远程资源；明确拖放至输入框的UTF-8文件仅在本地读取，仅在明确操作后导出。",
   "errors.PG_LSN_SYNTAX": "请输入两组1–8位十六进制数并用/分隔，仅允许外侧ASCII空格或制表符。",
   "errors.PG_LSN_SEGMENT_SIZE": "请选择1至1024 MiB中2次幂的段大小。",
 };
@@ -95,7 +95,7 @@ const zhTW: Messages = {
   "lsn.rejected": "編輯超過輸入上限。請替換該欄位或載入範例後再匯出結果。",
   "lsn.exportHelp": "明確操作後可複製或下載完整精確JSON報告，包含兩個位置與所選大小。",
   "lsn.exampleResult": "A = 0/FF000000，B = 1/01000000：B − A為33,554,432位元組（32 MiB）。16 MiB區段中，A位於區段255，B位於區段257，兩者位移均為0。",
-  "lsn.privacy": "輸入與結果僅保留在記憶體中，導覽、語言切換或重新載入時清除。不存取資料庫、URL或檔案，僅在明確操作後匯出。",
+  "lsn.privacy": "輸入與結果僅保留在記憶體中，導覽、語言切換或重新載入時清除。不連線至資料庫或遠端資源；明確拖放至輸入框的UTF-8檔案僅在本機讀取，僅在明確操作後匯出。",
   "errors.PG_LSN_SYNTAX": "請輸入兩組1–8位十六進位數並以/分隔，僅允許外側ASCII空格或定位字元。",
   "errors.PG_LSN_SEGMENT_SIZE": "請選擇1至1024 MiB中2次方的區段大小。",
 };
@@ -114,7 +114,7 @@ const ko: Messages = {
   "lsn.rejected": "편집이 입력 한도를 초과했습니다. 해당 필드를 바꾸거나 예제를 불러온 후 결과를 내보내세요.",
   "lsn.exportHelp": "명시적으로 복사하거나 다운로드하면 두 위치와 선택한 크기가 포함된 전체 정확한 JSON 보고서를 받습니다.",
   "lsn.exampleResult": "A = 0/FF000000, B = 1/01000000이면 B − A는 33,554,432바이트 (32 MiB)입니다. 16 MiB 세그먼트에서 A는 255, B는 257이며 두 오프셋은 모두 0입니다.",
-  "lsn.privacy": "입력과 결과는 메모리에만 보관되며 이동, 언어 변경 또는 새로고침 시 지워집니다. 데이터베이스, URL 또는 파일에 접근하지 않으며 요청 시에만 내보냅니다.",
+  "lsn.privacy": "입력과 결과는 메모리에만 보관되며 이동, 언어 변경 또는 새로고침 시 지워집니다. 데이터베이스나 원격 리소스에 연결하지 않습니다. 입력란에 명시적으로 놓은 UTF-8 파일은 로컬에서 읽으며 요청 시에만 내보냅니다.",
   "errors.PG_LSN_SYNTAX": "1–8자리 16진수 두 부분을 /로 구분하세요. 바깥쪽 ASCII 공백과 탭만 허용합니다.",
   "errors.PG_LSN_SEGMENT_SIZE": "1–1024 MiB 중 2의 거듭제곱인 세그먼트 크기를 선택하세요.",
 };

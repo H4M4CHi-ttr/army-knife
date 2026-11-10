@@ -56,6 +56,8 @@ no heavy work, background job or cancellation delay is necessary. A rejected
 paste clears the old report/export until that field is replaced. Sample and
 clear reset both inputs and the segment size. Navigation, language changes
 and reload discard inputs and results. Only the existing preferences persist.
+The shared input also accepts explicitly dropped local UTF-8 files within
+the same 64-byte limit; those files are read in memory without any upload.
 
 Vapor UI, shadcn-vue buttons, five locales, light/dark, keyboard, small screens,
 Noto/Sarasa fonts and explicit JSON exports reuse the existing app. There are
