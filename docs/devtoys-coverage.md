@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## PostgreSQL WAL LSN comparison (2026-11-11 JST)
+
+Exact recorded WAL position comparison and explicit segment arithmetic default
+**on**. No dedicated LSN workflow appears in the [official bundled list](https://devtoys.app/)
+checked 2026-11-11 JST. Generic base conversion and existing DSN/EXPLAIN tools
+do not perform this comparison. Community extensions are outside the comparison.
+[Precision, common-history precondition, zero sentinel and segment boundaries](pg-lsn.md).
+No database connection, telemetry or new runtime dependency is introduced.
+
 ## Forwarded proxy record inspector (2026-11-10 JST)
 
 Recorded Forwarded element/parameter grouping defaults **on**. No dedicated
