@@ -28,7 +28,15 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await input.fill('""'); await expect(page.getByTestId("dns-txt-data-bytes")).toHaveText("0");
     await input.fill('"\\255"'); await expect(result).toHaveCount(0);
     await expect(page.getByRole("alert")).toHaveText(m["errors.DNS_TXT_UTF8"]);
-    await page.locator("#dns-txt-mode").selectOption("split"); await input.fill("<script>" + PRIVATE + "</script>");
+    await page.locator("#dns-txt-mode").selectOption("split");
+    await input.evaluate(element => {
+      const event = new Event("drop", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { files: [new File(["\ufeffa"], "synthetic.txt")], getData: () => "" } });
+      element.dispatchEvent(event);
+    });
+    await expect(page.getByTestId("dns-txt-data-bytes")).toHaveText("4");
+    expect(await page.getByTestId("dns-txt-text").locator("pre").textContent()).toBe("\ufeffa");
+    await input.fill("<script>" + PRIVATE + "</script>");
     await expect(result).toBeVisible(); await expect(result.locator("script, img, a")).toHaveCount(0);
     expect(JSON.stringify(await page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage }, url: location.href })))).not.toContain(PRIVATE);
     await page.getByTestId("dns-txt-clear").click(); await page.reload(); await expect(input).toHaveValue("");

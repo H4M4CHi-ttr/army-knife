@@ -46,7 +46,7 @@ function changeMode(event: Event) {
         <option value="restore">{{ t("dnsTxt.restore") }}</option>
       </select>
     </div>
-    <CodeInput :key="revision" :model-value="input" :label="t(mode === 'split' ? 'dnsTxt.textInput' : 'dnsTxt.rdataInput')" input-id="dns-txt-input" :rows="5" :file="false" :max-bytes="mode === 'split' ? DNS_TXT_LIMITS.textBytes : DNS_TXT_LIMITS.rdataBytes" :placeholder="mode === 'split' ? DNS_TXT_SAMPLE_TEXT : DNS_TXT_SAMPLE_RDATA" @update:model-value="input = $event; rejected = false; active = true" @rejected="rejected = true" />
+    <CodeInput :key="revision" :model-value="input" :label="t(mode === 'split' ? 'dnsTxt.textInput' : 'dnsTxt.rdataInput')" input-id="dns-txt-input" :rows="5" :file="false" :preserve-bom="true" :max-bytes="mode === 'split' ? DNS_TXT_LIMITS.textBytes : DNS_TXT_LIMITS.rdataBytes" :placeholder="mode === 'split' ? DNS_TXT_SAMPLE_TEXT : DNS_TXT_SAMPLE_RDATA" @update:model-value="input = $event; rejected = false; active = true" @rejected="rejected = true" />
     <div class="run-bar">
       <p class="hint">{{ t("tool.dns-txt.hint") }}</p>
       <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />

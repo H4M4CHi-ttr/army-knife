@@ -10,6 +10,9 @@ instant/800ms/manual/cancel/disposal. Four-project production E2E covers
 five locales, themes, keyboard/mobile, exact downloads, state clearing and
 exact-dist-asset privacy. Public tests extend the existing Pages suite.
 These verify text conversion, not DNS publication or mail authentication.
+Reader/actual-worker tests cover opt-in file BOM preservation with unchanged
+defaults. Real Vapor and browser drops cover BOM-only/prefixed files and
+multibyte byte-limit rejection retaining invalid state after async fallback.
 
 ## PostgreSQL WAL LSN coverage (2026-11-11 JST)
 

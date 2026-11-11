@@ -20,6 +20,8 @@ const props = withDefaults(
     maxBytes?: number;
     rows?: number;
     file?: boolean;
+    /** Preserve an initial UTF-8 BOM when exact file bytes matter. */
+    preserveBom?: boolean;
     disabled?: boolean;
   }>(),
   { maxBytes: 16 * 1024 * 1024, rows: 10, file: true },
@@ -105,9 +107,11 @@ function acceptLargePaste(text: string) {
   void prepareLargeText(text, props.maxBytes, controller.signal)
     .catch((error: unknown) => {
       if (ticket !== sequence || controller.signal.aborted) return;
-      fileError.value = codeFor(error);
       // Invalid text must not remain eligible for analysis.
       emit("update:modelValue", "");
+      // Notify after the fallback so a host's accepted-edit handler cannot
+      // accidentally reset this rejection and export a valid empty value.
+      fileError.value = codeFor(error);
     })
     .finally(() => {
       if (ticket !== sequence) return;
@@ -150,8 +154,8 @@ async function loadFile(selected: File) {
   try {
     const text =
       selected.size < LARGE_TEXT_THRESHOLD
-        ? await readTextFile(selected, props.maxBytes)
-        : await prepareLargeText(selected, props.maxBytes, controller.signal);
+        ? await readTextFile(selected, props.maxBytes, props.preserveBom)
+        : await prepareLargeText(selected, props.maxBytes, controller.signal, props.preserveBom);
     if (ticket === sequence && !controller.signal.aborted) {
       loading.value = false;
       emit("update:modelValue", text);

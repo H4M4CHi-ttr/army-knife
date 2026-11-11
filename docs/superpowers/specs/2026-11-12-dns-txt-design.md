@@ -62,6 +62,10 @@ Five locales, both themes, keyboard and 390px widths use existing patterns.
 
 Inputs/results stay in component memory, clearing on tool/locale navigation
 and reload. Explicitly dropped UTF-8 files use CodeInput's local reader.
+The view opts into BOM preservation through both local and worker file
+readers. Other callers retain existing defaults. Async rejected imports
+notify rejection after the empty-model fallback, so a host cannot turn a
+rejected drop into an intentional empty TXT export.
 No input/result requests, logs, URL/storage writes, new telemetry/font CDN,
 WebMCP or deployment configuration. Existing site preferences remain.
 

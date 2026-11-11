@@ -20,9 +20,42 @@ beforeEach(() => {
   Object.assign(settings.preferences, defaultPreferences("en")); i18n.global.locale.value = "en";
   wrapper = mountTool();
 });
-afterEach(() => { if (wrapper?.exists()) wrapper.unmount(); vi.restoreAllMocks(); vi.useRealTimers(); });
+afterEach(() => { if (wrapper?.exists()) wrapper.unmount(); vi.restoreAllMocks(); vi.unstubAllGlobals(); vi.useRealTimers(); });
 
 describe("DNS TXT real Vapor workflow", () => {
+  it("preserves BOM-only and BOM-prefixed files explicitly dropped into the input", async () => {
+    for (const text of ["\ufeff", "\ufeffa"]) {
+      const event = new Event("drop", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { files: [new File([text], "synthetic.txt")], getData: () => "" } });
+      wrapper.get("#dns-txt-input").element.dispatchEvent(event); await flushPromises();
+      expect(wrapper.get('[data-testid="dns-txt-text"] pre').element.textContent).toBe(text);
+      expect(wrapper.get('[data-testid="dns-txt-data-bytes"]').text()).toBe(String(new TextEncoder().encode(text).length));
+    }
+  });
+  it("keeps a byte-limit-rejected text drop invalid after the async empty fallback", async () => {
+    let respond: ((event: MessageEvent) => void) | null = null;
+    class DropWorker {
+      onerror = null; onmessageerror = null;
+      set onmessage(handler: (event: MessageEvent) => void) { respond = handler; }
+      postMessage() {}
+      terminate() {}
+    }
+    vi.stubGlobal("Worker", DropWorker);
+    await sample();
+    const event = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: { files: [], getData: () => "é".repeat(4097) } });
+    wrapper.get("#dns-txt-input").element.dispatchEvent(event);
+    await flushPromises();
+    expect(respond).not.toBeNull();
+    (respond as unknown as (event: MessageEvent) => void)({ data: { id: 1, ok: false, code: "INPUT_TOO_LARGE" } } as MessageEvent);
+    await flushPromises();
+    expect(wrapper.get("#dns-txt-input").element).toHaveProperty("value", "");
+    expect(result().exists()).toBe(false);
+    expect(wrapper.find(".output-actions").exists()).toBe(false);
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+    await input("accepted"); expect(result().exists()).toBe(true);
+    await input(""); expect(result().exists()).toBe(true);
+  });
   it("starts untouched, splits the sample, and clears input on mode change", async () => {
     expect(result().exists()).toBe(false); await sample();
     expect(wrapper.get('[data-testid="dns-txt-rdata"] pre').text()).toBe(DNS_TXT_SAMPLE_RDATA);

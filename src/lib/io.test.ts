@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vite-plus/test";
-import { prepareLargeText, LARGE_TEXT_PREVIEW, LARGE_TEXT_THRESHOLD } from "./io";
+import { prepareLargeText, readTextFile, LARGE_TEXT_PREVIEW, LARGE_TEXT_THRESHOLD } from "./io";
 
 class FakeWorker {
   static instances: FakeWorker[] = [];
@@ -23,6 +23,26 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("large text input transport", () => {
+  it("preserves file BOM only when explicitly requested and counts its raw bytes", async () => {
+    for (const text of ["\ufeff", "\ufeffa"]) {
+      const file = new File([text], "synthetic.txt");
+      await expect(readTextFile(file, 8)).resolves.toBe(text.slice(1));
+      await expect(readTextFile(file, 8, true)).resolves.toBe(text);
+    }
+    await expect(readTextFile(new File(["\ufeffa"], "synthetic.txt"), 3, true)).rejects.toThrow("INPUT_TOO_LARGE");
+    await expect(readTextFile(new File([Uint8Array.of(255)], "synthetic.txt"), 8, true)).rejects.toThrow("INVALID_UTF8");
+  });
+
+  it("passes the BOM opt-in through worker transport without altering default jobs", async () => {
+    const file = new File(["\ufeffa"], "synthetic.txt");
+    const job = prepareLargeText(file, 8, undefined, true);
+    const worker = FakeWorker.instances[0]!;
+    expect(worker.postMessage).toHaveBeenCalledWith({
+      id: 1, maxBytes: 8, preserveBom: true, source: { kind: "file", file },
+    });
+    worker.finish({ id: 1, ok: true, text: "\ufeffa" });
+    await expect(job).resolves.toBe("\ufeffa");
+  });
   it("has a strict bounded live-editor preview", () => {
     expect(LARGE_TEXT_THRESHOLD).toBe(128 * 1024);
     expect(LARGE_TEXT_PREVIEW).toBe(2048);

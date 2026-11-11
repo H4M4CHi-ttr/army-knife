@@ -1,8 +1,8 @@
-export async function readTextFile(file: File, maxBytes: number): Promise<string> {
+export async function readTextFile(file: File, maxBytes: number, preserveBom = false): Promise<string> {
   if (file.size > maxBytes) throw new Error("INPUT_TOO_LARGE");
   const bytes = new Uint8Array(await file.arrayBuffer());
   try {
-    return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    return new TextDecoder("utf-8", { fatal: true, ignoreBOM: preserveBom }).decode(bytes);
   } catch {
     throw new Error("INVALID_UTF8");
   }
@@ -36,6 +36,7 @@ export function prepareLargeText(
   source: File | string,
   maxBytes: number,
   signal?: AbortSignal,
+  preserveBom = false,
 ): Promise<string> {
   if (signal?.aborted) return Promise.reject(new Error("CANCELLED"));
   if (typeof source === "string" && source.length > maxBytes)
@@ -88,6 +89,7 @@ export function prepareLargeText(
       worker.postMessage({
         id: 1,
         maxBytes,
+        ...(preserveBom ? { preserveBom: true } : {}),
         source:
           typeof source === "string"
             ? { kind: "text", value: source }

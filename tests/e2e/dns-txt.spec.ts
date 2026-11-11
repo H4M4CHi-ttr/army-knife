@@ -155,3 +155,33 @@ test("DNS TXT data clears on mode, tool, locale and reload; no URL or storage in
   await expect(page.getByRole("dialog")).toHaveCount(0); await expect(input).toHaveValue(""); await expect(result).toHaveCount(0);
   expect(JSON.stringify(await state())).not.toContain(PRIVATE);
 });
+
+test("DNS TXT dropped files keep BOM and rejected multibyte text drops stay invalid", async ({ page }) => {
+  await page.goto("./en/tools/dns-txt/");
+  const input = page.locator("#dns-txt-input"), result = page.getByTestId("dns-txt-result");
+  for (const text of ["\ufeff", "\ufeffa"]) {
+    await input.evaluate((element, value) => {
+      const event = new Event("drop", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { files: [new File([value], "synthetic.txt")], getData: () => "" } });
+      element.dispatchEvent(event);
+    }, text);
+    await expect(page.getByTestId("dns-txt-data-bytes")).toHaveText(String(new TextEncoder().encode(text).length));
+    expect(await page.getByTestId("dns-txt-text").locator("pre").textContent()).toBe(text);
+  }
+  await input.evaluate(element => {
+    const event = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: { files: [], getData: () => "é".repeat(4097) } });
+    element.dispatchEvent(event);
+  });
+  await expect(input).toHaveValue("");
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(result).toHaveCount(0); await expect(page.locator(".output-actions")).toHaveCount(0);
+  await page.getByTestId("dns-txt-sample").click(); await expect(result).toBeVisible();
+  await input.evaluate(element => {
+    const event = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: { files: [new File([Uint8Array.of(255)], "synthetic.txt")], getData: () => "" } });
+    element.dispatchEvent(event);
+  });
+  await expect(result).toHaveCount(0); await expect(page.locator(".output-actions")).toHaveCount(0);
+  await expect(page.getByRole("alert")).toBeVisible();
+});
