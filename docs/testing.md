@@ -1,5 +1,19 @@
 # Testing and deployment
 
+## DNS TXT coverage (2026-11-12 JST)
+
+The [bounded TXT codec](dns-txt.md) checks 255/256-octet boundaries, UTF-8
+scalars crossing fragments, exact decimal/quoted escapes, empty values, BOM,
+strict decoding and every raw/data/count cap. Real Vapor checks both modes,
+intentional empty exports, rejected edits, five locales, inert text and
+instant/800ms/manual/cancel/disposal. Four-project production E2E covers
+five locales, themes, keyboard/mobile, exact downloads, state clearing and
+exact-dist-asset privacy. Public tests extend the existing Pages suite.
+These verify text conversion, not DNS publication or mail authentication.
+Reader/actual-worker tests cover opt-in file BOM preservation with unchanged
+defaults. Real Vapor and browser drops cover BOM-only/prefixed files and
+multibyte byte-limit rejection retaining invalid state after async fallback.
+
 ## PostgreSQL WAL LSN coverage (2026-11-11 JST)
 
 `src/lib/tools/pg-lsn.test.ts` checks exact 64-bit arithmetic, adjacent values

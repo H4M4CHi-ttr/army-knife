@@ -1,4 +1,5 @@
 export type ToolId =
+  | "dns-txt"
   | "pg-lsn"
   | "forwarded"
   | "http-accept"
@@ -86,6 +87,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "dns-txt", category: "network", wasm: false, devtoys: false,
+    keywords: "dns txt rdata split restore fragment octet utf8 zone spf dkim verification 分割 復元 断片 拆分 还原 分割 還原 분할 복원", color: "blue" },
   { id: "pg-lsn", category: "data", wasm: false, devtoys: false,
     keywords: "postgres postgresql wal lsn log sequence number replication recovery segment byte distance データベース 複製 復旧 バイト 距離 复制 複寫 恢复 復原 字节 位元組 복제 복구 바이트 거리", color: "purple" },
   { id: "forwarded", category: "network", wasm: false, devtoys: false,

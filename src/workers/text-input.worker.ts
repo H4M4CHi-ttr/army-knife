@@ -2,6 +2,7 @@
 type Job = {
   id: number;
   maxBytes: number;
+  preserveBom?: boolean;
   source: { kind: "file"; file: File } | { kind: "text"; value: string };
 };
 type Reply =
@@ -14,7 +15,7 @@ const scope = self as unknown as {
 };
 
 scope.onmessage = async ({ data }) => {
-  const { id, maxBytes, source } = data;
+  const { id, maxBytes, source, preserveBom = false } = data;
   try {
     if (!Number.isSafeInteger(maxBytes) || maxBytes <= 0) throw new Error("INTERNAL_ERROR");
     if (source.kind === "file") {
@@ -22,7 +23,7 @@ scope.onmessage = async ({ data }) => {
       const bytes = await source.file.arrayBuffer();
       if (bytes.byteLength > maxBytes) throw new Error("INPUT_TOO_LARGE");
       try {
-        const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+        const text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: preserveBom }).decode(bytes);
         scope.postMessage({ id, ok: true, text });
       } catch {
         throw new Error("INVALID_UTF8");
@@ -43,3 +44,5 @@ scope.onmessage = async ({ data }) => {
     });
   }
 };
+
+export {};
