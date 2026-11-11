@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  "dns-txt": Network,
   "pg-lsn": GitCompareArrows,
   forwarded: Workflow,
   "http-accept": GitCompareArrows,

@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## DNS TXT split / restore (2026-11-12 JST)
+
+The dedicated 255-octet UTF-8 TXT fragmentation/reconstruction workflow defaults
+**on**. The [official bundled list](https://devtoys.app/) was checked on
+2026-11-12 JST: generic escape/unescape differs from DNS character-string
+byte limits, decimal octet syntax and exact joined UTF-8 reconstruction.
+Community extensions are outside this comparison. Existing overlap defaults
+are unchanged. [Exact grammar, bounds and exclusions](dns-txt.md).
+
 ## PostgreSQL WAL LSN comparison (2026-11-11 JST)
 
 Exact recorded WAL position comparison and explicit segment arithmetic default
