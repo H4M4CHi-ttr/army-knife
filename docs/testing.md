@@ -1,5 +1,16 @@
 # Testing and deployment
 
+## Recorded Content-Range coverage (2026-11-13 JST)
+
+The [bounded byte-field inspector](content-range.md) checks inclusive endpoints,
+known/unknown/unsatisfied-zero states, adjacent large integers, 40 input digits
+and 41 derived digits, canonical form, raw UTF-8/ASCII limits and atomic errors.
+Real Vapor covers null/zero/false, immediate auto-off behavior, rejected paste,
+explicit local file/BOM/UTF-8 rejection, exact JSON, five locales and disposal.
+Four-project production E2E checks five languages/themes, keyboard/mobile,
+actual downloads, input lifecycle and exact-dist-asset privacy. Public checks
+extend the existing Pages suite. No status, body or real transfer is validated.
+
 ## DNS TXT coverage (2026-11-12 JST)
 
 The [bounded TXT codec](dns-txt.md) checks 255/256-octet boundaries, UTF-8

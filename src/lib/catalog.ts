@@ -1,4 +1,5 @@
 export type ToolId =
+  | "content-range"
   | "dns-txt"
   | "pg-lsn"
   | "forwarded"
@@ -87,6 +88,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "content-range", category: "network", wasm: false, devtoys: false,
+    keywords: "http content range response bytes partial download resume 206 416 offset complete length unknown 応答 区間 全体長 再開 响应 回應 范围 範圍 응답 범위", color: "blue" },
   { id: "dns-txt", category: "network", wasm: false, devtoys: false,
     keywords: "dns txt rdata split restore fragment octet utf8 zone spf dkim verification 分割 復元 断片 拆分 还原 分割 還原 분할 복원", color: "blue" },
   { id: "pg-lsn", category: "data", wasm: false, devtoys: false,

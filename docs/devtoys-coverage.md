@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## Recorded Content-Range bytes (2026-11-13 JST)
+
+The response-field interval/unknown-total/unsatisfied workflow defaults **on**.
+No dedicated counterpart appears in the [official bundled list](https://devtoys.app/)
+checked on 2026-11-13 JST. Existing request-range arithmetic generates reference
+fields; it does not inspect a recorded response or unknown complete length.
+Community extensions are outside the comparison. No network, new dependency
+or telemetry is added. [Exact arithmetic and excluded transfer semantics](content-range.md).
+
 ## DNS TXT split / restore (2026-11-12 JST)
 
 The dedicated 255-octet UTF-8 TXT fragmentation/reconstruction workflow defaults
