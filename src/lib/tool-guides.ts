@@ -1,3 +1,4 @@
+import { contentRangeGuide } from "./content-range-guide.ts";
 import { dnsTxtGuide } from "./dns-txt-guide.ts";
 import { pgLsnGuide } from "./pg-lsn-guide.ts";
 import { forwardedGuide } from "./forwarded-guide.ts";
@@ -169,6 +170,7 @@ export const toolGuides = {
   "http-accept": acceptGuide,
   "http-link": httpLinkGuide,
   "json-merge-patch": mergePatchGuide,
+  "content-range": contentRangeGuide,
   "dns-txt": dnsTxtGuide,
   "pg-lsn": pgLsnGuide,
   forwarded: forwardedGuide,
