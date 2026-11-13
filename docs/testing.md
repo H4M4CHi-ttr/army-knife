@@ -9,10 +9,14 @@ dimensions/SQL/JSON forms, exact raw UTF-8/item/output bounds and atomic errors.
 The real Vapor suite exercises both modes, explicit complete copy, the labelled
 32-item preview, file/paste rejection, immediate work with auto off, deterministic
 800ms/manual/cancel/mode/disposal behavior and all five locales.
-`tests/e2e/pg-text-array.spec.ts` runs 36 production cases across Chromium/Firefox
+`tests/e2e/pg-text-array.spec.ts` runs 40 production cases across Chromium/Firefox
 desktop/390px projects: five locales, both themes, keyboard, independent copy and
 actual downloads, valid/invalid file imports, BOM, stale-output invalidation,
 deferred controls, clearing and exact-dist-asset network/privacy auditing.
+Real-browser CR/CRLF/escaped-CR cases reproduce textarea normalization and verify
+raw paste/import, protected read-only preview, keyboard edits, original-byte
+download and explicit replacement. The opt-in CodeInput behavior is used only
+by this tool's PostgreSQL input; existing tools keep their previous behavior.
 `tests/public/pg-text-array.spec.ts` adds 20 actual Pages checks after deployment.
 Synthetic screenshots contain no real database values. See [scope](pg-text-array.md).
 

@@ -22,6 +22,8 @@ const props = withDefaults(
     file?: boolean;
     /** Preserve an initial UTF-8 BOM when exact file bytes matter. */
     preserveBom?: boolean;
+    /** Opt in to raw CR paste and a read-only preview until explicit replacement. */
+    preserveCarriageReturns?: boolean;
     disabled?: boolean;
   }>(),
   { maxBytes: 16 * 1024 * 1024, rows: 10, file: true },
@@ -35,6 +37,7 @@ const fileError = ref("");
 watch(fileError, (error) => { if (error) emit("rejected"); }, { flush: "sync" });
 const loading = ref(false);
 const large = computed(() => props.modelValue.length >= LARGE_TEXT_THRESHOLD);
+const carriageReturns = computed(() => Boolean(props.preserveCarriageReturns && props.modelValue.includes("\r")));
 const visibleText = computed(() =>
   large.value ? props.modelValue.slice(0, LARGE_TEXT_PREVIEW) : props.modelValue,
 );
@@ -71,6 +74,9 @@ function codeFor(error: unknown): string {
 
 function onInput(event: Event) {
   const field = event.target as HTMLTextAreaElement;
+  // The textarea API normalizes CR/CRLF to LF, including after file imports.
+  // A protected preview must never replace the raw model with that API value.
+  if (carriageReturns.value) { field.value = visibleText.value; return; }
   const text = field.value;
   stopLoading();
   if (text.length > props.maxBytes) {
@@ -123,11 +129,13 @@ function acceptLargePaste(text: string) {
 
 function onPaste(event: ClipboardEvent) {
   if (props.disabled) return;
+  if (carriageReturns.value) { event.preventDefault(); return; }
   const pasted = event.clipboardData?.getData("text/plain");
   if (!pasted) return;
   const field = event.target as HTMLTextAreaElement;
   const length = field.value.length - (field.selectionEnd - field.selectionStart) + pasted.length;
-  if (length < LARGE_TEXT_THRESHOLD && length <= props.maxBytes) return;
+  const rawCR = props.preserveCarriageReturns && pasted.includes("\r");
+  if (length < LARGE_TEXT_THRESHOLD && length <= props.maxBytes && !rawCR) return;
   event.preventDefault();
   if (length > props.maxBytes) {
     fileError.value = "INPUT_TOO_LARGE";
@@ -137,6 +145,15 @@ function onPaste(event: ClipboardEvent) {
     field.value.slice(0, field.selectionStart) +
     pasted +
     field.value.slice(field.selectionEnd);
+  if (length < LARGE_TEXT_THRESHOLD) {
+    stopLoading(); fileError.value = "";
+    if (new TextEncoder().encode(text).byteLength > props.maxBytes) {
+      fileError.value = "INPUT_TOO_LARGE";
+      return;
+    }
+    emit("update:modelValue", text);
+    return;
+  }
   acceptLargePaste(text);
 }
 
@@ -214,14 +231,14 @@ function downloadInput() {
       :rows="large ? Math.min(rows, 6) : rows"
       :placeholder="placeholder"
       :disabled="disabled || loading"
-      :readonly="large"
+      :readonly="large || carriageReturns"
       :wrap="large ? 'off' : 'soft'"
       class="code-editor w-full border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 outline-none focus-visible:ring-3"
       spellcheck="false"
       autocapitalize="off"
       autocomplete="off"
       autocorrect="off"
-      :aria-describedby="inputId + '-hint'"
+      :aria-describedby="inputId + '-hint' + (carriageReturns ? ' ' + inputId + '-cr-hint' : '')"
       @input="onInput"
       @paste="onPaste"
       @drop="onDrop"
@@ -236,6 +253,13 @@ function downloadInput() {
         <Button variant="ghost" size="sm" :disabled="loading" @click="downloadInput">
           <Download class="size-3.5" />{{ t("largeInput.download") }}
         </Button>
+      </div>
+    </div>
+    <div v-if="carriageReturns" class="large-input-summary" role="status" data-testid="preserved-cr-input">
+      <p :id="inputId + '-cr-hint'">{{ t("largeInput.carriageReturns") }}</p>
+      <div class="control-row">
+        <Button variant="outline" size="sm" :disabled="loading" data-testid="replace-raw-cr-input" @click="replace">{{ t("largeInput.replace") }}</Button>
+        <Button variant="ghost" size="sm" :disabled="loading" data-testid="download-raw-cr-input" @click="downloadInput"><Download class="size-3.5" />{{ t("largeInput.download") }}</Button>
       </div>
     </div>
     <div :id="inputId + '-hint'" class="input-footnote">

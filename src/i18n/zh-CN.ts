@@ -78,6 +78,7 @@ export const zhCN: Messages = {
   "labels.no": "否",
   "largeInput.summary": "大文本共 {characters} 个字符，仅显示前 {preview} 个字符；分析仍使用全文。",
   "largeInput.replace": "替换文本",
+  "largeInput.carriageReturns": "保留原始CR/CRLF。此只读预览以LF显示换行。请替换文本或导入新文件来修改输入。下载原文或输出以取得精确字节。",
   "largeInput.download": "下载原文",
   "largeInput.outputPreview": "预览最多显示 1,000 个条目与 8,192 个字符。复制或下载可获取完整结果。",
   "largeInput.loading": "正在浏览器内读取或验证文本…",

@@ -71,6 +71,14 @@ bare root `NULL` / root JSON `null` are not accepted.
 - Files decode strictly as UTF-8 and retain BOM. An outer BOM is a syntax error;
   a BOM character within a text value is retained. Rejected imports/pastes hide
   old outputs until accepted replacement/sample input arrives.
+- PostgreSQL values containing CR/CRLF use a labelled read-only input preview.
+  The textarea display normalizes line endings, so ordinary editing would change
+  values. Raw paste/file contents remain in memory; use Replace text, another
+  file, or clear/sample/mode controls to replace them. UTF-8 downloads use the
+  exact raw source/values. Clipboard actions pass full strings to the browser;
+  the native OS clipboard is outside this codec. Prefer JSON escapes or downloads
+  when newline fidelity is required. JSON input stays editable:
+  meaningful CR there is written as a JSON escape, not a raw string character.
 - Input, output and errors stay in memory. Mode/tool/language changes or reload
   discard them. No input/result request, log, URL, cookie or persistent storage
   is added. Assets/fonts use existing fixed local paths. No new dependency,
@@ -87,6 +95,9 @@ exact exports, keyboard/themes/mobile, pending cancellation and privacy.
 
 Primary references: [PostgreSQL 18 §8.15.2 / §8.15.6](https://www.postgresql.org/docs/18/arrays.html)
 and [`array_nulls`](https://www.postgresql.org/docs/18/runtime-config-compatible.html#GUC-ARRAY-NULLS).
+The [HTML textarea API](https://html.spec.whatwg.org/multipage/form-elements.html#the-textarea-element)
+explains why raw CR input needs a protected preview; actual-browser regression
+tests cover the normalization that the DOM unit-test environment does not model.
 The [official DevToys bundled list](https://devtoys.app/) was rechecked on
 2026-11-14 JST; this dedicated array-value codec defaults on. Community extensions
 are outside the comparison. The existing JSON, DSN and LSN tools serve different

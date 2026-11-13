@@ -30,6 +30,15 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await expect(result).toBeVisible(); await expect(page.locator("#main-content script, #main-content img")).toHaveCount(0);
     const state = () => page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage }, url: location.href, cookie: document.cookie }));
     expect(JSON.stringify(await state())).not.toContain(PRIVATE);
+    await page.locator("#pg-array-mode").selectOption("decode");
+    const raw = '{"' + PRIVATE + '\r\nvalue"}';
+    await page.locator('input[type="file"]').setInputFiles({ name: "synthetic-public-cr.txt", mimeType: "text/plain", buffer: Buffer.from(raw) });
+    await expect(page.getByTestId("pg-array-json").locator("pre")).toHaveText(JSON.stringify([PRIVATE + "\r\nvalue"], null, 2));
+    await input.focus(); await page.keyboard.press("ControlOrMeta+End"); await page.keyboard.type(" ");
+    await expect(page.getByTestId("pg-array-json").locator("pre")).toHaveText(JSON.stringify([PRIVATE + "\r\nvalue"], null, 2));
+    expect(await input.evaluate((element: HTMLTextAreaElement) => element.readOnly)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
+    expect(JSON.stringify(await state())).not.toContain(PRIVATE);
     await page.getByTestId("pg-array-clear").click(); await page.reload(); await expect(input).toHaveValue("");
     expect(requests.join("\n")).not.toContain(PRIVATE); expect(errors).toEqual([]);
   });

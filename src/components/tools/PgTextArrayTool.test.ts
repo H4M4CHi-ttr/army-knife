@@ -122,4 +122,21 @@ describe("PostgreSQL text-array real Vapor workflow", () => {
     }
     expect(errors).not.toHaveBeenCalled();
   });
+  it("preserves CR source through protected preview, replacement and raw short paste in all locales", async () => {
+    for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
+      i18n.global.locale.value = locale; await nextTick(); await mode("decode");
+      const source = '{"a\r\nb"}';
+      const event = new Event("paste", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "clipboardData", { value: { getData: () => source } });
+      wrapper.get("#pg-array-input").element.dispatchEvent(event); await flushPromises();
+      expect(event.defaultPrevented).toBe(true);
+      expect(JSON.parse(wrapper.get('[data-testid="pg-array-json"] pre').element.textContent!)).toEqual(["a\r\nb"]);
+      expect(wrapper.get("#pg-array-input").element).toHaveProperty("readOnly", true);
+      expect(wrapper.get('[data-testid="preserved-cr-input"]').text()).toContain(i18n.global.t("largeInput.carriageReturns"));
+      await input('{"a\nb"} '); // Even a generated input event cannot replace raw CR.
+      expect(JSON.parse(wrapper.get('[data-testid="pg-array-json"] pre').element.textContent!)).toEqual(["a\r\nb"]);
+      await wrapper.get('[data-testid="replace-raw-cr-input"]').trigger("click");
+      expect(result().exists()).toBe(false); expect(wrapper.get("#pg-array-input").element).toHaveProperty("readOnly", false);
+    }
+  });
 });

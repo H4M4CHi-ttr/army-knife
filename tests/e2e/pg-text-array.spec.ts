@@ -168,3 +168,49 @@ test("PostgreSQL array values clear on tool, mode, locale and reload without URL
   await expect(page.getByRole("dialog")).toHaveCount(0); await expect(input).toHaveValue(""); await expect(result).toHaveCount(0);
   expect(JSON.stringify(await state())).not.toContain(PRIVATE);
 });
+
+test("PostgreSQL arrays preserve quoted and escaped carriage returns through file, keyboard and raw paste", async ({ page }) => {
+  await page.goto("./en/tools/pg-text-array/");
+  const input = page.locator("#pg-array-input"), json = page.getByTestId("pg-array-json").locator("pre");
+  for (const [source, value] of [['{"a\rb"}', "a\rb"], ['{"a\r\nb"}', "a\r\nb"], ["{a\\\rb}", "a\rb"]]) {
+    await page.getByTestId("pg-array-clear").click();
+    await page.locator('input[type="file"]').setInputFiles({ name: "raw-cr.txt", mimeType: "text/plain", buffer: Buffer.from(source!) });
+    const expected = JSON.stringify([value], null, 2);
+    await expect(json).toHaveText(expected);
+    await input.focus(); await page.keyboard.press("ControlOrMeta+End"); await page.keyboard.type(" ");
+    await expect(json).toHaveText(expected);
+    expect(await input.evaluate((element: HTMLTextAreaElement) => element.readOnly)).toBe(true);
+    await expect(page.getByTestId("preserved-cr-input")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
+    if (process.env.ARMY_KNIFE_CAPTURE_SCREENSHOTS === "1" && page.viewportSize()?.width === 390 && page.context().browser()?.browserType().name() === "chromium" && source === '{"a\rb"}') {
+      await page.evaluate(() => document.fonts.ready);
+      await page.screenshot({ fullPage: true, path: "docs/screenshots/pg-text-array-cr-en-light-small.png" });
+    }
+    const pending = page.waitForEvent("download"); await page.getByTestId("download-raw-cr-input").click();
+    const chunks: Buffer[] = []; for await (const chunk of (await (await pending).createReadStream())!) chunks.push(chunk);
+    expect(Buffer.concat(chunks).toString("utf8")).toBe(source);
+    await page.getByTestId("replace-raw-cr-input").click(); await expect(input).toHaveValue("");
+    expect(await input.evaluate((element: HTMLTextAreaElement) => element.readOnly)).toBe(false);
+    const prevented = await input.evaluate((element, text) => {
+      const event = new Event("paste", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "clipboardData", { value: { getData: () => text } }); element.dispatchEvent(event);
+      return event.defaultPrevented;
+    }, source!);
+    expect(prevented).toBe(true); await expect(json).toHaveText(expected);
+  }
+  await page.getByTestId("replace-raw-cr-input").click();
+  await input.evaluate(element => {
+    const event = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "clipboardData", { value: { getData: () => '{"' + "é".repeat(4094) + '\r"}' } });
+    element.dispatchEvent(event);
+  });
+  await expect(page.getByRole("alert")).toHaveText("The input exceeds this tool’s size limit.");
+  await expect(page.getByTestId("pg-array-result")).toHaveCount(0);
+  await page.locator("#pg-array-mode").selectOption("encode");
+  await expect(input).toHaveValue("");
+  await page.locator('input[type="file"]').setInputFiles({ name: "crlf-json.json", mimeType: "application/json", buffer: Buffer.from('[\r\n"a\\rb"\r\n]') });
+  await expect(json).toHaveText(JSON.stringify(["a\rb"], null, 2));
+  expect(await input.evaluate((element: HTMLTextAreaElement) => element.readOnly)).toBe(false);
+  await input.focus(); await page.keyboard.press("ControlOrMeta+End"); await page.keyboard.type(" ");
+  expect(JSON.parse((await json.textContent())!)).toEqual(["a\rb"]);
+});

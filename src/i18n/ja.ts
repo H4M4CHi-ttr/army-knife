@@ -79,6 +79,7 @@ export const ja: Messages = {
   "labels.no": "いいえ",
   "largeInput.summary": "大きな入力（{characters}文字）のため先頭{preview}文字だけを表示しています。解析には全文を使用します。",
   "largeInput.replace": "テキストを入れ替える",
+  "largeInput.carriageReturns": "CR・CRLFを元のまま保持しています。表示上の改行はLFになるため、読み取り専用のプレビューです。変更はテキストの入れ替えか新しいファイルで行い、正確なバイト列は元の全文・出力の保存から取得してください。",
   "largeInput.download": "元の全文を保存",
   "largeInput.outputPreview": "表示は先頭1,000項目・8,192文字までです。コピー・ダウンロードには全件を含みます。",
   "largeInput.loading": "ブラウザ内で読み込み・サイズ確認中…",

@@ -44,6 +44,11 @@ to select and ship one tool, not additional user-selected requirements.
   controls. At these fixed bounds no heavy worker is necessary. Editing,
   rejected imports, mode/navigation/language changes and disposal invalidate
   exports and pending work. Preserve file BOM so syntax cannot silently change.
+- Review correction: opt into CodeInput raw CR paste and a labelled read-only
+  preview for PostgreSQL source containing CR/CRLF. Replacement/import and exact
+  original download remain available; inline edits cannot normalize preserved
+  values. JSON-mode input is unaffected. Add real-browser CR/CRLF/escaped-CR
+  regressions and public checks; happy-dom does not model this normalization.
 - Reuse Vapor, shadcn buttons, CodeInput, OutputActions, useToolExecution, five
   locales, both themes, keyboard and 390px layouts. Add no dependency, external
   input/result request, telemetry, font/CDN, URL/storage input or WebMCP.
