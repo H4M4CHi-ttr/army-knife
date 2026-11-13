@@ -52,14 +52,14 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
       await testInfo.attach("pg-text-array-" + locale + "-" + theme, { body: await page.screenshot({ fullPage: true, path }), contentType: "image/png" });
     }
     await page.locator("#pg-array-mode").selectOption("encode");
-    await expect(page.locator("#pg-array-input")).toHaveValue(""); await expect(page.getByTestId("pg-array-result")).toHaveCount(0);
+    await expect(page.locator("#pg-text-array-input")).toHaveValue(""); await expect(page.getByTestId("pg-array-result")).toHaveCount(0);
     await page.getByTestId("pg-array-sample").click();
     expect(await page.getByTestId("pg-array-array").locator("pre").textContent()).toBe(PG_TEXT_ARRAY_SAMPLE);
-    await page.locator("#pg-array-input").fill("[1]");
+    await page.locator("#pg-text-array-input").fill("[1]");
     await expect(page.getByRole("alert")).toHaveText(m["errors.PG_ARRAY_JSON_SHAPE"]);
     await expect(page.getByTestId("pg-array-result")).toHaveCount(0);
     await page.getByTestId("pg-array-clear").focus(); await page.keyboard.press("Enter");
-    await expect(page.locator("#pg-array-input")).toHaveValue("");
+    await expect(page.locator("#pg-text-array-input")).toHaveValue("");
   });
 }
 
@@ -86,14 +86,14 @@ test("PostgreSQL arrays export complete independent formats, inert values and la
   }
   await page.locator("#pg-array-mode").selectOption("encode");
   const values = ["<img src=https://example.invalid/" + PRIVATE + ">", "9007199254740993", null, "", ...Array(36).fill("tail")];
-  await page.locator("#pg-array-input").fill(JSON.stringify(values));
+  await page.locator("#pg-text-array-input").fill(JSON.stringify(values));
   await expect(page.getByTestId("pg-array-item")).toHaveCount(32);
   await expect(page.locator("caption")).toContainText("40");
   expect(JSON.parse((await page.getByTestId("pg-array-json").locator("pre").textContent())!)).toEqual(values);
   await expect(page.locator("#main-content img, #main-content script")).toHaveCount(0);
   await page.getByTestId("pg-array-json").getByRole("button", { name: "Copy", exact: true }).click();
   expect(JSON.parse((await page.evaluate(() => (window as unknown as { copies: string[] }).copies.at(-1)))!)).toEqual(values);
-  await page.locator("#pg-array-input").fill("[]"); await expect(page.getByTestId("pg-array-count")).toHaveText("0");
+  await page.locator("#pg-text-array-input").fill("[]"); await expect(page.getByTestId("pg-array-count")).toHaveText("0");
   await expect(page.getByTestId("pg-array-zero-dim")).toBeVisible();
   const pending = page.waitForEvent("download"); await page.getByTestId("pg-array-array").getByRole("button", { name: "Download", exact: true }).click();
   const chunks: Buffer[] = []; for await (const chunk of (await (await pending).createReadStream())!) chunks.push(chunk);
@@ -102,7 +102,7 @@ test("PostgreSQL arrays export complete independent formats, inert values and la
 
 test("PostgreSQL arrays reject malformed values, counts, output expansion and invalid imports atomically", async ({ page }) => {
   await page.goto("./en/tools/pg-text-array/");
-  const input = page.locator("#pg-array-input"), result = page.getByTestId("pg-array-result");
+  const input = page.locator("#pg-text-array-input"), result = page.getByTestId("pg-array-result");
   for (const value of ["{x,}", "{{x}}", "[0:1]={x,y}", "'{}'::text[]"]) {
     await input.fill(value); await expect(result).toHaveCount(0); await expect(page.getByRole("alert")).toBeVisible();
   }
@@ -139,7 +139,7 @@ test("PostgreSQL arrays reject malformed values, counts, output expansion and in
 test("PostgreSQL arrays defer large work, cancel and apply manually while short work stays immediate", async ({ page }) => {
   await page.clock.install({ time: new Date("2026-11-14T00:00:00Z") }); await page.goto("./en/tools/pg-text-array/");
   await page.clock.pauseAt(new Date("2026-11-14T01:00:00Z"));
-  const input = page.locator("#pg-array-input"), result = page.getByTestId("pg-array-result");
+  const input = page.locator("#pg-text-array-input"), result = page.getByTestId("pg-array-result");
   await input.fill('{"' + "x".repeat(2049) + '"}');
   await expect(page.getByTestId("apply-control")).toHaveAttribute("data-status", "pending");
   await page.clock.runFor(799); await expect(result).toHaveCount(0); await page.clock.runFor(1); await expect(result).toBeVisible();
@@ -156,7 +156,7 @@ test("PostgreSQL arrays defer large work, cancel and apply manually while short 
 
 test("PostgreSQL array values clear on tool, mode, locale and reload without URL/storage leakage", async ({ page }) => {
   await page.goto("./en/tools/pg-text-array/");
-  const input = page.locator("#pg-array-input"), result = page.getByTestId("pg-array-result");
+  const input = page.locator("#pg-text-array-input"), result = page.getByTestId("pg-array-result");
   const value = '{"' + PRIVATE + '",NULL,"NULL",""}';
   const state = () => page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage }, url: location.href, cookie: document.cookie }));
   await input.fill(value); await expect(result).toBeVisible(); expect(JSON.stringify(await state())).not.toContain(PRIVATE);
@@ -171,7 +171,7 @@ test("PostgreSQL array values clear on tool, mode, locale and reload without URL
 
 test("PostgreSQL arrays preserve quoted and escaped carriage returns through file, keyboard and raw paste", async ({ page }) => {
   await page.goto("./en/tools/pg-text-array/");
-  const input = page.locator("#pg-array-input"), json = page.getByTestId("pg-array-json").locator("pre");
+  const input = page.locator("#pg-text-array-input"), json = page.getByTestId("pg-array-json").locator("pre");
   for (const [source, value] of [['{"a\rb"}', "a\rb"], ['{"a\r\nb"}', "a\r\nb"], ["{a\\\rb}", "a\rb"]]) {
     await page.getByTestId("pg-array-clear").click();
     await page.locator('input[type="file"]').setInputFiles({ name: "raw-cr.txt", mimeType: "text/plain", buffer: Buffer.from(source!) });

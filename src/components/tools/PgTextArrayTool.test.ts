@@ -12,7 +12,7 @@ const copy = vi.fn(async (_text: string) => {});
 const result = () => wrapper.find('[data-testid="pg-array-result"]');
 const sample = () => wrapper.get('[data-testid="pg-array-sample"]').trigger("click");
 const mode = (value: string) => wrapper.get("#pg-array-mode").setValue(value);
-const input = (value: string) => wrapper.get("#pg-array-input").setValue(value);
+const input = (value: string) => wrapper.get("#pg-text-array-input").setValue(value);
 const mountTool = () => mount(defineComponent({ render: () => h("div", [h(PgTextArrayTool)]) }), { global: { plugins: [vaporInteropPlugin, i18n] } });
 beforeEach(() => {
   copy.mockClear(); localStorage.clear(); sessionStorage.clear();
@@ -25,7 +25,7 @@ afterEach(() => { if (wrapper?.exists()) wrapper.unmount(); vi.restoreAllMocks()
 describe("PostgreSQL text-array real Vapor workflow", () => {
   it("starts empty and distinguishes sample null, string NULL, empty and escaped text", async () => {
     expect(result().exists()).toBe(false); await sample();
-    expect(wrapper.get("#pg-array-input").element).toHaveProperty("value", PG_TEXT_ARRAY_SAMPLE);
+    expect(wrapper.get("#pg-text-array-input").element).toHaveProperty("value", PG_TEXT_ARRAY_SAMPLE);
     expect(wrapper.get('[data-testid="pg-array-count"]').text()).toBe("7");
     expect(wrapper.get('[data-testid="pg-array-nulls"]').text()).toBe("1");
     expect(wrapper.get('[data-testid="pg-array-empty"]').text()).toBe("1");
@@ -34,8 +34,8 @@ describe("PostgreSQL text-array real Vapor workflow", () => {
   });
   it("clears on mode change and encodes JSON without changing string values", async () => {
     await sample(); await mode("encode");
-    expect(result().exists()).toBe(false); expect(wrapper.get("#pg-array-input").element).toHaveProperty("value", "");
-    await sample(); expect(wrapper.get("#pg-array-input").element).toHaveProperty("value", PG_TEXT_ARRAY_SAMPLE_JSON);
+    expect(result().exists()).toBe(false); expect(wrapper.get("#pg-text-array-input").element).toHaveProperty("value", "");
+    await sample(); expect(wrapper.get("#pg-text-array-input").element).toHaveProperty("value", PG_TEXT_ARRAY_SAMPLE_JSON);
     expect(wrapper.get('[data-testid="pg-array-array"] pre').element.textContent).toBe(PG_TEXT_ARRAY_SAMPLE);
   });
   it("shows explicit zero-dimensional empty arrays in both directions", async () => {
@@ -71,7 +71,7 @@ describe("PostgreSQL text-array real Vapor workflow", () => {
       await sample();
       const event = new Event("paste", { bubbles: true, cancelable: true });
       Object.defineProperty(event, "clipboardData", { value: { getData: () => "x".repeat(8193) } });
-      wrapper.get("#pg-array-input").element.dispatchEvent(event); await flushPromises();
+      wrapper.get("#pg-text-array-input").element.dispatchEvent(event); await flushPromises();
       expect(event.defaultPrevented).toBe(true); expect(result().exists()).toBe(false);
       expect(wrapper.find(".output-actions").exists()).toBe(false);
       await sample(); expect(result().exists()).toBe(true);
@@ -84,8 +84,8 @@ describe("PostgreSQL text-array real Vapor workflow", () => {
       const text = "\ufeff" + (operation === "decode" ? "{}" : "[]");
       const event = new Event("drop", { bubbles: true, cancelable: true });
       Object.defineProperty(event, "dataTransfer", { value: { files: [new File([text], "synthetic.txt")], getData: () => "" } });
-      wrapper.get("#pg-array-input").element.dispatchEvent(event); await flushPromises();
-      expect(wrapper.get("#pg-array-input").element).toHaveProperty("value", text);
+      wrapper.get("#pg-text-array-input").element.dispatchEvent(event); await flushPromises();
+      expect(wrapper.get("#pg-text-array-input").element).toHaveProperty("value", text);
       expect(result().exists()).toBe(false); expect(wrapper.find('[role="alert"]').exists()).toBe(true);
     }
   });
@@ -109,7 +109,7 @@ describe("PostgreSQL text-array real Vapor workflow", () => {
     await vi.advanceTimersByTimeAsync(1000); expect(result().exists()).toBe(false);
     await input('["' + "q".repeat(2049) + '"]'); wrapper.unmount(); wrapper = mountTool();
     await vi.advanceTimersByTimeAsync(1000); expect(result().exists()).toBe(false);
-    expect(wrapper.get("#pg-array-input").element).toHaveProperty("value", "");
+    expect(wrapper.get("#pg-text-array-input").element).toHaveProperty("value", "");
   });
   it("localizes results and supported error states in all five locales", async () => {
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});
@@ -128,15 +128,15 @@ describe("PostgreSQL text-array real Vapor workflow", () => {
       const source = '{"a\r\nb"}';
       const event = new Event("paste", { bubbles: true, cancelable: true });
       Object.defineProperty(event, "clipboardData", { value: { getData: () => source } });
-      wrapper.get("#pg-array-input").element.dispatchEvent(event); await flushPromises();
+      wrapper.get("#pg-text-array-input").element.dispatchEvent(event); await flushPromises();
       expect(event.defaultPrevented).toBe(true);
       expect(JSON.parse(wrapper.get('[data-testid="pg-array-json"] pre').element.textContent!)).toEqual(["a\r\nb"]);
-      expect(wrapper.get("#pg-array-input").element).toHaveProperty("readOnly", true);
+      expect(wrapper.get("#pg-text-array-input").element).toHaveProperty("readOnly", true);
       expect(wrapper.get('[data-testid="preserved-cr-input"]').text()).toContain(i18n.global.t("largeInput.carriageReturns"));
       await input('{"a\nb"} '); // Even a generated input event cannot replace raw CR.
       expect(JSON.parse(wrapper.get('[data-testid="pg-array-json"] pre').element.textContent!)).toEqual(["a\r\nb"]);
       await wrapper.get('[data-testid="replace-raw-cr-input"]').trigger("click");
-      expect(result().exists()).toBe(false); expect(wrapper.get("#pg-array-input").element).toHaveProperty("readOnly", false);
+      expect(result().exists()).toBe(false); expect(wrapper.get("#pg-text-array-input").element).toHaveProperty("readOnly", false);
     }
   });
 });

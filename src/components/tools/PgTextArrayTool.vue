@@ -53,7 +53,7 @@ function changeMode(event: Event) {
         <option value="encode">{{ t("pgArray.encode") }}</option>
       </select>
     </div>
-    <CodeInput :key="revision" :model-value="input" :label="t(mode === 'decode' ? 'pgArray.arrayInput' : 'pgArray.jsonInput')" input-id="pg-array-input" :rows="5" :preserve-bom="true" :preserve-carriage-returns="mode === 'decode'" :max-bytes="PG_TEXT_ARRAY_LIMITS.inputBytes" :placeholder="mode === 'decode' ? PG_TEXT_ARRAY_SAMPLE : PG_TEXT_ARRAY_SAMPLE_JSON" @update:model-value="input = $event; rejected = false" @rejected="rejected = true" />
+    <CodeInput :key="revision" :model-value="input" :label="t(mode === 'decode' ? 'pgArray.arrayInput' : 'pgArray.jsonInput')" input-id="pg-text-array-input" :rows="5" :preserve-bom="true" :preserve-carriage-returns="mode === 'decode'" :max-bytes="PG_TEXT_ARRAY_LIMITS.inputBytes" :placeholder="mode === 'decode' ? PG_TEXT_ARRAY_SAMPLE : PG_TEXT_ARRAY_SAMPLE_JSON" @update:model-value="input = $event; rejected = false" @rejected="rejected = true" />
     <div class="run-bar">
       <p class="hint">{{ t("tool.pg-text-array.hint") }}</p>
       <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />

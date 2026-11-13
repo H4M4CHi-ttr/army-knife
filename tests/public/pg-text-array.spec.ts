@@ -8,7 +8,7 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     page.on("pageerror", error => errors.push(error.message));
     context.on("request", request => requests.push(JSON.stringify({ url: request.url(), headers: request.headers(), body: request.postData() })));
     const response = await page.goto("./" + locale + "/tools/pg-text-array/"); expect(response?.status()).toBe(200);
-    const m = pgTextArrayMessages[locale], input = page.locator("#pg-array-input"), result = page.getByTestId("pg-array-result");
+    const m = pgTextArrayMessages[locale], input = page.locator("#pg-text-array-input"), result = page.getByTestId("pg-array-result");
     await expect(page.locator("h1")).toHaveText(m["tool.pg-text-array.name"]);
     await expect(page.locator("#page-guide")).toContainText(m["pgArray.scope"]);
     await page.getByTestId("pg-array-sample").focus(); await page.keyboard.press("Enter");
