@@ -1,5 +1,21 @@
 # Testing and deployment
 
+## PostgreSQL text-array coverage (2026-11-14 JST)
+
+`src/lib/tools/pg-text-array.test.ts` covers quoted/escaped/case-insensitive NULL,
+empty and numeric-looking strings, ASCII vs Unicode whitespace, all non-NUL
+ASCII round trips, Unicode/BOM/surrogate handling, malformed and unsupported
+dimensions/SQL/JSON forms, exact raw UTF-8/item/output bounds and atomic errors.
+The real Vapor suite exercises both modes, explicit complete copy, the labelled
+32-item preview, file/paste rejection, immediate work with auto off, deterministic
+800ms/manual/cancel/mode/disposal behavior and all five locales.
+`tests/e2e/pg-text-array.spec.ts` runs 36 production cases across Chromium/Firefox
+desktop/390px projects: five locales, both themes, keyboard, independent copy and
+actual downloads, valid/invalid file imports, BOM, stale-output invalidation,
+deferred controls, clearing and exact-dist-asset network/privacy auditing.
+`tests/public/pg-text-array.spec.ts` adds 20 actual Pages checks after deployment.
+Synthetic screenshots contain no real database values. See [scope](pg-text-array.md).
+
 ## Recorded Content-Range coverage (2026-11-13 JST)
 
 The [bounded byte-field inspector](content-range.md) checks inclusive endpoints,

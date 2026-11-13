@@ -1,4 +1,5 @@
 export type ToolId =
+  | "pg-text-array"
   | "content-range"
   | "dns-txt"
   | "pg-lsn"
@@ -88,6 +89,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "pg-text-array", category: "data", wasm: false, devtoys: false,
+    keywords: "postgres postgresql text array json codec null quote escape literal 配列 変換 空文字 引用 数组 转换 空字符串 陣列 轉換 空字串 배열 변환 빈문자열", color: "purple" },
   { id: "content-range", category: "network", wasm: false, devtoys: false,
     keywords: "http content range response bytes partial download resume 206 416 offset complete length unknown 応答 区間 全体長 再開 响应 回應 范围 範圍 응답 범위", color: "blue" },
   { id: "dns-txt", category: "network", wasm: false, devtoys: false,

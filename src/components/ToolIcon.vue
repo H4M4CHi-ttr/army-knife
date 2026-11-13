@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  "pg-text-array": Braces,
   "content-range": Ruler,
   "dns-txt": Network,
   "pg-lsn": GitCompareArrows,

@@ -1,5 +1,15 @@
 # DevToys overlap policy
 
+## PostgreSQL text-array codec (2026-11-14 JST)
+
+The empty/one-dimensional text[] ↔ JSON string/null-array workflow defaults
+**on**. The [official bundled list](https://devtoys.app/) was checked afresh on
+2026-11-14 JST: no dedicated PostgreSQL array-value codec is listed. Generic
+JSON conversion and existing DSN/EXPLAIN/LSN/TXT tools do not implement these
+null/quote/escape rules. Community extensions are outside the comparison.
+No new dependency, telemetry, font or external runtime service is introduced.
+[Exact format assumptions, bounds and SQL-layer exclusions](pg-text-array.md).
+
 ## Recorded Content-Range bytes (2026-11-13 JST)
 
 The response-field interval/unknown-total/unsatisfied workflow defaults **on**.
