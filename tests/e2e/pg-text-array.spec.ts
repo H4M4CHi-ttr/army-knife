@@ -182,10 +182,6 @@ test("PostgreSQL arrays preserve quoted and escaped carriage returns through fil
     expect(await input.evaluate((element: HTMLTextAreaElement) => element.readOnly)).toBe(true);
     await expect(page.getByTestId("preserved-cr-input")).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
-    if (process.env.ARMY_KNIFE_CAPTURE_SCREENSHOTS === "1" && page.viewportSize()?.width === 390 && page.context().browser()?.browserType().name() === "chromium" && source === '{"a\rb"}') {
-      await page.evaluate(() => document.fonts.ready);
-      await page.screenshot({ fullPage: true, path: "docs/screenshots/pg-text-array-cr-en-light-small.png" });
-    }
     const pending = page.waitForEvent("download"); await page.getByTestId("download-raw-cr-input").click();
     const chunks: Buffer[] = []; for await (const chunk of (await (await pending).createReadStream())!) chunks.push(chunk);
     expect(Buffer.concat(chunks).toString("utf8")).toBe(source);
