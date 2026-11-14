@@ -48,7 +48,7 @@ function replace(sample: boolean) {
       </div>
     </div>
     <CodeInput :key="'key-' + revision" :model-value="input.key" :label="t('ssh.input')" input-id="ssh-key-input"
-      :rows="5" :max-bytes="SSH_KEY_LIMITS.inputBytes" :preserve-bom="true" :placeholder="SSH_KEY_SAMPLE"
+      :rows="5" accept=".pub,.txt,text/plain" :max-bytes="SSH_KEY_LIMITS.inputBytes" :preserve-bom="true" :placeholder="SSH_KEY_SAMPLE"
       @update:model-value="accept('key', $event)" @rejected="reject('key')" />
     <div class="ssh-key-reference">
       <CodeInput :key="'reference-' + revision" :model-value="input.expected" :label="t('ssh.expected')" input-id="ssh-key-expected"

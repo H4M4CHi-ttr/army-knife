@@ -87,14 +87,18 @@ test("SSH public-key five locales, keyboard, guides and responsive themes", asyn
 test("SSH public-key real formats and CRLF imports retain exact exports and inert comments", async ({ page }) => {
   await page.addInitScript(() => {
     const copies: string[] = [];
-    (window as Window & { __sshCopies: string[] }).__sshCopies = copies;
+    (window as typeof window & { __sshCopies: string[] }).__sshCopies = copies;
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (text: string) => { copies.push(text); } } });
   });
   await open(page);
   const result = page.getByTestId("ssh-key-result"), reference = page.locator("#ssh-key-expected");
   for (const fixture of publicKeys) {
-    await page.locator("#ssh-key-input-file").setInputFiles({
-      name: "synthetic-" + fixture.type + ".pub", mimeType: "text/plain", buffer: Buffer.from(fixture.input + "\r\n"),
+    const pendingChooser = page.waitForEvent("filechooser");
+    await page.locator('label[for="ssh-key-input"]').locator("..").getByRole("button").click();
+    const chooser = await pendingChooser;
+    expect(await chooser.element().getAttribute("accept")).toBe(".pub,.txt,text/plain");
+    await chooser.setFiles({
+      name: "synthetic-" + fixture.type + ".pub", mimeType: "application/vnd.ms-publisher", buffer: Buffer.from(fixture.input + "\r\n"),
     });
     await reference.fill(fixture.fingerprint);
     await expect(page.getByTestId("ssh-key-fingerprint").locator("pre")).toHaveText(fixture.fingerprint);
@@ -119,10 +123,10 @@ test("SSH public-key real formats and CRLF imports retain exact exports and iner
   await expect(page.getByTestId("ssh-key-fingerprint").locator("pre")).toHaveText(SSH_KEY_SAMPLE_FINGERPRINT);
   await expect(page.getByTestId("ssh-key-comment")).toContainText("\\u202e");
   await expect(result.locator("img, script, a")).toHaveCount(0);
-  expect(await page.evaluate(() => (window as Window & { __sshCopies: string[] }).__sshCopies)).toEqual([]);
+  expect(await page.evaluate(() => (window as typeof window & { __sshCopies: string[] }).__sshCopies)).toEqual([]);
   await page.getByTestId("ssh-key-fingerprint").getByRole("button", { name: "Copy", exact: true }).click();
   await result.locator(".result-header").first().getByRole("button", { name: "Copy", exact: true }).click();
-  const copies = await page.evaluate(() => (window as Window & { __sshCopies: string[] }).__sshCopies);
+  const copies = await page.evaluate(() => (window as typeof window & { __sshCopies: string[] }).__sshCopies);
   expect(copies[0]).toBe(SSH_KEY_SAMPLE_FINGERPRINT);
   expect(JSON.parse(copies[1]!)).toMatchObject({ comment, matches: true, fingerprint: SSH_KEY_SAMPLE_FINGERPRINT });
   const pending = page.waitForEvent("download");

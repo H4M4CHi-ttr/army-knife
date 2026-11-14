@@ -20,13 +20,15 @@ const props = withDefaults(
     maxBytes?: number;
     rows?: number;
     file?: boolean;
+    /** Override the native file chooser filter for a tool-specific format. */
+    accept?: string;
     /** Preserve an initial UTF-8 BOM when exact file bytes matter. */
     preserveBom?: boolean;
     /** Opt in to raw CR paste and a read-only preview until explicit replacement. */
     preserveCarriageReturns?: boolean;
     disabled?: boolean;
   }>(),
-  { maxBytes: 16 * 1024 * 1024, rows: 10, file: true },
+  { maxBytes: 16 * 1024 * 1024, rows: 10, file: true, accept: ".csv,.tsv,.txt,.log,.json,.har,.env,text/*,application/json" },
 );
 const emit = defineEmits<{ "update:modelValue": [value: string]; rejected: [] }>();
 const { t } = useAppI18n();
@@ -272,7 +274,7 @@ function downloadInput() {
       :id="inputId + '-file'"
       ref="picker"
       type="file"
-      accept=".csv,.tsv,.txt,.log,.json,.har,.env,text/*,application/json"
+      :accept="accept"
       hidden
       :aria-label="label + ': ' + t('actions.import')"
       @change="onFile"

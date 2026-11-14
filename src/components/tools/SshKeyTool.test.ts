@@ -26,6 +26,9 @@ beforeEach(() => {
 afterEach(() => { if (wrapper?.exists()) wrapper.unmount(); vi.unstubAllGlobals(); vi.restoreAllMocks(); vi.useRealTimers(); });
 
 describe("SSH public-key real Vapor workflow", () => {
+  it("offers .pub files in the native import picker", () => {
+    expect(wrapper.get("#ssh-key-input-file").attributes("accept")).toBe(".pub,.txt,text/plain");
+  });
   it("runs small input with saved auto-apply off and clears invalid output", async () => {
     settings.preferences.autoApply = false;
     expect(result().exists()).toBe(false);

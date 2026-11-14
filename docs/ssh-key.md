@@ -89,8 +89,9 @@ Up to 2,048 combined UTF-16 code units starts immediately even when saved
 auto-apply is off. Larger input uses the existing 800ms/manual controls.
 New edits, navigation, cancellation and the deadline discard late hash results.
 The browser-native digest itself cannot be interrupted; at most 4 KiB is hashed.
-No new Worker/WASM engine is warranted by these bounds. File input uses the
-existing bounded same-origin I/O worker.
+No new Worker/WASM engine is warranted by these bounds. File input uses bounded,
+strict local UTF-8 decoding.
+The native picker explicitly includes `.pub`, regardless of the OS MIME mapping.
 
 ## Privacy, delivery and checks
 
@@ -108,7 +109,7 @@ thumbprints differ. Community extensions are outside the comparison.
 
 The 76 engine tests cover all types, canonical bytes, exact integers, malformed
 lengths/mpints/points, bounds and native crypto failure/deadline/abort behavior.
-Seventeen real Vapor cases cover five languages, exact independent copies,
+Eighteen real Vapor cases cover five languages, exact independent copies,
 rejected input, manual/cancel and late completion disposal. Production browser
 coverage runs in Chromium/Firefox desktop/390px, including five independent
 public fixtures, actual file/exports, privacy and SPA navigation. The unchanged

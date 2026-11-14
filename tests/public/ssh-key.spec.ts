@@ -31,7 +31,11 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await reference.fill(SSH_KEY_SAMPLE_FINGERPRINT);
     const comment = PRIVATE + ' <img src="https://example.invalid/no-request"> \u202e';
     const record = SSH_KEY_SAMPLE.split(" ").slice(0, 2).join(" ") + " " + comment + "\r\n";
-    await page.locator("#ssh-key-input-file").setInputFiles({ name: "synthetic-public.pub", mimeType: "text/plain", buffer: Buffer.from(record) });
+    const pendingChooser = page.waitForEvent("filechooser");
+    await page.locator('label[for="ssh-key-input"]').locator("..").getByRole("button").click();
+    const chooser = await pendingChooser;
+    expect(await chooser.element().getAttribute("accept")).toBe(".pub,.txt,text/plain");
+    await chooser.setFiles({ name: "synthetic-public.pub", mimeType: "application/vnd.ms-publisher", buffer: Buffer.from(record) });
     await expect(page.getByTestId("ssh-key-match")).toHaveText(m["ssh.match"]);
     await expect(page.getByTestId("ssh-key-comment")).toContainText("\\u202e");
     await expect(result.locator("img, script, a")).toHaveCount(0);

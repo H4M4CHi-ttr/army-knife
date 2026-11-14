@@ -10,13 +10,14 @@ deliberately distinguished from mathematical validity. Public fixtures use
 RFC8037/RFC5903 material and synthetic RSA; independent Python hashlib and
 read-only ssh-keygen confirm their fingerprints without private-key generation.
 
-Seventeen real Vapor cases cover all five translations, independent explicit
+Eighteen real Vapor cases cover all five translations, independent explicit
 fingerprint/JSON copies, inert/directional comments, invalid/rejected reference
 and key edits, small input with auto-apply off, 800ms/manual/cancel and late
 native completion after cancel/clear/edit/unmount.
 
 The dedicated production suite covers five locales/themes/keyboard,
-desktop/390px layout, actual CRLF .pub imports for five public-key formats,
+desktop/390px layout, native filechooser events and actual CRLF .pub imports
+for five public-key formats (including OS Publisher MIME mapping),
 complete JSON/fingerprint exports, malformed/file/paste/bound errors, manual/
 cancel flow, real SPA tool/locale navigation and exact-dist privacy auditing in
 all four specified Chromium/Firefox projects. Four review PNGs use only public
