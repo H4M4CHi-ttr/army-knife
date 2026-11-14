@@ -27,10 +27,11 @@ const curves: Record<string, { width: number; bits: number }> = {
   nistp521: { width: 66, bits: 521 },
 };
 function text(value: string): void {
-  if (value.startsWith("\ufeff") || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/.test(value))
-    throw new ToolError("SSH_TEXT");
+  if (value.startsWith("\ufeff")) throw new ToolError("SSH_TEXT");
   for (let i = 0; i < value.length; i++) {
     const c = value.charCodeAt(i);
+    if ((c < 32 && c !== 9 && c !== 10 && c !== 13) || (c >= 0x7f && c <= 0x9f))
+      throw new ToolError("SSH_TEXT");
     if (c >= 0xd800 && c <= 0xdbff) {
       const next = value.charCodeAt(++i);
       if (!(next >= 0xdc00 && next <= 0xdfff)) throw new ToolError("SSH_TEXT");

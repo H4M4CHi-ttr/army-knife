@@ -1,4 +1,5 @@
 export type ToolId =
+  | "ssh-key"
   | "pg-text-array"
   | "content-range"
   | "dns-txt"
@@ -89,6 +90,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "ssh-key", category: "network", wasm: false, devtoys: false,
+    keywords: "ssh openssh public key fingerprint sha256 rsa ed25519 ecdsa pub compare 公開鍵 指紋 照合 公钥 指纹 比较 公開金鑰 比對 공개 키 지문 비교", color: "rose" },
   { id: "pg-text-array", category: "data", wasm: false, devtoys: false,
     keywords: "postgres postgresql text array json codec null quote escape literal 配列 変換 空文字 引用 数组 转换 空字符串 陣列 轉換 空字串 배열 변환 빈문자열", color: "purple" },
   { id: "content-range", category: "network", wasm: false, devtoys: false,
