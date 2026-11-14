@@ -134,5 +134,8 @@ other repositories, protection/billing/credentials, or force/admin operations.
 - https://www.rfc-editor.org/rfc/rfc4253#section-6.6
 - https://www.rfc-editor.org/rfc/rfc8709#section-4
 - https://www.rfc-editor.org/rfc/rfc5656#section-3.1
+- https://www.rfc-editor.org/rfc/rfc8332#section-3
+- https://www.rfc-editor.org/rfc/rfc8037#appendix-A.2
+- https://www.rfc-editor.org/rfc/rfc5903#section-8 (public coordinates only)
 - OpenSSH sshkey.c fingerprint serialization/Base64 presentation, inspected
   afresh as primary implementation evidence; no upstream code is copied.

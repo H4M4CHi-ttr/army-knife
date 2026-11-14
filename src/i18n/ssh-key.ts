@@ -1,4 +1,4 @@
-import { SSH_KEY_SAMPLE_FINGERPRINT as fp } from "../lib/tools/ssh-key-sample";
+import { SSH_KEY_SAMPLE_FINGERPRINT as fp } from "../lib/tools/ssh-key-sample.ts";
 
 const en = {
   "tool.ssh-key.name": "SSH public-key inspector",

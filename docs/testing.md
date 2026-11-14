@@ -1,5 +1,28 @@
 # Testing and deployment
 
+## SSH public-key coverage (2026-11-15 JST)
+
+The [bounded SSH inspector](ssh-key.md) adds 76 engine cases for public-byte
+SHA-256, optional canonical reference matching, every supported type, exact RSA
+integers, signed mpint/length/point/Base64/text limits and native crypto
+unavailable/failure/deadline/abort/late completion. Structural point shape is
+deliberately distinguished from mathematical validity. Public fixtures use
+RFC8037/RFC5903 material and synthetic RSA; independent Python hashlib and
+read-only ssh-keygen confirm their fingerprints without private-key generation.
+
+Seventeen real Vapor cases cover all five translations, independent explicit
+fingerprint/JSON copies, inert/directional comments, invalid/rejected reference
+and key edits, small input with auto-apply off, 800ms/manual/cancel and late
+native completion after cancel/clear/edit/unmount.
+
+The dedicated production suite covers five locales/themes/keyboard,
+desktop/390px layout, actual CRLF .pub imports for five public-key formats,
+complete JSON/fingerprint exports, malformed/file/paste/bound errors, manual/
+cancel flow, real SPA tool/locale navigation and exact-dist privacy auditing in
+all four specified Chromium/Firefox projects. Four review PNGs use only public
+test vectors. Public SSH tests add five locales in each of those projects;
+the existing post-deploy workflow collects/runs them on the same Pages destination.
+
 ## PostgreSQL text-array coverage (2026-11-14 JST)
 
 `src/lib/tools/pg-text-array.test.ts` covers quoted/escaped/case-insensitive NULL,
@@ -168,7 +191,7 @@ The font source archives and generated output are cached together under a key th
 
 ## Quality gate
 
-The quality job has a 40-minute timeout so the complete browser suite and report upload fit after the build gates. With 924 browser cases, the 2026-11-06 Link addition's first complete CI attempt reached the former 30-minute job cap after 910 passing cases and no assertion failures; the remaining cases and report upload were unverified. The per-test 45-second timeout, two CI workers, retries and four browser projects retain their existing settings. It performs these steps in order:
+The quality job has a 45-minute timeout so the complete browser suite and report upload fit after the build gates. The [2026-11-14 main run](https://github.com/H4M4CHi-ttr/army-knife/actions/runs/43534128040) took 38 minutes 38 seconds for the quality job with 1,192 browser cases, close to its former 40-minute cap. The SSH inspector raises the collection to 1,212 cases; the five additional minutes leave room for the complete checks and report upload. The per-test 45-second timeout, two CI workers, retries and four browser projects retain their existing settings. It performs these steps in order:
 
 1. Install locked JavaScript dependencies and the pinned Python font dependencies.
 2. Build fonts and run `python scripts/build-fonts.py --check` against the resulting assets.

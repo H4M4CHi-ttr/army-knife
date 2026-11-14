@@ -1,5 +1,16 @@
 # DevToys overlap policy
 
+## SSH public-key structure and fingerprints (2026-11-15 JST)
+
+The single-line OpenSSH public-key workflow defaults **on**. The
+[official bundled list](https://devtoys.app/) was checked afresh on
+2026-11-15 JST: no dedicated SSH-wire structure/fingerprint comparison tool
+appears. Generic Base64/hash/certificate tools do not validate the public blob,
+extract exact RSA/curve fields or compare its SHA256: representation. Existing
+JWK thumbprints hash a different representation. Community extensions are
+outside the comparison. No key generation, connection, new dependency or
+telemetry is added. [Exact supported subset, limits and nonvalidation](ssh-key.md).
+
 ## PostgreSQL text-array codec (2026-11-14 JST)
 
 The empty/one-dimensional text[] ↔ JSON string/null-array workflow defaults
