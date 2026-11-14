@@ -81,6 +81,7 @@ export const ko: Messages = {
   "labels.no": "아니요",
   "largeInput.summary": "대용량 입력 {characters}자 중 앞부분 {preview}자만 표시합니다. 전체 텍스트로 분석합니다.",
   "largeInput.replace": "텍스트 바꾸기",
+  "largeInput.carriageReturns": "원본 CR/CRLF를 보존합니다. 이 읽기 전용 미리보기는 줄바꿈을 LF로 표시합니다. 텍스트 바꾸기나 새 파일 가져오기로 입력을 변경하세요. 정확한 바이트는 원본 또는 출력 다운로드로 가져오세요.",
   "largeInput.download": "원본 다운로드",
   "largeInput.outputPreview": "미리보기는 최대 1,000개 항목과 8,192자로 제한됩니다. 복사하거나 다운로드하면 전체 결과가 포함됩니다.",
   "largeInput.loading": "브라우저 내부에서 텍스트 확인 중…",

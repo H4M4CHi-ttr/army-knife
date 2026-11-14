@@ -44,6 +44,7 @@ import { combineClassifierRankings } from "@/lib/search/classifier-runtime";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
 const ContentRangeTool = defineAsyncComponent(() => import("@/components/tools/ContentRangeTool.vue"));
+const PgTextArrayTool = defineAsyncComponent(() => import("@/components/tools/PgTextArrayTool.vue"));
 const DnsTxtTool = defineAsyncComponent(() => import("@/components/tools/DnsTxtTool.vue"));
 const PgLsnTool = defineAsyncComponent(() => import("@/components/tools/PgLsnTool.vue"));
 const ForwardedTool = defineAsyncComponent(() => import("@/components/tools/ForwardedTool.vue"));
@@ -869,6 +870,7 @@ onBeforeUnmount(() => {
             <ImageReferenceTool v-else-if="selectedTool.id === 'image-reference'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <JsonMergePatchTool v-else-if="selectedTool.id === 'json-merge-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ContentRangeTool v-else-if="selectedTool.id === 'content-range'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <PgTextArrayTool v-else-if="selectedTool.id === 'pg-text-array'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <DnsTxtTool v-else-if="selectedTool.id === 'dns-txt'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <PgLsnTool v-else-if="selectedTool.id === 'pg-lsn'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ForwardedTool v-else-if="selectedTool.id === 'forwarded'" :key="`${selectedTool.id}:${preferences.locale}`" />

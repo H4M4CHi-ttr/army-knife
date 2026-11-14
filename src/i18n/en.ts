@@ -79,6 +79,7 @@ export const en = {
   "labels.no": "No",
   "largeInput.summary": "Large input: {characters} characters. Only the first {preview} are shown; the full text is kept for analysis.",
   "largeInput.replace": "Replace text",
+  "largeInput.carriageReturns": "Raw CR/CRLF are preserved. This read-only preview displays line endings as LF. Use Replace text or import a new file to change the input. Download original or an output for exact bytes.",
   "largeInput.download": "Download original",
   "largeInput.outputPreview": "Showing at most 1,000 items and 8,192 characters. Copy or download includes all results.",
   "largeInput.loading": "Validating or reading text locally…",

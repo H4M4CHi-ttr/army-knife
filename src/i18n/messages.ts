@@ -1,3 +1,4 @@
+import { pgTextArrayMessages } from "./pg-text-array.ts";
 import { contentRangeMessages } from "./content-range.ts";
 import { dnsTxtMessages } from "./dns-txt.ts";
 import { pgLsnMessages } from "./pg-lsn.ts";
@@ -48,6 +49,7 @@ import { searchMessages } from "./search.ts";
 
 export const messages = {
   en: {
+    ...pgTextArrayMessages.en,
     ...contentRangeMessages.en,
     ...dnsTxtMessages.en,
     ...pgLsnMessages.en,
@@ -91,6 +93,7 @@ export const messages = {
       "Large text means at least 18 pt (24 CSS px), or 14 pt (about 18.7 CSS px) when bold. Pass/fail uses the unrounded ratio.",
   },
   ja: {
+    ...pgTextArrayMessages.ja,
     ...contentRangeMessages.ja,
     ...dnsTxtMessages.ja,
     ...pgLsnMessages.ja,
@@ -134,6 +137,7 @@ export const messages = {
       "大きな文字は18 pt（24 CSS px）以上、太字では14 pt（約18.7 CSS px）以上です。達成判定には丸める前の比率を使います。",
   },
   "zh-CN": {
+    ...pgTextArrayMessages["zh-CN"],
     ...contentRangeMessages["zh-CN"],
     ...dnsTxtMessages["zh-CN"],
     ...pgLsnMessages["zh-CN"],
@@ -177,6 +181,7 @@ export const messages = {
       "大号文字指至少 18 pt（24 CSS px），粗体至少 14 pt（约 18.7 CSS px）。判定使用未经四舍五入的比值。",
   },
   "zh-TW": {
+    ...pgTextArrayMessages["zh-TW"],
     ...contentRangeMessages["zh-TW"],
     ...dnsTxtMessages["zh-TW"],
     ...pgLsnMessages["zh-TW"],
@@ -220,6 +225,7 @@ export const messages = {
       "大字指至少 18 pt（24 CSS px），粗體至少 14 pt（約 18.7 CSS px）。判定使用未經四捨五入的比值。",
   },
   ko: {
+    ...pgTextArrayMessages.ko,
     ...contentRangeMessages.ko,
     ...dnsTxtMessages.ko,
     ...pgLsnMessages.ko,

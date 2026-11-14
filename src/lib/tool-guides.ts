@@ -1,3 +1,4 @@
+import { pgTextArrayGuide } from "./pg-text-array-guide.ts";
 import { contentRangeGuide } from "./content-range-guide.ts";
 import { dnsTxtGuide } from "./dns-txt-guide.ts";
 import { pgLsnGuide } from "./pg-lsn-guide.ts";
@@ -171,6 +172,7 @@ export const toolGuides = {
   "http-link": httpLinkGuide,
   "json-merge-patch": mergePatchGuide,
   "content-range": contentRangeGuide,
+  "pg-text-array": pgTextArrayGuide,
   "dns-txt": dnsTxtGuide,
   "pg-lsn": pgLsnGuide,
   forwarded: forwardedGuide,
