@@ -1,4 +1,5 @@
 export type ToolId =
+  | "websocket-accept"
   | "pg-text-array"
   | "content-range"
   | "dns-txt"
@@ -89,6 +90,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "websocket-accept", category: "network", wasm: false, devtoys: false,
+    keywords: "websocket sec-websocket-key sec-websocket-accept handshake sha1 nonce guid base64 ハンドシェイク 照合 接続 握手 交握 핸드셰이크 비교", color: "blue" },
   { id: "pg-text-array", category: "data", wasm: false, devtoys: false,
     keywords: "postgres postgresql text array json codec null quote escape literal 配列 変換 空文字 引用 数组 转换 空字符串 陣列 轉換 空字串 배열 변환 빈문자열", color: "purple" },
   { id: "content-range", category: "network", wasm: false, devtoys: false,

@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## Recorded WebSocket Accept calculation (2026-11-18 JST)
+
+The encoded client-key/GUID calculation and recorded response comparison default
+**on**. No dedicated workflow appears in the [official bundled list](https://devtoys.app/)
+checked on 2026-11-18 JST. General Base64/hash converters and existing HTTP
+inspectors do not perform this calculation. Community extensions are outside the
+comparison. No connection, dependency, telemetry or font service is added.
+[Strict input subset, boundaries and excluded full-handshake semantics](websocket-accept.md).
+
 ## PostgreSQL text-array codec (2026-11-14 JST)
 
 The empty/one-dimensional text[] ↔ JSON string/null-array workflow defaults
