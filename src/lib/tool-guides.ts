@@ -1,3 +1,4 @@
+import { websocketAcceptGuide } from "./websocket-accept-guide.ts";
 import { pgTextArrayGuide } from "./pg-text-array-guide.ts";
 import { contentRangeGuide } from "./content-range-guide.ts";
 import { dnsTxtGuide } from "./dns-txt-guide.ts";
@@ -168,6 +169,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  "websocket-accept": websocketAcceptGuide,
   "http-accept": acceptGuide,
   "http-link": httpLinkGuide,
   "json-merge-patch": mergePatchGuide,

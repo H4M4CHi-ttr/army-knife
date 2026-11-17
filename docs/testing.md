@@ -1,5 +1,22 @@
 # Testing and deployment
 
+## WebSocket Accept coverage (2026-11-18 JST)
+
+`src/lib/tools/websocket-accept.test.ts` checks the RFC 6455 vector, independent
+native Node hash vectors, exact raw UTF-8 limits, canonical padding, ASCII/field
+grammar, omitted/null/false distinctions and sanitized crypto/abort/watchdog
+failures. Real Vapor tests exercise actual cryptography, immediate auto-off
+behavior, both independent exports, rejected edits, all five locales and
+running/cancel/retry/supersession/timeout/disposal. Production browser tests run
+all four specified Chromium/Firefox desktop/390px projects: native crypto,
+five locales/themes, keyboard, real independent downloads, raw file/BOM/UTF-8
+rejection, independently pending file reads, memory lifecycle and exact-dist-asset
+request/privacy audits. The
+timing test delays completion of an actual native digest to verify cancellation
+and the watchdog. Existing-Pages public cases check the deployed workflow;
+synthetic screenshots contain only the public RFC vector. This verifies a
+[bounded field-value calculation](websocket-accept.md), not a complete handshake.
+
 ## PostgreSQL text-array coverage (2026-11-14 JST)
 
 `src/lib/tools/pg-text-array.test.ts` covers quoted/escaped/case-insensitive NULL,
