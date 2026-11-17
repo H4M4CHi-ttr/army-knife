@@ -11,7 +11,7 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     context.on("request", request => requests.push(JSON.stringify({ url: request.url(), headers: request.headers(), body: request.postData() })));
     const response = await page.goto("./" + locale + "/tools/websocket-accept/"); expect(response?.status()).toBe(200);
     const m = websocketAcceptMessages[locale], result = page.getByTestId("websocket-accept-result");
-    const key = page.locator("#websocket-accept-key"), accept = page.locator("#websocket-accept-response");
+    const key = page.locator("#websocket-accept-input"), accept = page.locator("#websocket-accept-response");
     await expect(page.locator("h1")).toHaveText(m["tool.websocket-accept.name"]);
     await expect(page.locator("#page-guide")).toContainText(m["wsAccept.scope"]);
     await page.getByTestId("websocket-accept-sample").focus(); await page.keyboard.press("Enter");

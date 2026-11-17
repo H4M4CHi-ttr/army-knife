@@ -63,7 +63,7 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await page.locator("#websocket-accept-response").fill("");
     await expect(page.getByTestId("websocket-accept-status")).toHaveText(m["wsAccept.notCompared"]);
     await page.getByTestId("websocket-accept-clear").focus(); await page.keyboard.press("Enter");
-    for (const id of ["key", "response"]) await expect(page.locator(`#websocket-accept-${id}`)).toHaveValue("");
+    for (const id of ["input", "response"]) await expect(page.locator(`#websocket-accept-${id}`)).toHaveValue("");
     await expect(page.getByTestId("websocket-accept-result")).toHaveCount(0);
   });
 }
@@ -97,9 +97,9 @@ test("WebSocket Accept exports exact independent JSON and header downloads", asy
 test("WebSocket Accept rejects either malformed/oversize input and preserves independent rejection", async ({ page }) => {
   await page.goto("./en/tools/websocket-accept/");
   const result = page.getByTestId("websocket-accept-result"), sample = page.getByTestId("websocket-accept-sample");
-  for (const id of ["key", "response"]) {
+  for (const id of ["input", "response"]) {
     const input = page.locator(`#websocket-accept-${id}`);
-    const original = id === "key" ? KEY : ACCEPT;
+    const original = id === "input" ? KEY : ACCEPT;
     for (const value of [" ", original + "\n", "\u00a0" + original, "\ufeff" + original, original.slice(0, -1), "Sec-WebSocket-Key: " + original, "x".repeat(129), "é".repeat(65)]) {
       await sample.click(); await expect(result).toBeVisible(); await input.fill(value);
       await expect(result).toHaveCount(0); await expect(page.locator(".output-actions")).toHaveCount(0);
@@ -110,7 +110,7 @@ test("WebSocket Accept rejects either malformed/oversize input and preserves ind
       Object.defineProperty(event, "clipboardData", { value: { getData: () => "x".repeat(129) } }); element.dispatchEvent(event);
     });
     await expect(result).toHaveCount(0);
-    await page.locator(`#websocket-accept-${id === "key" ? "response" : "key"}`).fill(id === "key" ? "" : "AAAAAAAAAAAAAAAAAAAAAA==");
+    await page.locator(`#websocket-accept-${id === "input" ? "response" : "input"}`).fill(id === "input" ? "" : "AAAAAAAAAAAAAAAAAAAAAA==");
     await expect(result).toHaveCount(0);
     await input.fill(original + " ".repeat(128 - original.length)); await expect(result).toBeVisible();
   }
@@ -119,8 +119,8 @@ test("WebSocket Accept rejects either malformed/oversize input and preserves ind
 test("WebSocket Accept reads dropped UTF-8 locally and rejects BOM, invalid bytes and raw file limits", async ({ page }) => {
   await page.goto("./en/tools/websocket-accept/");
   const sample = page.getByTestId("websocket-accept-sample"), result = page.getByTestId("websocket-accept-result");
-  for (const id of ["key", "response"]) {
-    const original = id === "key" ? KEY : ACCEPT;
+  for (const id of ["input", "response"]) {
+    const original = id === "input" ? KEY : ACCEPT;
     for (const bytes of [[...new TextEncoder().encode("\ufeff" + original)], [0xc3, 0x28], [...new TextEncoder().encode(original + "\r\n")], [...new TextEncoder().encode(original + " ".repeat(129 - original.length))]]) {
       await sample.click(); await expect(result).toBeVisible();
       await page.locator(`#websocket-accept-${id}`).evaluate((element, data) => {
@@ -141,7 +141,7 @@ test("WebSocket Accept reads dropped UTF-8 locally and rejects BOM, invalid byte
 
 test("WebSocket Accept keeps private values out of storage/URL and clears on navigation/reload/locale", async ({ page }) => {
   await page.goto("./en/tools/websocket-accept/");
-  await page.locator("#websocket-accept-key").fill(PRIVATE_KEY);
+  await page.locator("#websocket-accept-input").fill(PRIVATE_KEY);
   await page.locator("#websocket-accept-response").fill(PRIVATE_ACCEPT);
   await expect(page.getByTestId("websocket-accept-status")).toHaveText(websocketAcceptMessages.en["wsAccept.match"]);
   const state = () => page.evaluate(() => ({ local: { ...localStorage }, session: { ...sessionStorage }, url: location.href, cookie: document.cookie }));
@@ -150,14 +150,14 @@ test("WebSocket Accept keeps private values out of storage/URL and clears on nav
   await expect(page.getByTestId("websocket-accept-result")).toHaveCount(0);
   await expect(page.locator("#main-content img, #main-content script")).toHaveCount(0);
   expect(JSON.stringify(await state())).not.toContain(PRIVATE);
-  await page.reload(); await expect(page.locator("#websocket-accept-key")).toHaveValue("");
+  await page.reload(); await expect(page.locator("#websocket-accept-input")).toHaveValue("");
   await page.getByTestId("websocket-accept-sample").click(); await expect(page.getByTestId("websocket-accept-result")).toBeVisible();
   await page.locator(".back-link").click(); await page.getByTestId("tool-card-websocket-accept").click();
-  await expect(page.locator("#websocket-accept-key")).toHaveValue("");
+  await expect(page.locator("#websocket-accept-input")).toHaveValue("");
   await page.getByTestId("websocket-accept-sample").click(); await expect(page.getByTestId("websocket-accept-result")).toBeVisible();
   await page.getByTestId("settings-button").click(); await page.getByTestId("locale-select").selectOption("ja");
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  for (const id of ["key", "response"]) await expect(page.locator(`#websocket-accept-${id}`)).toHaveValue("");
+  for (const id of ["input", "response"]) await expect(page.locator(`#websocket-accept-${id}`)).toHaveValue("");
   await expect(page.getByTestId("websocket-accept-result")).toHaveCount(0);
 });
 
@@ -173,20 +173,20 @@ test("WebSocket Accept hides both exports while either native file read is pendi
   });
   await page.goto("./en/tools/websocket-accept/");
   const sample = page.getByTestId("websocket-accept-sample"), result = page.getByTestId("websocket-accept-result");
-  for (const id of ["key", "response"]) {
+  for (const id of ["input", "response"]) {
     await sample.click(); await expect(result).toBeVisible();
     await page.evaluate(() => (window as unknown as { holdFileReads(): void }).holdFileReads());
     await page.locator(`#websocket-accept-${id}`).evaluate((element, text) => {
       const transfer = new DataTransfer(); transfer.items.add(new File([text], "synthetic.txt"));
       element.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: transfer }));
-    }, id === "key" ? KEY : ACCEPT);
+    }, id === "input" ? KEY : ACCEPT);
     await expect(page.getByTestId("large-input-loading")).toBeVisible();
     await expect(result).toHaveCount(0); await expect(page.locator(".output-actions")).toHaveCount(0);
-    await page.locator(`#websocket-accept-${id === "key" ? "response" : "key"}`).fill(id === "key" ? "" : "AAAAAAAAAAAAAAAAAAAAAA==");
+    await page.locator(`#websocket-accept-${id === "input" ? "response" : "input"}`).fill(id === "input" ? "" : "AAAAAAAAAAAAAAAAAAAAAA==");
     await expect(result).toHaveCount(0);
     await page.evaluate(() => (window as unknown as { releaseFileReads(): void }).releaseFileReads());
     await expect(result).toBeVisible();
-    await expect(page.getByTestId("websocket-accept-status")).toHaveText(websocketAcceptMessages.en[id === "key" ? "wsAccept.notCompared" : "wsAccept.mismatch"]);
+    await expect(page.getByTestId("websocket-accept-status")).toHaveText(websocketAcceptMessages.en[id === "input" ? "wsAccept.notCompared" : "wsAccept.mismatch"]);
   }
 });
 
@@ -198,7 +198,7 @@ test("WebSocket Accept cancels/discards delayed native digests and retries after
     crypto.subtle.digest = (...args) => native(...args).then(value => hold ? new Promise<ArrayBuffer>(resolve => { pending.push(() => resolve(value)); }) : value);
     Object.assign(window, { releaseDigests: () => { hold = false; pending.splice(0).forEach(finish => finish()); }, holdDigests: () => { hold = true; } });
   });
-  await page.goto("./en/tools/websocket-accept/"); await page.locator("#websocket-accept-key").fill(KEY);
+  await page.goto("./en/tools/websocket-accept/"); await page.locator("#websocket-accept-input").fill(KEY);
   await expect(page.getByTestId("websocket-accept-running")).toBeVisible();
   await page.getByTestId("websocket-accept-cancel").click();
   await page.evaluate(() => (window as unknown as { releaseDigests(): void }).releaseDigests());

@@ -38,7 +38,7 @@ function replace(example: boolean) {
         <Button variant="ghost" size="sm" data-testid="websocket-accept-clear" @click="replace(false)">{{ t("actions.clear") }}</Button>
       </div>
     </div>
-    <CodeInput :key="'key-' + revision" :model-value="key" :label="t('wsAccept.key')" input-id="websocket-accept-key" :rows="1" :file="false" preserve-bom :max-bytes="WEBSOCKET_ACCEPT_LIMITS.inputBytes" :input-hint="t('wsAccept.inputLimit')" :placeholder="WEBSOCKET_ACCEPT_SAMPLE.key" @update:model-value="key = $event; rejectedKey = false" @rejected="rejectedKey = true" @loading="loadingKey = $event" />
+    <CodeInput :key="'key-' + revision" :model-value="key" :label="t('wsAccept.key')" input-id="websocket-accept-input" :rows="1" :file="false" preserve-bom :max-bytes="WEBSOCKET_ACCEPT_LIMITS.inputBytes" :input-hint="t('wsAccept.inputLimit')" :placeholder="WEBSOCKET_ACCEPT_SAMPLE.key" @update:model-value="key = $event; rejectedKey = false" @rejected="rejectedKey = true" @loading="loadingKey = $event" />
     <CodeInput :key="'response-' + revision" :model-value="response" :label="t('wsAccept.response')" input-id="websocket-accept-response" :rows="1" :file="false" preserve-bom :max-bytes="WEBSOCKET_ACCEPT_LIMITS.inputBytes" :input-hint="t('wsAccept.inputLimit')" :placeholder="WEBSOCKET_ACCEPT_SAMPLE.accept" @update:model-value="response = $event; rejectedResponse = false" @rejected="rejectedResponse = true" @loading="loadingResponse = $event" />
     <div class="run-bar">
       <p class="hint">{{ t("tool.websocket-accept.hint") }}</p>
