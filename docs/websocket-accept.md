@@ -52,9 +52,12 @@ SHA-1 and the five-second watchdog produce localized, input-free errors.
 
 Input and output exist only in memory and clear on tool/locale navigation,
 reload or disposal. Rejected edits, replacement, clear and newer digest requests
-invalidate old work. There are no input/result requests, sockets, logs, URL or
-persistent storage. Export occurs only after an explicit action. No dependency,
-telemetry, external font/CDN, WebMCP or deployment/permission setting is added.
+invalidate old work. Both exports are also invalid from the start of either file
+read until all pending reads finish successfully. An edit to the other field
+cannot expose a result computed from the previous, still-loading value. There are no input/result
+requests, sockets, logs, URL or persistent storage. Export occurs only after an
+explicit action. No dependency, telemetry, external font/CDN, WebMCP or
+deployment/permission setting is added.
 The existing app's preference storage and site analytics policy remain as
 documented in README; this tool does not add events or send input to them.
 

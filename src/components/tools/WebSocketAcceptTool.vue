@@ -13,15 +13,17 @@ import { WEBSOCKET_ACCEPT_SAMPLE } from "@/lib/tools/websocket-accept-sample";
 const { t } = useAppI18n();
 const key = ref(""), response = ref(""), revision = ref(0);
 const rejectedKey = ref(false), rejectedResponse = ref(false);
-const source = computed(() => ({ key: key.value, response: response.value, rejectedKey: rejectedKey.value, rejectedResponse: rejectedResponse.value, revision: revision.value }));
+const loadingKey = ref(false), loadingResponse = ref(false);
+const source = computed(() => ({ key: key.value, response: response.value, rejectedKey: rejectedKey.value, rejectedResponse: rejectedResponse.value, loadingKey: loadingKey.value, loadingResponse: loadingResponse.value, revision: revision.value }));
 const { result, error, busy, control, apply, cancel, setAuto } = useToolExecution({
-  source, canRun: () => Boolean(key.value) && !rejectedKey.value && !rejectedResponse.value,
+  source, canRun: () => Boolean(key.value) && !rejectedKey.value && !rejectedResponse.value && !loadingKey.value && !loadingResponse.value,
   mode: "instant", execute: signal => inspectWebSocketAccept(key.value, response.value, signal),
 });
 const output = computed(() => result.value ? JSON.stringify(result.value, null, 2) : "");
 const comparison = computed(() => result.value?.matches === true ? "match" : result.value?.matches === false ? "mismatch" : "notCompared");
 function replace(example: boolean) {
   revision.value++; rejectedKey.value = false; rejectedResponse.value = false;
+  loadingKey.value = false; loadingResponse.value = false;
   key.value = example ? WEBSOCKET_ACCEPT_SAMPLE.key : "";
   response.value = example ? WEBSOCKET_ACCEPT_SAMPLE.accept : "";
 }
@@ -36,8 +38,8 @@ function replace(example: boolean) {
         <Button variant="ghost" size="sm" data-testid="websocket-accept-clear" @click="replace(false)">{{ t("actions.clear") }}</Button>
       </div>
     </div>
-    <CodeInput :key="'key-' + revision" :model-value="key" :label="t('wsAccept.key')" input-id="websocket-accept-key" :rows="1" :file="false" preserve-bom :max-bytes="WEBSOCKET_ACCEPT_LIMITS.inputBytes" :placeholder="WEBSOCKET_ACCEPT_SAMPLE.key" @update:model-value="key = $event; rejectedKey = false" @rejected="rejectedKey = true" />
-    <CodeInput :key="'response-' + revision" :model-value="response" :label="t('wsAccept.response')" input-id="websocket-accept-response" :rows="1" :file="false" preserve-bom :max-bytes="WEBSOCKET_ACCEPT_LIMITS.inputBytes" :placeholder="WEBSOCKET_ACCEPT_SAMPLE.accept" @update:model-value="response = $event; rejectedResponse = false" @rejected="rejectedResponse = true" />
+    <CodeInput :key="'key-' + revision" :model-value="key" :label="t('wsAccept.key')" input-id="websocket-accept-key" :rows="1" :file="false" preserve-bom :max-bytes="WEBSOCKET_ACCEPT_LIMITS.inputBytes" :input-hint="t('wsAccept.inputLimit')" :placeholder="WEBSOCKET_ACCEPT_SAMPLE.key" @update:model-value="key = $event; rejectedKey = false" @rejected="rejectedKey = true" @loading="loadingKey = $event" />
+    <CodeInput :key="'response-' + revision" :model-value="response" :label="t('wsAccept.response')" input-id="websocket-accept-response" :rows="1" :file="false" preserve-bom :max-bytes="WEBSOCKET_ACCEPT_LIMITS.inputBytes" :input-hint="t('wsAccept.inputLimit')" :placeholder="WEBSOCKET_ACCEPT_SAMPLE.accept" @update:model-value="response = $event; rejectedResponse = false" @rejected="rejectedResponse = true" @loading="loadingResponse = $event" />
     <div class="run-bar">
       <p class="hint">{{ t("tool.websocket-accept.hint") }}</p>
       <div class="control-row">

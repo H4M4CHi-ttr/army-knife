@@ -10,7 +10,8 @@ behavior, both independent exports, rejected edits, all five locales and
 running/cancel/retry/supersession/timeout/disposal. Production browser tests run
 all four specified Chromium/Firefox desktop/390px projects: native crypto,
 five locales/themes, keyboard, real independent downloads, raw file/BOM/UTF-8
-rejection, memory lifecycle and exact-dist-asset request/privacy audits. The
+rejection, independently pending file reads, memory lifecycle and exact-dist-asset
+request/privacy audits. The
 timing test delays completion of an actual native digest to verify cancellation
 and the watchdog. Existing-Pages public cases check the deployed workflow;
 synthetic screenshots contain only the public RFC vector. This verifies a

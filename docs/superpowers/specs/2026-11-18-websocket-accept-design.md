@@ -36,6 +36,9 @@ not express the key + fixed GUID rule or recorded response comparison.
   and explicit retry. Editing/rejection/clear/navigation/locale/disposal remove
   stale reports. Only explicit actions copy/download the complete JSON or
   response header. Preserve file BOM so it cannot silently change validation.
+  From the start of either file read, hide both exports until every pending
+  import succeeds; editing the other field cannot recompute from the old value.
+  Display each input limit as 128 UTF-8 bytes.
 - This checks two field values, not a full HTTP handshake, peer identity,
   nonce randomness, TLS, HTTP/2 extended CONNECT, connectivity or data frames.
   SHA-1 is fixed by this protocol. Do not generate keys or open connections.

@@ -5,6 +5,7 @@ const en = {
   "tool.websocket-accept.description": "Calculate the expected Sec-WebSocket-Accept from a recorded client key and compare a response locally, without opening a connection.",
   "tool.websocket-accept.hint": "Paste field values without header names. Leave the response completely empty to calculate only. Small edits apply immediately.",
   "wsAccept.key": "Recorded Sec-WebSocket-Key",
+  "wsAccept.inputLimit": "UTF-8 field value · max 128 bytes",
   "wsAccept.response": "Recorded Sec-WebSocket-Accept (optional)",
   "wsAccept.expected": "Expected Sec-WebSocket-Accept",
   "wsAccept.normalizedKey": "Key after outer spaces/tabs are removed",
@@ -31,6 +32,7 @@ const en = {
 };
 type Messages = Record<keyof typeof en, string>;
 const ja: Messages = {
+  "wsAccept.inputLimit": "UTF-8のフィールド値・最大128バイト",
   "tool.websocket-accept.name": "WebSocket Accept照合",
   "tool.websocket-accept.description": "記録済みのクライアントキーから期待するSec-WebSocket-Acceptを計算し、接続せず応答値と照合します。",
   "tool.websocket-accept.hint": "ヘッダー名を付けず値を貼り付けます。計算のみの場合は応答欄を完全に空にしてください。編集は即時反映します。",
@@ -55,6 +57,7 @@ const ja: Messages = {
   "errors.WS_ACCEPT_TIMEOUT": "ローカル計算が5秒以内に完了せず、遅れた結果を破棄しました。再試行すると計算し直します。",
 };
 const zhCN: Messages = {
+  "wsAccept.inputLimit": "UTF-8字段值 · 最多128字节",
   "tool.websocket-accept.name": "WebSocket Accept计算",
   "tool.websocket-accept.description": "从已记录的客户端密钥计算预期Sec-WebSocket-Accept，并在不建立连接的情况下比较响应。",
   "tool.websocket-accept.hint": "粘贴字段值，不要包含字段名。仅计算时请将响应栏完全留空。编辑即时生效。",
@@ -79,6 +82,7 @@ const zhCN: Messages = {
   "errors.WS_ACCEPT_TIMEOUT": "本地摘要未在5秒内完成，迟到结果已丢弃。重试可重新计算。",
 };
 const zhTW: Messages = {
+  "wsAccept.inputLimit": "UTF-8欄位值・最多128位元組",
   "tool.websocket-accept.name": "WebSocket Accept計算",
   "tool.websocket-accept.description": "從已記錄的用戶端金鑰計算預期Sec-WebSocket-Accept，並在不建立連線的情況下比對回應。",
   "tool.websocket-accept.hint": "貼上欄位值，不含標頭名稱。僅計算時請將回應欄完全留空。編輯即時生效。",
@@ -103,6 +107,7 @@ const zhTW: Messages = {
   "errors.WS_ACCEPT_TIMEOUT": "本機摘要未於5秒內完成，延遲結果已捨棄。重試可重新計算。",
 };
 const ko: Messages = {
+  "wsAccept.inputLimit": "UTF-8 필드 값 · 최대 128바이트",
   "tool.websocket-accept.name": "WebSocket Accept 계산",
   "tool.websocket-accept.description": "기록된 클라이언트 키로 예상 Sec-WebSocket-Accept를 계산하고 연결 없이 응답과 비교합니다.",
   "tool.websocket-accept.hint": "헤더 이름 없이 필드 값만 붙여 넣으세요. 계산만 하려면 응답을 완전히 비워 두세요. 편집은 즉시 반영됩니다.",

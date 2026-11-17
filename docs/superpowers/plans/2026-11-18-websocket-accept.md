@@ -23,7 +23,7 @@ one Vapor view, typed five-language messages and static guides. No new dependenc
 
 - Hash encoded key + exact GUID, not decoded nonce or a re-encoded invalid key.
 - Noncanonical pad bits and Unicode whitespace cannot be silently repaired.
-- A supplied empty/whitespace response differs from omitted comparison.
+- An exactly empty response omits comparison; nonempty whitespace fails.
 - Either rejected edit and late crypto completion cannot restore stale exports.
 - Two exports remain independent and input clears across app/locale navigation.
 

@@ -81,6 +81,44 @@ describe("WebSocket Accept Vapor workflow", () => {
     await vi.waitFor(() => expect(result().exists()).toBe(true));
     expect(wrapper.get('[data-testid="websocket-accept-expected"]').text()).toBe(accept);
   });
+  it.each(["key", "response"])("invalidates exports from the start of a pending %s file read, including edits to the other field", async (id) => {
+    await sample();
+    let finish!: (value: ArrayBuffer) => void;
+    const file = new File([id === "key" ? key : accept], "synthetic.txt", { type: "text/plain" });
+    Object.defineProperty(file, "arrayBuffer", { value: () => new Promise<ArrayBuffer>((resolve) => { finish = resolve; }) });
+    const event = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: { files: [file], getData: () => "" } });
+    wrapper.get(`#websocket-accept-${id}`).element.dispatchEvent(event); await nextTick();
+    expect(result().exists()).toBe(false); expect(wrapper.find(".output-actions").exists()).toBe(false);
+    await wrapper.get(`#websocket-accept-${id === "key" ? "response" : "key"}`).setValue(id === "key" ? "" : "AAAAAAAAAAAAAAAAAAAAAA==");
+    await flushPromises(); expect(result().exists()).toBe(false);
+    finish(new TextEncoder().encode(id === "key" ? key : accept).buffer);
+    await vi.waitFor(() => expect(result().exists()).toBe(true));
+    expect(wrapper.get('[data-testid="websocket-accept-status"]').text()).toBe(websocketAcceptMessages.en[id === "key" ? "wsAccept.notCompared" : "wsAccept.mismatch"]);
+  });
+  it("keeps two pending imports independent until both finish and ignores a read replaced by the sample", async () => {
+    await sample();
+    const finishes: ((value: ArrayBuffer) => void)[] = [];
+    for (const id of ["key", "response"]) {
+      const file = new File([id === "key" ? key : accept], "synthetic.txt");
+      Object.defineProperty(file, "arrayBuffer", { value: () => new Promise<ArrayBuffer>((resolve) => { finishes.push(resolve); }) });
+      const event = new Event("drop", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "dataTransfer", { value: { files: [file], getData: () => "" } });
+      wrapper.get(`#websocket-accept-${id}`).element.dispatchEvent(event);
+    }
+    await nextTick(); expect(result().exists()).toBe(false);
+    finishes[0]!(new TextEncoder().encode(key).buffer); await flushPromises(); expect(result().exists()).toBe(false);
+    finishes[1]!(new TextEncoder().encode(accept).buffer); await vi.waitFor(() => expect(result().exists()).toBe(true));
+    let stale!: (value: ArrayBuffer) => void;
+    const file = new File([key], "synthetic.txt");
+    Object.defineProperty(file, "arrayBuffer", { value: () => new Promise<ArrayBuffer>((resolve) => { stale = resolve; }) });
+    const event = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: { files: [file], getData: () => "" } });
+    wrapper.get("#websocket-accept-key").element.dispatchEvent(event); await nextTick(); expect(result().exists()).toBe(false);
+    await sample(); stale(new TextEncoder().encode("AAAAAAAAAAAAAAAAAAAAAA==").buffer); await flushPromises();
+    expect(wrapper.get("#websocket-accept-key").element).toHaveProperty("value", key);
+    expect(wrapper.get('[data-testid="websocket-accept-status"]').text()).toBe(websocketAcceptMessages.en["wsAccept.match"]);
+  });
   it("times out and sanitizes native crypto errors with a recoverable retry", async () => {
     vi.useFakeTimers(); vi.stubGlobal("crypto", { subtle: { digest: () => new Promise(() => {}) } });
     await wrapper.get("#websocket-accept-key").setValue(key);
@@ -110,6 +148,7 @@ describe("WebSocket Accept Vapor workflow", () => {
     for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
       i18n.global.locale.value = locale; await sample();
       const m = websocketAcceptMessages[locale]; expect(wrapper.text()).toContain(m["wsAccept.scope"]);
+      for (const id of ["key", "response"]) expect(wrapper.get(`#websocket-accept-${id}-hint`).text()).toBe(m["wsAccept.inputLimit"]);
       expect(wrapper.get('[data-testid="websocket-accept-status"]').text()).toBe(m["wsAccept.match"]);
       await wrapper.get("#websocket-accept-response").setValue("AAAAAAAAAAAAAAAAAAAAAAAAAAA=");
       await vi.waitFor(() => expect(wrapper.get('[data-testid="websocket-accept-status"]').text()).toBe(m["wsAccept.mismatch"]));

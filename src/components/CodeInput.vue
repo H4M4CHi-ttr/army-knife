@@ -18,6 +18,8 @@ const props = withDefaults(
     inputId: string;
     placeholder?: string;
     maxBytes?: number;
+    /** Optional localized description for small byte bounds. */
+    inputHint?: string;
     rows?: number;
     file?: boolean;
     /** Preserve an initial UTF-8 BOM when exact file bytes matter. */
@@ -28,7 +30,7 @@ const props = withDefaults(
   }>(),
   { maxBytes: 16 * 1024 * 1024, rows: 10, file: true },
 );
-const emit = defineEmits<{ "update:modelValue": [value: string]; rejected: [] }>();
+const emit = defineEmits<{ "update:modelValue": [value: string]; rejected: []; loading: [value: boolean] }>();
 const { t } = useAppI18n();
 const picker = ref<HTMLInputElement>();
 const editor = ref<HTMLTextAreaElement>();
@@ -36,6 +38,8 @@ const fileError = ref("");
 // Hosts can invalidate their analysis when an attempted edit was rejected.
 watch(fileError, (error) => { if (error) emit("rejected"); }, { flush: "sync" });
 const loading = ref(false);
+// Opt-in consumers can invalidate exports before asynchronous file reads finish.
+watch(loading, value => emit("loading", value), { flush: "sync" });
 const large = computed(() => props.modelValue.length >= LARGE_TEXT_THRESHOLD);
 const carriageReturns = computed(() => Boolean(props.preserveCarriageReturns && props.modelValue.includes("\r")));
 const visibleText = computed(() =>
@@ -263,7 +267,7 @@ function downloadInput() {
       </div>
     </div>
     <div :id="inputId + '-hint'" class="input-footnote">
-      {{ t("labels.utf8", { size: maxBytes / 1024 / 1024 }) }}
+      {{ inputHint ?? t("labels.utf8", { size: maxBytes / 1024 / 1024 }) }}
     </div>
     <p v-if="loading" class="hint" role="status" data-testid="large-input-loading">{{
       t("largeInput.loading")

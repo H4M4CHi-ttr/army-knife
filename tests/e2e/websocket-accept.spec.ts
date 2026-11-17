@@ -161,6 +161,35 @@ test("WebSocket Accept keeps private values out of storage/URL and clears on nav
   await expect(page.getByTestId("websocket-accept-result")).toHaveCount(0);
 });
 
+test("WebSocket Accept hides both exports while either native file read is pending", async ({ page }) => {
+  await page.addInitScript(() => {
+    const native = File.prototype.arrayBuffer;
+    let hold = true;
+    const pending: (() => void)[] = [];
+    File.prototype.arrayBuffer = function () {
+      return hold ? new Promise<ArrayBuffer>((resolve, reject) => { pending.push(() => { native.call(this).then(resolve, reject); }); }) : native.call(this);
+    };
+    Object.assign(window, { holdFileReads: () => { hold = true; }, releaseFileReads: () => { hold = false; pending.splice(0).forEach(finish => finish()); } });
+  });
+  await page.goto("./en/tools/websocket-accept/");
+  const sample = page.getByTestId("websocket-accept-sample"), result = page.getByTestId("websocket-accept-result");
+  for (const id of ["key", "response"]) {
+    await sample.click(); await expect(result).toBeVisible();
+    await page.evaluate(() => (window as unknown as { holdFileReads(): void }).holdFileReads());
+    await page.locator(`#websocket-accept-${id}`).evaluate((element, text) => {
+      const transfer = new DataTransfer(); transfer.items.add(new File([text], "synthetic.txt"));
+      element.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    }, id === "key" ? KEY : ACCEPT);
+    await expect(page.getByTestId("large-input-loading")).toBeVisible();
+    await expect(result).toHaveCount(0); await expect(page.locator(".output-actions")).toHaveCount(0);
+    await page.locator(`#websocket-accept-${id === "key" ? "response" : "key"}`).fill(id === "key" ? "" : "AAAAAAAAAAAAAAAAAAAAAA==");
+    await expect(result).toHaveCount(0);
+    await page.evaluate(() => (window as unknown as { releaseFileReads(): void }).releaseFileReads());
+    await expect(result).toBeVisible();
+    await expect(page.getByTestId("websocket-accept-status")).toHaveText(websocketAcceptMessages.en[id === "key" ? "wsAccept.notCompared" : "wsAccept.mismatch"]);
+  }
+});
+
 test("WebSocket Accept cancels/discards delayed native digests and retries after its watchdog", async ({ page }) => {
   await page.addInitScript(() => {
     const native = crypto.subtle.digest.bind(crypto.subtle);
