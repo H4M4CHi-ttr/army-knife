@@ -202,7 +202,21 @@ The font source archives and generated output are cached together under a key th
 
 ## Quality gate
 
-The quality job has a 40-minute timeout so the complete browser suite and report upload fit after the build gates. With 924 browser cases, the 2026-11-06 Link addition's first complete CI attempt reached the former 30-minute job cap after 910 passing cases and no assertion failures; the remaining cases and report upload were unverified. The per-test 45-second timeout, two CI workers, retries and four browser projects retain their existing settings. It performs these steps in order:
+The quality job has a **60-minute timeout** for the 1,284-case suite including
+the Redis Cluster slot addition. In [PR #175's first final-head run](https://github.com/H4M4CHi-ttr/army-knife/actions/runs/44412898381),
+the build gates took 2m13s and browser/system-dependency preparation took 16m19s,
+including long Ubuntu mirror transfers. The former 40-minute job cap cancelled
+E2E after 21m40s and 1,015 passing cases; no assertion-failure lines were recorded,
+but the remaining cases and report upload were unverified. The same head's full
+local four-project run completed all 1,284 cases in 33.7 minutes. These observed
+durations total about 52 minutes before report/cache upload, so a finite
+60-minute job budget includes that preparation and the complete new workload.
+
+The per-test 45-second timeout, two CI workers, retries, all four browser projects,
+every quality gate and artifact/deployment dependencies retain their existing
+settings. There are no additional runners or permission/billing-setting changes.
+The earlier 2026-11-06 Link addition had likewise expanded the job from 30 to
+40 minutes for its then-924-case suite. The current job performs these steps in order:
 
 1. Install locked JavaScript dependencies and the pinned Python font dependencies.
 2. Build fonts and run `python scripts/build-fonts.py --check` against the resulting assets.
@@ -381,6 +395,15 @@ GitHub Actions is the reference environment for the full browser gate. Its uploa
 The workflow's default token permission is `contents: read`. Pull request code runs under that read-only job; it receives no Pages write or identity-token permission. The checkout does not persist Git credentials.
 
 The separate deployment job depends on the entire quality job, runs only for `main`, and has a five-minute timeout. It uses the `github-pages` environment, `pages: write`, and `id-token: write` to deploy the tested Pages artifact. Concurrent Pages deployments are serialized.
+
+The subsequent public-verification job has a **30-minute timeout** for all
+140 cases, including the Redis slot addition's 20 cases. The preceding main
+[run 44202003638](https://github.com/H4M4CHi-ttr/army-knife/actions/runs/44202003638)
+used 9m50s of its former ten-minute budget with 120 cases (6m10s preparing
+browsers, 3m14s testing). The observed 16m19s preparation during PR #175 plus the
+expanded live suite and report upload needs a larger finite allowance. The
+same Chromium/Firefox desktop/small projects, assertions and read-only token
+permissions are retained. The five-minute deployment allowance is unchanged.
 
 In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. The pinned [`configure-pages` action](https://github.com/actions/configure-pages/blob/v5.0.0/action.yml) has `enablement: false`; the workflow does not use an administrator token or attempt to enable Pages through an alternate path. A repository that has not enabled Pages will fail at configuration, leaving the quality report available for review. Once Pages is configured, rerun the workflow on `main`.
 

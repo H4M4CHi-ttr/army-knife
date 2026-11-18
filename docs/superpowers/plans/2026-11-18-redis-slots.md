@@ -61,3 +61,18 @@ README, testing/overlap/tool docs and synthetic screenshots.
 - [ ] Update PR purpose/scope/results/limitations/screenshots; ready after gates.
 - [ ] Check latest main/head/mergeability/checks/reviews, normally merge only
   successful final head, then verify main/automatic Pages/live behavior.
+
+### Task 4: Complete CI within measured finite budgets
+
+**Files:** `.github/workflows/ci.yml`, `docs/testing.md`.
+**Evidence:** final-head run 44412898381 spent 2m13s on build gates, 16m19s
+preparing browsers and 21m40s on E2E before the 40-minute cap cancelled it.
+The full local 1,284-case suite took 33.7m. Prior main's public job took 9m50s
+for 120 cases; this addition raises that suite to 140 cases.
+
+- [ ] Set only quality/public job timeouts to finite 60/30 minutes; preserve
+  all tests, gates, worker/retry/test-timeout settings, permissions and deploy flow.
+- [ ] Review the immutable final change, verify the exact workflow diff,
+  rerun all repository gates on the final head and obtain complete successful CI.
+- [ ] Confirm current main/head/checks/reviews, ready and normally merge only
+  the verified head; verify automatic Pages deployment and live feature behavior.
