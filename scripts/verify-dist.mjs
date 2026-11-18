@@ -5,6 +5,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Window } from 'happy-dom';
 import { babelParse } from 'vue/compiler-sfc';
+import { distributionFiles, parsePublicAssets, PUBLIC_ASSETS_FILE } from './public-assets.ts';
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 export const BASE_PATH = '/army-knife/';
@@ -183,6 +184,11 @@ export function verifyDist(directory = join(PROJECT_ROOT, 'dist')) {
     fail('dist/index.html is missing. Build the production app before verifying it.');
     return { ok: false, errors, counts };
   }
+  attempt('Public asset manifest', () => {
+    const text = readFileSync(join(root, PUBLIC_ASSETS_FILE), 'utf8');
+    parsePublicAssets(text);
+    check(isDeepStrictEqual(JSON.parse(text).paths, distributionFiles(root)), 'Public asset manifest must list the exact distribution files.');
+  });
   const actualRoot = realpathSync(root);
   const files = [];
   const walk = (path) => {

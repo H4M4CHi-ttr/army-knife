@@ -43,7 +43,7 @@ function replace(example: boolean) {
         <Button variant="ghost" size="sm" data-testid="redis-slots-clear" @click="replace(false)">{{ t("actions.clear") }}</Button>
       </div>
     </div>
-    <CodeInput :key="revision" :model-value="input" :label="t('redis.input')" :input-hint="t('redis.inputLimit')" input-id="redis-slots-input" :rows="5" :preserve-bom="true" :max-bytes="REDIS_SLOTS_LIMITS.inputBytes" :placeholder="REDIS_SLOTS_SAMPLE" @update:model-value="input = $event; rejected = false" @rejected="rejected = true" @loading="loading = $event" />
+    <CodeInput :key="revision" :model-value="input" :label="t('redis.input')" :input-hint="t('redis.inputLimit')" input-id="redis-slots-input" :rows="5" :preserve-bom="true" :preserve-carriage-returns="true" :max-bytes="REDIS_SLOTS_LIMITS.inputBytes" :placeholder="REDIS_SLOTS_SAMPLE" @update:model-value="input = $event; rejected = false" @rejected="rejected = true" @loading="loading = $event" />
     <div class="run-bar">
       <p class="hint">{{ t("tool.redis-slots.hint") }}</p>
       <ApplyControl :state="control" @apply="apply" @cancel="cancel" @auto="setAuto" />

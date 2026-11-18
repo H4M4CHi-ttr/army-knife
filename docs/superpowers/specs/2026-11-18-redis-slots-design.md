@@ -30,7 +30,9 @@ serve this offline workflow. Binary-key/hex modes and node mapping are excluded.
   Larger input uses existing 800ms/manual scheduling, pending/loading and
   cancellation. Edits, rejected imports, clearing, locale/navigation and
   disposal invalidate output. Read local UTF-8 files through existing bounds
-  and preserve BOM for rejection. No streaming or unlimited-file mode.
+  and preserve BOM for rejection. CR/CRLF paste/import uses the existing
+  protected read-only preview and explicit replacement/original-byte download.
+  No streaming or unlimited-file mode.
 - Same-slot equality does not establish command compatibility, topology,
   availability, key existence or distinct key identity; CRC/slot collisions
   are possible. No Redis, HTTP or WebSocket connection is opened.
@@ -61,3 +63,11 @@ Record synthetic screenshots and add existing-Pages tests. Run the complete
 repository gates on final head, get an independent immutable-diff review,
 verify checks/review conditions/main/head immediately before a normal merge,
 then verify automatic Pages deployment and the actual published tool.
+
+## Independent review fixes
+
+The initial immutable review identified raw CRLF-paste normalization at the input
+cap and a weaker live request-path audit. Regression tests reproduce both.
+Use the existing raw-CR input option; publish a build-only revision/file inventory
+verified against dist, and share its strict path parser across local/live audits.
+This adds no app request, runtime dependency or workflow permission.

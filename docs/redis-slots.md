@@ -31,7 +31,9 @@ hexadecimal. Output preserves input order and duplicate entries.
 - Malformed JSON, BOM, nonstrings and invalid counts reject the entire report.
 - Input through **2,048 UTF-16 units** applies immediately, even with delayed
   auto-apply off. Longer input uses existing **800ms/manual/cancel** controls.
-  The bounded synchronous calculation needs no Worker or WASM.
+  CR/CRLF paste/import preserves original bytes in the existing protected
+  read-only preview. Use Replace text, clear or sample to resume editing; the
+  original-byte download remains explicit. The bounded calculation needs no Worker or WASM.
 - The keyboard-focusable, horizontally scrollable table explicitly previews
   **32 rows**. Copy/download includes all accepted rows and full-input totals,
   capped at **64 KiB**. Keys and selected hash text are displayed as JSON strings; Unicode format,
@@ -60,6 +62,12 @@ honor the recurring request's explicit telemetry prohibition. The distribution
 verifier rejects any reintroduced third-party script/image/connect permission.
 E2E audits include serving the actual distribution under the published hostname,
 where hostname-conditional tracking previously ran, as well as live Pages checks.
+The build emits `public-assets.json` with its Git revision and exact file inventory.
+Distribution verification checks this against all real files. Local and live
+Pages audits share the same parser, file set and directory aliases; live CI also
+checks the deployed revision. Unlisted same-origin paths are refused by the audit.
+The manifest contains build metadata only and is fetched solely by verification,
+so no visitor input or new application network request is introduced.
 
 This is a complementary default-on workflow: no dedicated Redis Cluster key-slot
 tool appears in the [official DevToys bundled list](https://devtoys.app/) checked

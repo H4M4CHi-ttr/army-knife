@@ -1,9 +1,11 @@
 import { fileURLToPath, URL } from "node:url";
 import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { defineConfig } from "vite-plus";
 import vue from "@vitejs/plugin-vue";
 import tailwindcss from "@tailwindcss/vite";
 import { writeStaticPages } from "./scripts/static-pages";
+import { writePublicAssets } from "./scripts/public-assets";
 
 export default defineConfig({
   base: "/army-knife/",
@@ -17,6 +19,7 @@ export default defineConfig({
       apply: "build",
       closeBundle() {
         writeStaticPages(fileURLToPath(new URL("./dist", import.meta.url)));
+        writePublicAssets(fileURLToPath(new URL("./dist", import.meta.url)), execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim());
       },
     },
     {

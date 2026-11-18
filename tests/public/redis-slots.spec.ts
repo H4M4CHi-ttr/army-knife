@@ -1,9 +1,13 @@
 import { expect, test } from "@playwright/test";
 import { redisSlotsMessages } from "../../src/i18n/redis-slots";
+import { parsePublicAssets } from "../../scripts/public-assets";
 
 const PRIVATE = "PRIVATE_REDIS_SLOTS_PUBLIC_175";
 for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
-  test("published Redis Cluster slot operation in " + locale, async ({ page, context, baseURL }, testInfo) => {
+  test("published Redis Cluster slot operation in " + locale, async ({ page, context, request, baseURL }, testInfo) => {
+    const manifest = await request.get(new URL("public-assets.json", baseURL!).href, { maxRedirects: 0 });
+    expect(manifest.status()).toBe(200);
+    const allowed = parsePublicAssets(await manifest.text(), process.env.ARMY_KNIFE_DEPLOYED_SHA ?? process.env.GITHUB_SHA);
     const errors: string[] = [], requests: { url: string; method: string; headers: Record<string, string>; body: string | null }[] = [], sockets: string[] = [];
     page.on("pageerror", error => errors.push(error.message));
     page.on("websocket", socket => sockets.push(socket.url()));
@@ -34,7 +38,7 @@ for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {
     await page.getByTestId("redis-slots-clear").click(); await page.reload(); await expect(input).toHaveValue("");
     for (const request of requests) {
       const url = new URL(request.url); expect(url.origin).toBe(new URL(baseURL!).origin);
-      expect(url.pathname).toMatch(/^\/army-knife\//); expect(url.search).toBe("");
+      expect(allowed.has(url.pathname)).toBe(true); expect(url.search).toBe("");
       expect(request.method).toBe("GET"); expect(request.body).toBeNull();
     }
     expect(JSON.stringify(requests)).not.toContain(PRIVATE); expect(errors).toEqual([]); expect(sockets).toEqual([]);

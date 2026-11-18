@@ -108,6 +108,28 @@ describe("Redis slots real Vapor view", () => {
     expect(wrapper.get("#redis-slots-input").element).toHaveProperty("value", REDIS_SLOTS_SAMPLE);
     expect(wrapper.get('[data-testid="redis-slots-slot"]').text()).toBe("3443");
   });
+  it("checks original pasted CRLF bytes on both sides of the raw UTF-8 boundary", async () => {
+    settings.preferences.autoApply = false;
+    const paste = async (text: string) => {
+      const field = wrapper.get("#redis-slots-input").element as HTMLTextAreaElement;
+      field.setSelectionRange(0, field.value.length);
+      const event = new Event("paste", { bubbles: true, cancelable: true });
+      Object.defineProperty(event, "clipboardData", { value: { getData: () => text } });
+      field.dispatchEvent(event); await flushPromises(); return event;
+    };
+    await sample();
+    const exact = '["界"]\r\n' + " ".repeat(8183);
+    expect(new TextEncoder().encode(exact)).toHaveLength(8192);
+    expect((await paste(exact)).defaultPrevented).toBe(true);
+    expect(wrapper.find('[data-testid="preserved-cr-input"]').exists()).toBe(true);
+    await wrapper.get('[data-testid="apply-now"]').trigger("click");
+    expect(result().exists()).toBe(true);
+    await result().get(".output-actions button").trigger("click"); await flushPromises();
+    expect(JSON.parse(copy.mock.calls.at(-1)![0]).keys[0].key).toBe("界");
+    await sample();
+    expect((await paste(exact + " ")).defaultPrevented).toBe(true);
+    expect(result().exists()).toBe(false); expect(wrapper.find(".output-actions").exists()).toBe(false);
+  });
   it("translates all statuses/errors in five languages and clears on remount", async () => {
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});
     for (const locale of ["ja", "en", "zh-CN", "zh-TW", "ko"] as const) {

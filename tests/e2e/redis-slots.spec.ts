@@ -1,18 +1,12 @@
-import { readdir } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { test as base, expect } from "@playwright/test";
 import { redisSlotsMessages } from "../../src/i18n/redis-slots";
 import { REDIS_SLOTS_SAMPLE } from "../../src/lib/tools/redis-slots-sample";
+import { parsePublicAssets } from "../../scripts/public-assets";
 
 const PRIVATE = "PRIVATE_REDIS_SLOTS_175";
-async function assets(dir: string, prefix = "/army-knife/"): Promise<string[]> {
-  return (await Promise.all((await readdir(dir, { withFileTypes: true })).map(entry =>
-    entry.isDirectory() ? assets(`${dir}/${entry.name}`, `${prefix}${entry.name}/`) : [`${prefix}${entry.name}`],
-  ))).flat();
-}
-const allowed = assets("dist").then(paths => new Set([
-  ...paths, ...paths.filter(path => path.endsWith("index.html")).map(path => path.slice(0, -10)),
-]));
+const allowed = readFile("dist/public-assets.json", "utf8").then(text => parsePublicAssets(text));
 const test = base.extend<{ audit: void }>({
   audit: [async ({ context, page, baseURL }, use) => {
     const requests: { url: string; method: string; headers: Record<string, string>; body: string | null }[] = [];
@@ -145,6 +139,28 @@ test("pending local file reads hide exports and cannot overwrite a sample", asyn
   await page.evaluate(() => (window as unknown as { finishRead: () => void }).finishRead());
   await expect(page.locator("#redis-slots-input")).toHaveValue(REDIS_SLOTS_SAMPLE);
   await expect(page.getByTestId("redis-slots-slot").first()).toHaveText("3443");
+});
+
+test("raw CRLF paste boundaries and protected original-byte workflow", async ({ page }) => {
+  await page.goto("./en/tools/redis-slots/"); await page.getByTestId("redis-slots-sample").click();
+  const input = page.locator("#redis-slots-input"), result = page.getByTestId("redis-slots-result");
+  const paste = (value: string) => input.evaluate((element, text) => {
+    const field = element as HTMLTextAreaElement; field.focus(); field.setSelectionRange(0, field.value.length);
+    const event = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "clipboardData", { value: { getData: () => text } }); field.dispatchEvent(event);
+    return event.defaultPrevented;
+  }, value);
+  const exact = '["界"]\r\n' + " ".repeat(8183);
+  expect(Buffer.byteLength(exact)).toBe(8192); expect(await paste(exact)).toBe(true);
+  await expect(input).toHaveAttribute("readonly", ""); await expect(page.getByTestId("preserved-cr-input")).toBeVisible();
+  await page.getByTestId("apply-now").click(); await expect(page.getByTestId("redis-slots-count")).toHaveText("1");
+  const pending = page.waitForEvent("download"); await page.getByTestId("download-raw-cr-input").click();
+  const download = await pending, chunks: Buffer[] = [];
+  for await (const chunk of (await download.createReadStream())!) chunks.push(chunk);
+  expect(Buffer.concat(chunks).toString("utf8")).toBe(exact);
+  await page.getByTestId("replace-raw-cr-input").click(); await expect(input).toHaveValue(""); await expect(result).toHaveCount(0);
+  await page.getByTestId("redis-slots-sample").click(); expect(await paste(exact + " ")).toBe(true);
+  await expect(result).toHaveCount(0); await expect(page.locator(".output-actions")).toHaveCount(0);
 });
 
 test.describe("production hostname privacy", () => {

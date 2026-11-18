@@ -6,12 +6,15 @@ Pure tests cover the documented CRC vector, independent Python binascii vectors,
 all first-brace rules, duplicate/empty/control/Unicode keys, exact byte/count
 bounds, lone surrogates and atomic errors. Real Vapor covers full copy versus
 32-row preview, five locales, immediate/800ms/manual/cancel/disposal and pending
-file-read invalidation. Four-project production E2E covers keyboard/mobile,
+file-read invalidation, including raw 8,192/8,193-byte CRLF paste boundaries. Four-project production E2E covers keyboard/mobile,
 themes, all languages, complete actual downloads, imports, input lifecycle and
 exact-dist-asset privacy. A separate production-hostname route serves the same
 distribution to catch hostname-conditional telemetry. Public tests exercise the
 existing Pages deployment. CSP verifier regressions reject third-party
-script/image/connect exceptions. Synthetic screenshot keys contain no real data.
+script/image/connect exceptions. The build-generated `public-assets.json`
+contains the Git revision and exact distribution paths. Distribution verification
+rejects stale inventories; local and live audits use its shared parser and reject
+unlisted paths. Live CI verifies that the manifest matches the deployed revision. Synthetic screenshot keys contain no real data.
 These verify [offline slot arithmetic](redis-slots.md), not Redis command success.
 
 ## WebSocket Accept coverage (2026-11-18 JST)
