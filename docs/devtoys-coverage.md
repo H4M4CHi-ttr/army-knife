@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## Redis Cluster hash slots (2026-11-18 UTC)
+
+The UTF-8 key/tag/slot workflow defaults **on**. The [official bundled list](https://devtoys.app/)
+checked 2026-11-18 has no dedicated Redis Cluster slot calculator. General hash
+tools do not explain the first brace pair or compare placements. Community
+extensions are outside this comparison. No dependency or runtime service is
+added; the existing GA4 bootstrap and CSP exceptions are removed as explicitly
+required for this recurring run. [Exact bounds and exclusions](redis-slots.md).
+
 ## Recorded WebSocket Accept calculation (2026-11-18 JST)
 
 The encoded client-key/GUID calculation and recorded response comparison default

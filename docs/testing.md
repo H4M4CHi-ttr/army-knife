@@ -1,5 +1,19 @@
 # Testing and deployment
 
+## Redis Cluster slot coverage (2026-11-18 UTC)
+
+Pure tests cover the documented CRC vector, independent Python binascii vectors,
+all first-brace rules, duplicate/empty/control/Unicode keys, exact byte/count
+bounds, lone surrogates and atomic errors. Real Vapor covers full copy versus
+32-row preview, five locales, immediate/800ms/manual/cancel/disposal and pending
+file-read invalidation. Four-project production E2E covers keyboard/mobile,
+themes, all languages, complete actual downloads, imports, input lifecycle and
+exact-dist-asset privacy. A separate production-hostname route serves the same
+distribution to catch hostname-conditional telemetry. Public tests exercise the
+existing Pages deployment. CSP verifier regressions reject third-party
+script/image/connect exceptions. Synthetic screenshot keys contain no real data.
+These verify [offline slot arithmetic](redis-slots.md), not Redis command success.
+
 ## WebSocket Accept coverage (2026-11-18 JST)
 
 `src/lib/tools/websocket-accept.test.ts` checks the RFC 6455 vector, independent
@@ -91,8 +105,8 @@ After the existing Pages deployment succeeds, the contents-read-only
 `verify-public` job runs `pnpm exec playwright test --config playwright.public.config.ts`.
 It checks actual published operation in all four Chromium/Firefox projects,
 five locales and both themes, attaches screenshots, and verifies private-marker
-absence from requests/storage/URL. The site's pre-existing Analytics remains;
-the stricter same-origin asset audit applies to the local production tests.
+absence from requests/storage/URL. Analytics and telemetry are removed; the same-origin asset policy applies on
+both local and published hosts.
 
 
 ## HTTP Accept coverage (2026-11-09 JST)
@@ -312,7 +326,7 @@ The browser scenarios verify:
 - Both themes fit desktop and small viewports without page-level horizontal overflow. Screenshots are attached for human review.
 - The HTML accessibility checker keeps pasted markup inert, performs no request for embedded resource URLs, does not persist input, and allows long scans to be canceled.
 
-Every scenario also has a network audit. Analytics is enabled only for the published `h4m4chi-ttr.github.io/army-knife/` host; the local Playwright test host never loads the Google tag. This audit checks tool-input privacy during local tests, not live GA4 event delivery. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
+Every scenario also has a network audit. The same first-party-only policy applies to local and published hosts; no Analytics bootstrap or third-party CSP exceptions remain. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
 
 The suite uses [Playwright Clock](https://playwright.dev/docs/clock) for deterministic countdown testing, [Playwright downloads](https://playwright.dev/docs/downloads), [network events](https://playwright.dev/docs/network), and a [managed test web server](https://playwright.dev/docs/test-webserver). The viewport projects exercise layout in Chromium and Firefox at small widths; they do not emulate mobile Safari or claim coverage of every device.
 

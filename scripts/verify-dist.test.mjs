@@ -9,7 +9,7 @@ import { cssReferences, verifyDist } from './verify-dist.mjs';
 
 const project = dirname(dirname(fileURLToPath(import.meta.url)));
 const sourceLock = JSON.parse(readFileSync(join(project, 'scripts/font-sources.lock.json'), 'utf8'));
-const csp = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com; font-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'; manifest-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.googletagmanager.com https://*.google-analytics.com";
+const csp = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; font-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'; manifest-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:";
 
 function write(root, name, value) {
   const path = join(root, name);
@@ -181,3 +181,11 @@ test('CSS resource scanner handles image-set and CSS escapes, not content string
     { url: './theme.css', kind: 'stylesheet' },
   ]);
 });
+
+for (const directive of ['script-src', 'connect-src', 'img-src']) {
+  test(`rejects third-party telemetry permission in ${directive}`, () => withFixture((root) => {
+    const file = join(root, 'index.html');
+    writeFileSync(file, readFileSync(file, 'utf8').replace(directive + " ", directive + " https://www.googletagmanager.com "));
+    assert.match(verifyDist(root).errors.join('\n'), /CSP .* must be exactly/);
+  }));
+}
