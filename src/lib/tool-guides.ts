@@ -1,3 +1,4 @@
+import { gitBranchGuide } from "./git-branch-guide.ts";
 import { redisSlotsGuide } from "./redis-slots-guide.ts";
 import { websocketAcceptGuide } from "./websocket-accept-guide.ts";
 import { pgTextArrayGuide } from "./pg-text-array-guide.ts";
@@ -170,6 +171,7 @@ function localized(
 // The catalog owns tool identity; both tool and locale coverage are checked by TypeScript.
 // Examples are synthetic and shared across translations, never taken from user input.
 export const toolGuides = {
+  "git-branch": gitBranchGuide,
   "redis-slots": redisSlotsGuide,
   "websocket-accept": websocketAcceptGuide,
   "http-accept": acceptGuide,

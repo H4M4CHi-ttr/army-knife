@@ -1,4 +1,5 @@
 export type ToolId =
+  | "git-branch"
   | "redis-slots"
   | "websocket-accept"
   | "pg-text-array"
@@ -91,6 +92,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "git-branch", category: "text", wasm: false, devtoys: false,
+    keywords: "git branch ref name check syntax heads release ci ブランチ 名前 構文 分支 名称 檢查 검사 브랜치 이름", color: "orange" },
   { id: "redis-slots", category: "data", wasm: false, devtoys: false,
     keywords: "redis cluster hash slot crc16 xmodem hashtag crossslot key キー 配置 分布 哈希槽 雜湊槽 해시 슬롯", color: "orange" },
   { id: "websocket-accept", category: "network", wasm: false, devtoys: false,

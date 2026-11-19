@@ -1,5 +1,14 @@
 # DevToys overlap policy
 
+## Literal Git branch names (2026-11-20 JST)
+
+The branch-syntax/diagnostic/full-ref workflow defaults **on**. No dedicated Git
+branch checker appears in the [official bundled list](https://devtoys.app/)
+checked on 2026-11-20 JST. Generic text/regex tools and existing patch/conflict
+inspectors do not implement this workflow. Community extensions are outside the
+comparison. No dependency, runtime service, telemetry or font source is added.
+[Exact syntax, bounds and repository/hosting exclusions](git-branch.md).
+
 ## Redis Cluster hash slots (2026-11-18 UTC)
 
 The UTF-8 key/tag/slot workflow defaults **on**. The [official bundled list](https://devtoys.app/)

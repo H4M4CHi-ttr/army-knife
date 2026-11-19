@@ -1,5 +1,18 @@
 # Testing and deployment
 
+## Literal Git branch coverage (2026-11-20 JST)
+
+Pure tests check each documented rule, native Git outside a repository across
+non-NUL ASCII and Unicode edge cases, literal refs, empty/duplicate names, raw
+and decoded byte/count bounds, surrogates and atomic parse failures. Real Vapor
+checks 32-row preview versus complete copy, translated reasons, imports and late
+reads, immediate/800ms/manual/cancel/disposal and original CRLF byte boundaries.
+Four-project production E2E checks five locales, both themes, keyboard/390px,
+actual complete downloads, pending imports, memory lifecycle and the shared
+exact-asset network audit. Public cases extend the existing Pages job and check
+its manifest revision. No tests or workflow budgets are removed or relaxed.
+See [branch-only scope and limits](git-branch.md); screenshots use synthetic names.
+
 ## Redis Cluster slot coverage (2026-11-18 UTC)
 
 Pure tests cover the documented CRC vector, independent Python binascii vectors,
