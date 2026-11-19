@@ -132,11 +132,14 @@ test("pending local file reads hide exports and cannot overwrite a sample", asyn
     const native = File.prototype.arrayBuffer;
     File.prototype.arrayBuffer = async function () {
       const bytes = await native.call(this);
+      // Model a slow native file read before the controllable completion exists.
+      await new Promise(resolve => setTimeout(resolve, 500));
       await new Promise<void>(resolve => { (window as unknown as { finishRead: () => void }).finishRead = resolve; }); return bytes;
     };
   });
   await page.locator('input[type="file"]').setInputFiles({ name: "synthetic.json", mimeType: "application/json", buffer: Buffer.from('["old"]') });
   await expect(page.locator("#git-branch-input")).toBeDisabled(); await expect(page.getByTestId("git-branch-result")).toHaveCount(0);
+  await page.waitForFunction(() => typeof (window as unknown as { finishRead?: () => void }).finishRead === "function");
   await page.getByTestId("git-branch-sample").click();
   await page.evaluate(() => (window as unknown as { finishRead: () => void }).finishRead());
   await expect(page.locator("#git-branch-input")).toHaveValue(GIT_BRANCH_SAMPLE);
@@ -182,4 +185,3 @@ test.describe("production hostname privacy", () => {
     await expect(page.locator('script[src*="analytics"], script[src*="googletag"]')).toHaveCount(0);
   });
 });
-
