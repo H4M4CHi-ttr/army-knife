@@ -6,10 +6,11 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { cssReferences, verifyDist } from './verify-dist.mjs';
+import { parsePublicAssets, writePublicAssets } from './public-assets.ts';
 
 const project = dirname(dirname(fileURLToPath(import.meta.url)));
 const sourceLock = JSON.parse(readFileSync(join(project, 'scripts/font-sources.lock.json'), 'utf8'));
-const csp = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval' https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.google.com; font-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'; manifest-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://www.googletagmanager.com https://*.google-analytics.com";
+const csp = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; font-src 'self'; worker-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'; manifest-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:";
 
 function write(root, name, value) {
   const path = join(root, name);
@@ -85,6 +86,7 @@ function fixture() {
     schema: 1, sources: sourceLock, locales: sourceLock.locales, licenses, files,
     totalBytes: Object.values(files).reduce((sum, record) => sum + record.bytes, 0),
   }));
+  writePublicAssets(root, '1'.repeat(40));
   return root;
 }
 
@@ -100,6 +102,32 @@ test('accepts valid local artifacts and ignores documentation URLs and comments'
   assert.equal(result.counts.licenses, 6);
   assert.equal(result.counts.wasm, 1);
 }));
+
+test('public asset policy uses exact files and directory aliases, not a path prefix', () => withFixture((root) => {
+  const policy = parsePublicAssets(readFileSync(join(root, 'public-assets.json'), 'utf8'), '1'.repeat(40));
+  assert.equal(policy.has('/army-knife/'), true);
+  assert.equal(policy.has('/army-knife/assets/main.js'), true);
+  assert.equal(policy.has('/army-knife/public-assets.json'), true);
+  assert.equal(policy.has('/army-knife/unlisted-input-derived-path'), false);
+  assert.equal(policy.has('/army-knife/assets/main.js?key=private'), false);
+}));
+
+test('public asset manifests reject stale lists and wrong deployment revisions', () => withFixture((root) => {
+  const text = readFileSync(join(root, 'public-assets.json'), 'utf8');
+  assert.throws(() => parsePublicAssets(text, '2'.repeat(40)), /revision/);
+  write(root, 'assets/new-unlisted.js', 'export const added = true;');
+  assert.match(verifyDist(root).errors.join('\n'), /Public asset manifest.*exact/);
+}));
+
+test('public asset manifests reject unsafe, duplicated and malformed path lists', () => {
+  const manifest = paths => JSON.stringify({ schema: 1, revision: '1'.repeat(40), paths: ['/army-knife/index.html', '/army-knife/public-assets.json', ...paths].sort() });
+  for (const paths of [['/elsewhere/index.html'], ['/army-knife/../secret'], ['/army-knife/a?data=x'], ['/army-knife/a#x'], ['/army-knife/a\\b'], ['/army-knife/%61'], ['/army-knife/a\u0000'], ['/army-knife/a//b'], ['/army-knife/a', '/army-knife/a']]) {
+    assert.throws(() => parsePublicAssets(manifest(paths)), /manifest/);
+  }
+  assert.throws(() => parsePublicAssets(JSON.stringify({ schema: 1, revision: '1'.repeat(40), paths: [] })), /manifest/);
+  assert.throws(() => parsePublicAssets('{}'), /manifest/);
+  assert.throws(() => parsePublicAssets('not json'), /manifest/);
+});
 
 test('rejects an entry script that loses the GitHub Pages project base', () => withFixture((root) => {
   const file = join(root, 'index.html');
@@ -181,3 +209,11 @@ test('CSS resource scanner handles image-set and CSS escapes, not content string
     { url: './theme.css', kind: 'stylesheet' },
   ]);
 });
+
+for (const directive of ['script-src', 'connect-src', 'img-src']) {
+  test(`rejects third-party telemetry permission in ${directive}`, () => withFixture((root) => {
+    const file = join(root, 'index.html');
+    writeFileSync(file, readFileSync(file, 'utf8').replace(directive + " ", directive + " https://www.googletagmanager.com "));
+    assert.match(verifyDist(root).errors.join('\n'), /CSP .* must be exactly/);
+  }));
+}

@@ -1,4 +1,5 @@
 export type ToolId =
+  | "redis-slots"
   | "websocket-accept"
   | "pg-text-array"
   | "content-range"
@@ -90,6 +91,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "redis-slots", category: "data", wasm: false, devtoys: false,
+    keywords: "redis cluster hash slot crc16 xmodem hashtag crossslot key キー 配置 分布 哈希槽 雜湊槽 해시 슬롯", color: "orange" },
   { id: "websocket-accept", category: "network", wasm: false, devtoys: false,
     keywords: "websocket sec-websocket-key sec-websocket-accept handshake sha1 nonce guid base64 ハンドシェイク 照合 接続 握手 交握 핸드셰이크 비교", color: "blue" },
   { id: "pg-text-array", category: "data", wasm: false, devtoys: false,

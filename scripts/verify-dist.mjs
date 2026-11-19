@@ -5,6 +5,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Window } from 'happy-dom';
 import { babelParse } from 'vue/compiler-sfc';
+import { distributionFiles, parsePublicAssets, PUBLIC_ASSETS_FILE } from './public-assets.ts';
 
 const PROJECT_ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 export const BASE_PATH = '/army-knife/';
@@ -183,6 +184,11 @@ export function verifyDist(directory = join(PROJECT_ROOT, 'dist')) {
     fail('dist/index.html is missing. Build the production app before verifying it.');
     return { ok: false, errors, counts };
   }
+  attempt('Public asset manifest', () => {
+    const text = readFileSync(join(root, PUBLIC_ASSETS_FILE), 'utf8');
+    parsePublicAssets(text);
+    check(isDeepStrictEqual(JSON.parse(text).paths, distributionFiles(root)), 'Public asset manifest must list the exact distribution files.');
+  });
   const actualRoot = realpathSync(root);
   const files = [];
   const walk = (path) => {
@@ -233,9 +239,9 @@ export function verifyDist(directory = join(PROJECT_ROOT, 'dist')) {
     }
     const required = {
       'default-src': ["'none'"],
-      'script-src': ["'self'", "'wasm-unsafe-eval'", "https://www.googletagmanager.com"],
-      'img-src': ["'self'", "data:", "blob:", "https://www.googletagmanager.com", "https://*.google-analytics.com"],
-      'connect-src': ["'self'", "https://www.googletagmanager.com", "https://*.google-analytics.com", "https://*.google.com"],
+      'script-src': ["'self'", "'wasm-unsafe-eval'"],
+      'img-src': ["'self'", "data:", "blob:"],
+      'connect-src': ["'self'"],
       'font-src': ["'self'"],
       'worker-src': ["'self'"],
       'form-action': ["'none'"],

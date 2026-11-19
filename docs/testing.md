@@ -1,5 +1,22 @@
 # Testing and deployment
 
+## Redis Cluster slot coverage (2026-11-18 UTC)
+
+Pure tests cover the documented CRC vector, independent Python binascii vectors,
+all first-brace rules, duplicate/empty/control/Unicode keys, exact byte/count
+bounds, lone surrogates and atomic errors. Real Vapor covers full copy versus
+32-row preview, five locales, immediate/800ms/manual/cancel/disposal and pending
+file-read invalidation, including raw 8,192/8,193-byte CRLF paste boundaries. Four-project production E2E covers keyboard/mobile,
+themes, all languages, complete actual downloads, imports, input lifecycle and
+exact-dist-asset privacy. A separate production-hostname route serves the same
+distribution to catch hostname-conditional telemetry. Public tests exercise the
+existing Pages deployment. CSP verifier regressions reject third-party
+script/image/connect exceptions. The build-generated `public-assets.json`
+contains the Git revision and exact distribution paths. Distribution verification
+rejects stale inventories; local and live audits use its shared parser and reject
+unlisted paths. Live CI verifies that the manifest matches the deployed revision. Synthetic screenshot keys contain no real data.
+These verify [offline slot arithmetic](redis-slots.md), not Redis command success.
+
 ## WebSocket Accept coverage (2026-11-18 JST)
 
 `src/lib/tools/websocket-accept.test.ts` checks the RFC 6455 vector, independent
@@ -91,8 +108,8 @@ After the existing Pages deployment succeeds, the contents-read-only
 `verify-public` job runs `pnpm exec playwright test --config playwright.public.config.ts`.
 It checks actual published operation in all four Chromium/Firefox projects,
 five locales and both themes, attaches screenshots, and verifies private-marker
-absence from requests/storage/URL. The site's pre-existing Analytics remains;
-the stricter same-origin asset audit applies to the local production tests.
+absence from requests/storage/URL. Analytics and telemetry are removed; the same-origin asset policy applies on
+both local and published hosts.
 
 
 ## HTTP Accept coverage (2026-11-09 JST)
@@ -185,7 +202,21 @@ The font source archives and generated output are cached together under a key th
 
 ## Quality gate
 
-The quality job has a 40-minute timeout so the complete browser suite and report upload fit after the build gates. With 924 browser cases, the 2026-11-06 Link addition's first complete CI attempt reached the former 30-minute job cap after 910 passing cases and no assertion failures; the remaining cases and report upload were unverified. The per-test 45-second timeout, two CI workers, retries and four browser projects retain their existing settings. It performs these steps in order:
+The quality job has a **60-minute timeout** for the 1,284-case suite including
+the Redis Cluster slot addition. In [PR #175's first final-head run](https://github.com/H4M4CHi-ttr/army-knife/actions/runs/44412898381),
+the build gates took 2m13s and browser/system-dependency preparation took 16m19s,
+including long Ubuntu mirror transfers. The former 40-minute job cap cancelled
+E2E after 21m40s and 1,015 passing cases; no assertion-failure lines were recorded,
+but the remaining cases and report upload were unverified. The same head's full
+local four-project run completed all 1,284 cases in 33.7 minutes. These observed
+durations total about 52 minutes before report/cache upload, so a finite
+60-minute job budget includes that preparation and the complete new workload.
+
+The per-test 45-second timeout, two CI workers, retries, all four browser projects,
+every quality gate and artifact/deployment dependencies retain their existing
+settings. There are no additional runners or permission/billing-setting changes.
+The earlier 2026-11-06 Link addition had likewise expanded the job from 30 to
+40 minutes for its then-924-case suite. The current job performs these steps in order:
 
 1. Install locked JavaScript dependencies and the pinned Python font dependencies.
 2. Build fonts and run `python scripts/build-fonts.py --check` against the resulting assets.
@@ -312,7 +343,7 @@ The browser scenarios verify:
 - Both themes fit desktop and small viewports without page-level horizontal overflow. Screenshots are attached for human review.
 - The HTML accessibility checker keeps pasted markup inert, performs no request for embedded resource URLs, does not persist input, and allows long scans to be canceled.
 
-Every scenario also has a network audit. Analytics is enabled only for the published `h4m4chi-ttr.github.io/army-knife/` host; the local Playwright test host never loads the Google tag. This audit checks tool-input privacy during local tests, not live GA4 event delivery. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
+Every scenario also has a network audit. The same first-party-only policy applies to local and published hosts; no Analytics bootstrap or third-party CSP exceptions remain. The test walks the exact files in `dist` to build an allowed asset path set. Browser requests must be same-origin `GET` requests for those files or the site root, with no query string or request body. A private input marker must not appear in a URL, header, or body, and no WebSocket may open. Browser errors and loading errors fail the test. This checks observable browser behavior for the tested workflows; the production asset verification and content security policy provide additional coverage of the shipped bundle.
 
 The suite uses [Playwright Clock](https://playwright.dev/docs/clock) for deterministic countdown testing, [Playwright downloads](https://playwright.dev/docs/downloads), [network events](https://playwright.dev/docs/network), and a [managed test web server](https://playwright.dev/docs/test-webserver). The viewport projects exercise layout in Chromium and Firefox at small widths; they do not emulate mobile Safari or claim coverage of every device.
 
@@ -364,6 +395,15 @@ GitHub Actions is the reference environment for the full browser gate. Its uploa
 The workflow's default token permission is `contents: read`. Pull request code runs under that read-only job; it receives no Pages write or identity-token permission. The checkout does not persist Git credentials.
 
 The separate deployment job depends on the entire quality job, runs only for `main`, and has a five-minute timeout. It uses the `github-pages` environment, `pages: write`, and `id-token: write` to deploy the tested Pages artifact. Concurrent Pages deployments are serialized.
+
+The subsequent public-verification job has a **30-minute timeout** for all
+140 cases, including the Redis slot addition's 20 cases. The preceding main
+[run 44202003638](https://github.com/H4M4CHi-ttr/army-knife/actions/runs/44202003638)
+used 9m50s of its former ten-minute budget with 120 cases (6m10s preparing
+browsers, 3m14s testing). The observed 16m19s preparation during PR #175 plus the
+expanded live suite and report upload needs a larger finite allowance. The
+same Chromium/Firefox desktop/small projects, assertions and read-only token
+permissions are retained. The five-minute deployment allowance is unchanged.
 
 In the repository's **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**. The pinned [`configure-pages` action](https://github.com/actions/configure-pages/blob/v5.0.0/action.yml) has `enablement: false`; the workflow does not use an administrator token or attempt to enable Pages through an alternate path. A repository that has not enabled Pages will fail at configuration, leaving the quality report available for review. Once Pages is configured, rerun the workflow on `main`.
 

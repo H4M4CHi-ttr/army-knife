@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  "redis-slots": Workflow,
   "websocket-accept": Link2,
   "pg-text-array": Braces,
   "content-range": Ruler,
