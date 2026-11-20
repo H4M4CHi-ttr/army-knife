@@ -103,11 +103,11 @@ function formatIpv6(value: bigint): string {
   return `${parts.slice(0, bestStart).join(":")}::${parts.slice(bestStart + bestLength).join(":")}`;
 }
 
-function formatAddress(value: bigint, version: 4 | 6): string {
+export function formatAddress(value: bigint, version: 4 | 6): string {
   return version === 4 ? formatIpv4(value) : formatIpv6(value);
 }
 
-function parseCidr(input: string): ParsedAddress & { prefix: number } {
+export function parseCidr(input: string): ParsedAddress & { prefix: number } {
   const parts = input.trim().split("/");
   if (parts.length !== 2 || !/^(0|[1-9][0-9]{0,2})$/.test(parts[1] ?? "")) {
     throw new ToolError("CIDR_INVALID");

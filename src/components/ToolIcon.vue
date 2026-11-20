@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  "cidr-aggregate": Network,
   "git-branch": GitMerge,
   "redis-slots": Workflow,
   "websocket-accept": Link2,

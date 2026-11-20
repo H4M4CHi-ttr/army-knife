@@ -43,6 +43,7 @@ import { ClassifierClient } from "@/lib/search/classifier-client";
 import { combineClassifierRankings } from "@/lib/search/classifier-runtime";
 import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "@/lib/routes";
 
+const CidrAggregateTool = defineAsyncComponent(() => import("@/components/tools/CidrAggregateTool.vue"));
 const GitBranchTool = defineAsyncComponent(() => import("@/components/tools/GitBranchTool.vue"));
 const RedisSlotsTool = defineAsyncComponent(() => import("@/components/tools/RedisSlotsTool.vue"));
 const WebSocketAcceptTool = defineAsyncComponent(() => import("@/components/tools/WebSocketAcceptTool.vue"));
@@ -872,6 +873,7 @@ onBeforeUnmount(() => {
             <SpecificityTool v-else-if="selectedTool.id === 'css-specificity'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ImageReferenceTool v-else-if="selectedTool.id === 'image-reference'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <JsonMergePatchTool v-else-if="selectedTool.id === 'json-merge-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <CidrAggregateTool v-else-if="selectedTool.id === 'cidr-aggregate'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GitBranchTool v-else-if="selectedTool.id === 'git-branch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <RedisSlotsTool v-else-if="selectedTool.id === 'redis-slots'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <WebSocketAcceptTool v-else-if="selectedTool.id === 'websocket-accept'" :key="`${selectedTool.id}:${preferences.locale}`" />

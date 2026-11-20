@@ -1,5 +1,20 @@
 # Testing and deployment
 
+## Exact CIDR aggregation coverage (2026-11-21 JST)
+
+Pure tests cover duplicates, containment, gaps, non-alignable adjacency, /0 and
+final addresses, /32-/128 precision, mapped IPv6, all input/output bounds and
+indexed atomic rejection. Native Python collapse comparisons cover every prefix
+width and deterministic corpora; existing CIDR tests keep shared parser/formatter
+behavior intact. Actual Vapor verifies both complete exports, all locales,
+imports/late reads, immediate/800ms/manual/cancel/disposal and raw CRLF bounds.
+Four-project production browser tests check five languages, themes, keyboard/
+390px, actual full text/JSON downloads, lifecycle and exact-asset privacy. Paused
+clock tests pin the 799/800ms boundary; delayed native-read setup is explicitly
+awaited before completion. Live Pages cases retain strict merge-revision checks.
+See [bounded union-only semantics](cidr-aggregate.md). Screenshots contain only
+documentation addresses; no workflow/test budgets or protections are weakened.
+
 ## Literal Git branch coverage (2026-11-20 JST)
 
 Pure tests check each documented rule, native Git outside a repository across
