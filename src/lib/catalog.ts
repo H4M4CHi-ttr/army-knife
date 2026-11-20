@@ -1,4 +1,5 @@
 export type ToolId =
+  | "cidr-aggregate"
   | "git-branch"
   | "redis-slots"
   | "websocket-accept"
@@ -92,6 +93,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "cidr-aggregate", category: "network", wasm: false, devtoys: false,
+    keywords: "cidr aggregation collapse supernet prefix union deduplicate containment 集約 重複 包含 聚合 彙整 집약", color: "blue" },
   { id: "git-branch", category: "text", wasm: false, devtoys: false,
     keywords: "git branch ref name check syntax heads release ci ブランチ 名前 構文 分支 名称 檢查 검사 브랜치 이름", color: "orange" },
   { id: "redis-slots", category: "data", wasm: false, devtoys: false,

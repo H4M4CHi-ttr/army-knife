@@ -1,5 +1,15 @@
 # DevToys overlap policy
 
+## Exact CIDR aggregation (2026-11-21 JST)
+
+The bounded, same-family, network-aligned CIDR-union workflow defaults **on**.
+No dedicated workflow appears in the [official bundled list](https://devtoys.app/)
+checked 2026-11-21 JST. Generic text list comparison and the existing single-CIDR
+calculator do not perform address-set aggregation. Community extensions are
+outside the comparison. No package, telemetry, network/font service or workflow
+change is added. [Strict bounds, exact counts and policy exclusions](cidr-aggregate.md).
+This is the union-only CIDR subset of #60; the broader proposal stays open.
+
 ## Literal Git branch names (2026-11-20 JST)
 
 The branch-syntax/diagnostic/full-ref workflow defaults **on**. No dedicated Git
