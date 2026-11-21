@@ -1,5 +1,16 @@
 # Testing and deployment
 
+## Cache-Status coverage (2026-11-22 JST)
+
+Parser tests cover wire order, exact signed values, false and missing values,
+opaque extensions, malformed structured fields and exact input bounds. The
+real Vapor view checks stale-result invalidation, raw CRLF paste bounds,
+immediate output, the 800 ms boundary, cancellation and manual apply.
+Production browser cases exercise the five localized routes, keyboard and
+viewport behavior, both themes, explicit JSON download and exact-distribution
+network auditing. Pages cases use its revision manifest. See the
+[Cache-Status scope and limits](cache-status.md).
+
 ## Exact CIDR aggregation coverage (2026-11-21 JST)
 
 Pure tests cover duplicates, containment, gaps, non-alignable adjacency, /0 and

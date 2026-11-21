@@ -57,6 +57,7 @@ const icons = {
   "content-disposition": FileKey2,
   "server-timing": Activity,
   "cache-control": Activity,
+  "cache-status": Workflow,
   pkce: KeyRound,
   cors: Network,
   chmod: FileLock2,
