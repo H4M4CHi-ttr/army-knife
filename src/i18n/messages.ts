@@ -45,6 +45,7 @@ import { htmlAccessibilityMessages } from "./html-accessibility.ts";
 import { backlogMessages } from "./backlog.ts";
 
 import { pkceMessages } from "./pkce.ts";
+import { cacheStatusMessages } from "./cache-status.ts";
 import { serverTimingMessages } from "./server-timing.ts";
 import { dispositionMessages } from "./content-disposition.ts";
 import { cacheControlMessages } from "./cache-control.ts";
@@ -75,6 +76,7 @@ export const messages = {
     ...httpRangeMessages["en"],
     ...patchMessages["en"],
     ...dispositionMessages.en,
+    ...cacheStatusMessages.en,
     ...serverTimingMessages.en,
     ...cacheControlMessages.en,
     ...pkceMessages["en"],
@@ -123,6 +125,7 @@ export const messages = {
     ...httpRangeMessages["ja"],
     ...patchMessages["ja"],
     ...dispositionMessages.ja,
+    ...cacheStatusMessages.ja,
     ...serverTimingMessages.ja,
     ...cacheControlMessages.ja,
     ...pkceMessages["ja"],
@@ -171,6 +174,7 @@ export const messages = {
     ...httpRangeMessages["zh-CN"],
     ...patchMessages["zh-CN"],
     ...dispositionMessages["zh-CN"],
+    ...cacheStatusMessages["zh-CN"],
     ...serverTimingMessages["zh-CN"],
     ...cacheControlMessages["zh-CN"],
     ...pkceMessages["zh-CN"],
@@ -219,6 +223,7 @@ export const messages = {
     ...httpRangeMessages["zh-TW"],
     ...patchMessages["zh-TW"],
     ...dispositionMessages["zh-TW"],
+    ...cacheStatusMessages["zh-TW"],
     ...serverTimingMessages["zh-TW"],
     ...cacheControlMessages["zh-TW"],
     ...pkceMessages["zh-TW"],
@@ -267,6 +272,7 @@ export const messages = {
     ...httpRangeMessages["ko"],
     ...patchMessages["ko"],
     ...dispositionMessages.ko,
+    ...cacheStatusMessages.ko,
     ...serverTimingMessages.ko,
     ...cacheControlMessages.ko,
     ...pkceMessages["ko"],

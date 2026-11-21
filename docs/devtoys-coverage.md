@@ -1,5 +1,12 @@
 # DevToys overlap policy
 
+## Cache-Status (2026-11-22 JST)
+
+The recorded cache-chain inspector defaults **on**. The
+[official DevToys bundled list](https://devtoys.app/) has no dedicated
+Cache-Status workflow. Cache-Control reads policy directives and Server-Timing
+reads timing metrics. See the [Cache-Status scope and limits](cache-status.md).
+
 ## Exact CIDR aggregation (2026-11-21 JST)
 
 The bounded, same-family, network-aligned CIDR-union workflow defaults **on**.

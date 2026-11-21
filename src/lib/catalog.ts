@@ -21,6 +21,7 @@ export type ToolId =
   | "http-range"
   | "git-patch"
   | "content-disposition"
+  | "cache-status"
   | "server-timing"
   | "cache-control"
   | "pkce"
@@ -160,6 +161,8 @@ export const tools: readonly ToolDefinition[] = [
     keywords: "http content-disposition attachment inline filename filename* download utf8 header ファイル名 ダウンロード 保存名 文件名 檔名 파일명 다운로드",
     color: "purple",
   },
+  { id: "cache-status", category: "network", wasm: false, devtoys: false,
+    keywords: "http cache-status cache hit miss ttl freshness origin cdn response header キャッシュ 缓存 快取 캐시", color: "blue" },
   {
     id: "server-timing", category: "network", wasm: false, devtoys: false,
     keywords: "http server-timing duration performance metrics header response latency 計測 応答 時間 性能 服务器 伺服器 시간 성능",

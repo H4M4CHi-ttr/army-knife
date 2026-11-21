@@ -42,6 +42,7 @@ DevToys を補完する、ブラウザ内で動く開発者向けツール集で
 | HTTPバイト範囲検査 | Rangeの閉区間・末尾指定・範囲外・重複を正確な整数で確認 | TypeScript / BigInt | オン |
 | Git patch検査 | 記録済み差分のファイル・hunk・追加削除行・rename情報を通信せず確認 | 即時 / 遅延・手動 | ON |
 | Content-Disposition解析 | ダウンロード名・filename*の文字コード・優先関係・不審なパスや制御文字を確認 | 即時 / 遅延・手動 | ON |
+| Cache-Status解析         | 記録したキャッシュ経路のヒット・転送理由・残り鮮度を確認                    | 即時 / 遅延・手動   | ON      |
 | Server-Timing解析        | 宣言された時間・説明・重複パラメーターを精度を落とさず確認                    | 即時 / 遅延・手動   | ON       |
 | Cache-Control解析 | 応答のキャッシュ指示・正確な秒数・重複／不正引数・未知の拡張を通信なしで確認 | TypeScript | オン |
 | OAuth PKCE生成 | S256 verifier/challenge・任意stateの生成と既存verifierの確認 | Web Crypto | オン |
