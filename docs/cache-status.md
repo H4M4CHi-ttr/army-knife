@@ -36,3 +36,8 @@ Inputs of at most 2,048 characters apply immediately. Longer inputs wait
 stay in memory. Clearing, navigating away or reloading clears the input. The
 inspector reads already recorded response metadata and does not contact
 caches or verify the truth of their reported values.
+
+## Screenshots
+
+- [English, light, desktop](screenshots/cache-status-en-light-desktop.png) and [small](screenshots/cache-status-en-light-small.png)
+- [Japanese, dark, desktop](screenshots/cache-status-ja-dark-desktop.png) and [small](screenshots/cache-status-ja-dark-small.png)
