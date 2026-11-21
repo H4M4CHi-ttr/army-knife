@@ -63,6 +63,10 @@ for (const locale of ["en", "ja", "zh-CN", "zh-TW", "ko"] as const) {
         testInfo.project.name.startsWith("chromium-") &&
         ((locale === "en" && theme === "light") || (locale === "ja" && theme === "dark"));
       if (capture) {
+        await page.evaluate(() => {
+          if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+          window.scrollTo(0, 0);
+        });
         await page.screenshot({ fullPage: true, path: `docs/screenshots/cache-status-${locale}-${theme}-${testInfo.project.name.slice(9)}.png` });
       }
     }
@@ -117,13 +121,16 @@ test("uses cancellable deferred application and rejects oversized raw CRLF paste
   const result = page.getByTestId("cache-status-result");
   await page.getByTestId("cache-status-sample").click();
   await expect(result).toBeVisible();
-  await input.evaluate((element) => {
+  const prevented = await input.evaluate((element) => {
     const editor = element as HTMLTextAreaElement;
     editor.select();
-    const data = new DataTransfer();
-    data.setData("text/plain", "Cache-Status: edge\r\nCache-Status: next; detail=\"" + "a".repeat(8192) + "\"");
-    editor.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+    const text = 'Cache-Status: edge; detail="' + "a".repeat(8144) + '"\r\nCache-Status: next';
+    const paste = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(paste, "clipboardData", { value: { getData: () => text } });
+    editor.dispatchEvent(paste);
+    return paste.defaultPrevented;
   });
+  expect(prevented).toBe(true);
   await expect(result).toHaveCount(0);
   await expect(page.getByText(cacheStatusMessages.en["cacheStatus.rejected"])).toBeVisible();
   await input.fill('edge; detail="' + "a".repeat(2048) + '"');
