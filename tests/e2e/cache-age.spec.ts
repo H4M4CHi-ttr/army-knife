@@ -50,13 +50,16 @@ for (const locale of ["en", "ja", "zh-CN", "zh-TW", "ko"] as const) {
     await expect(page.locator("#page-guide")).toContainText(m["cacheAge.scope"]);
     await expect(page.getByTestId("cache-age-incomplete")).toHaveText(m["cacheAge.incomplete"]);
     await expect(headers).toHaveValue("");
+    expect((await headers.boundingBox())!.height).toBeLessThan(100);
     await page.getByTestId("cache-age-sample").focus();
     await page.keyboard.press("Enter");
     await expect(page.getByTestId("cache-age-current")).toHaveText("24.625 s");
     await expect(result.locator("dd")).toHaveText(["12.500 s", "1.250 s", "16.250 s", "16.250 s", "8.375 s"]);
     await expect(result).toContainText(m["cacheAge.winner.corrected"]);
     for (const field of CACHE_AGE_TIMES) {
-      await expect(page.getByLabel(m[`cacheAge.${field}`], { exact: true })).toHaveValue(CACHE_AGE_SAMPLE[field]);
+      const time = page.getByLabel(m[`cacheAge.${field}`], { exact: true });
+      await expect(time).toHaveValue(CACHE_AGE_SAMPLE[field]);
+      expect((await time.boundingBox())!.height).toBeLessThan(75);
     }
     for (const theme of ["light", "dark"] as const) {
       await page.getByTestId("settings-button").click();

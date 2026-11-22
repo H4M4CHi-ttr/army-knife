@@ -4,7 +4,6 @@ import { useAppI18n } from "@/i18n/useAppI18n";
 import { Button } from "@/components/ui/button";
 import ApplyControl from "@/components/ApplyControl.vue";
 import CodeInput from "@/components/CodeInput.vue";
-import EmptyResult from "@/components/EmptyResult.vue";
 import { useToolExecution } from "@/composables/useToolExecution";
 import { CACHE_AGE_LIMITS, calculateCacheAge, type CacheAgeInput } from "@/lib/tools/cache-age";
 import { CACHE_AGE_SAMPLE, CACHE_AGE_TIMES } from "@/lib/tools/cache-age-sample";
@@ -111,10 +110,10 @@ const stages = ["apparentAge", "responseDelay", "correctedAgeValue", "correctedI
     </dl>
     <p class="hint">{{ t("cacheAge.maximum") }} {{ t("cacheAge.winner." + result.initialAgeSource) }}</p>
   </section>
-  <EmptyResult v-else />
 </template>
 
 <style scoped>
+.tool-panel :deep(.code-editor) { min-height: 0; }
 .cache-age-times { display: grid; gap: .8rem 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .cache-age-stages { display: grid; gap: .6rem 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .cache-age-stages dt { color: var(--muted-foreground); font-size: .85rem; }
