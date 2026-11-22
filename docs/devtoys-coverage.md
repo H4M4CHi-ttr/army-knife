@@ -1,5 +1,13 @@
 # DevToys overlap policy
 
+## HTTP Cache Age (2026-11-23 JST)
+
+The recorded response age calculator defaults **on**. The [official bundled
+DevToys list](https://devtoys.app/) has no dedicated recorded Cache Age calculation.
+Cache-Status reads reported hits and TTL, Cache-Control reads directives, and
+[Cache Age](cache-age.md) derives elapsed age from explicitly recorded times.
+Community extensions are outside this comparison.
+
 ## Cache-Status (2026-11-22 JST)
 
 The recorded cache-chain inspector defaults **on**. The

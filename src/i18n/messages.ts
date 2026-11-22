@@ -46,6 +46,7 @@ import { backlogMessages } from "./backlog.ts";
 
 import { pkceMessages } from "./pkce.ts";
 import { cacheStatusMessages } from "./cache-status.ts";
+import { cacheAgeMessages } from "./cache-age.ts";
 import { serverTimingMessages } from "./server-timing.ts";
 import { dispositionMessages } from "./content-disposition.ts";
 import { cacheControlMessages } from "./cache-control.ts";
@@ -77,6 +78,7 @@ export const messages = {
     ...patchMessages["en"],
     ...dispositionMessages.en,
     ...cacheStatusMessages.en,
+    ...cacheAgeMessages.en,
     ...serverTimingMessages.en,
     ...cacheControlMessages.en,
     ...pkceMessages["en"],
@@ -126,6 +128,7 @@ export const messages = {
     ...patchMessages["ja"],
     ...dispositionMessages.ja,
     ...cacheStatusMessages.ja,
+    ...cacheAgeMessages.ja,
     ...serverTimingMessages.ja,
     ...cacheControlMessages.ja,
     ...pkceMessages["ja"],
@@ -175,6 +178,7 @@ export const messages = {
     ...patchMessages["zh-CN"],
     ...dispositionMessages["zh-CN"],
     ...cacheStatusMessages["zh-CN"],
+    ...cacheAgeMessages["zh-CN"],
     ...serverTimingMessages["zh-CN"],
     ...cacheControlMessages["zh-CN"],
     ...pkceMessages["zh-CN"],
@@ -224,6 +228,7 @@ export const messages = {
     ...patchMessages["zh-TW"],
     ...dispositionMessages["zh-TW"],
     ...cacheStatusMessages["zh-TW"],
+    ...cacheAgeMessages["zh-TW"],
     ...serverTimingMessages["zh-TW"],
     ...cacheControlMessages["zh-TW"],
     ...pkceMessages["zh-TW"],
@@ -273,6 +278,7 @@ export const messages = {
     ...patchMessages["ko"],
     ...dispositionMessages.ko,
     ...cacheStatusMessages.ko,
+    ...cacheAgeMessages.ko,
     ...serverTimingMessages.ko,
     ...cacheControlMessages.ko,
     ...pkceMessages["ko"],
