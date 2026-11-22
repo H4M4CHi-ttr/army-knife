@@ -22,6 +22,7 @@ export type ToolId =
   | "git-patch"
   | "content-disposition"
   | "cache-status"
+  | "cache-age"
   | "server-timing"
   | "cache-control"
   | "pkce"
@@ -163,6 +164,8 @@ export const tools: readonly ToolDefinition[] = [
   },
   { id: "cache-status", category: "network", wasm: false, devtoys: false,
     keywords: "http cache-status cache hit miss ttl freshness origin cdn response header キャッシュ 缓存 快取 캐시", color: "blue" },
+  { id: "cache-age", category: "network", wasm: false, devtoys: false,
+    keywords: "http cache age date current_age apparent_age resident time rfc 9111 経過時間 缓存年龄 快取存續 캐시 경과 시간", color: "blue" },
   {
     id: "server-timing", category: "network", wasm: false, devtoys: false,
     keywords: "http server-timing duration performance metrics header response latency 計測 応答 時間 性能 服务器 伺服器 시간 성능",

@@ -58,6 +58,7 @@ const icons = {
   "server-timing": Activity,
   "cache-control": Activity,
   "cache-status": Workflow,
+  "cache-age": CalendarClock,
   pkce: KeyRound,
   cors: Network,
   chmod: FileLock2,

@@ -66,6 +66,7 @@ const HttpRangeTool = defineAsyncComponent(() => import("@/components/tools/Http
 const GitPatchTool = defineAsyncComponent(() => import("@/components/tools/GitPatchTool.vue"));
 const WasmTool = defineAsyncComponent(() => import("@/components/tools/WasmTool.vue"));
 const CacheStatusTool = defineAsyncComponent(() => import("@/components/tools/CacheStatusTool.vue"));
+const CacheAgeTool = defineAsyncComponent(() => import("@/components/tools/CacheAgeTool.vue"));
 const ServerTimingTool = defineAsyncComponent(() => import("@/components/tools/ServerTimingTool.vue"));
 const ContentDispositionTool = defineAsyncComponent(() => import("@/components/tools/ContentDispositionTool.vue"));
 const CacheControlTool = defineAsyncComponent(() => import("@/components/tools/CacheControlTool.vue"));
@@ -894,6 +895,7 @@ onBeforeUnmount(() => {
             <HttpRangeTool v-else-if="selectedTool.id === 'http-range'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GitPatchTool v-else-if="selectedTool.id === 'git-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CacheStatusTool v-else-if="selectedTool.id === 'cache-status'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <CacheAgeTool v-else-if="selectedTool.id === 'cache-age'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ServerTimingTool v-else-if="selectedTool.id === 'server-timing'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ContentDispositionTool v-else-if="selectedTool.id === 'content-disposition'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CacheControlTool v-else-if="selectedTool.id === 'cache-control'" :key="`${selectedTool.id}:${preferences.locale}`" />
