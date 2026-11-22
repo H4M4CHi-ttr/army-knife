@@ -35,10 +35,10 @@ describe("Cache Age Vapor view", () => {
 
   it("shows the reason for no result, and exposes absent Age and possible clock skew", async () => {
     await button("sample").trigger("click");
-    await input("headers").setValue("Age: 8");
+    await input("input").setValue("Age: 8");
     expect(result().exists()).toBe(false);
     expect(wrapper.get('[role="alert"]').text()).toContain("Date is required");
-    await input("headers").setValue("Date: Mon, 23 Nov 2026 00:00:13 GMT");
+    await input("input").setValue("Date: Mon, 23 Nov 2026 00:00:13 GMT");
     expect(result().get('[data-testid="cache-age-current"]').text()).toBe("9.625 s");
     expect(result().text()).toContain("Age is absent");
     expect(result().text()).toContain("clocks may differ");

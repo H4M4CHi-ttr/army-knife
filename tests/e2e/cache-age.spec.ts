@@ -86,7 +86,7 @@ for (const locale of ["en", "ja", "zh-CN", "zh-TW", "ko"] as const) {
 
 test("bounded input, stale-result removal, and memory-only lifecycle", async ({ page }) => {
   await page.goto("./en/tools/cache-age/");
-  const headers = page.locator("#cache-age-headers");
+  const headers = page.locator("#cache-age-input");
   const at = page.locator("#cache-age-evaluation");
   const current = page.getByTestId("cache-age-current");
   const m = cacheAgeMessages.en;
