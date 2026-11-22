@@ -5,10 +5,11 @@
 Pure tests pin the conservative maximum, ties, future Date, missing Age, invalid
 and missing inputs, duplicate fields, exact bounds and millisecond precision.
 The real Vapor view tests immediate execution, stale-result invalidation,
-rejected paste and clear. Production browser tests cover five locales, both
-themes, keyboard, narrow viewports, clearing on reload and navigation, and
-exact-distribution asset and storage auditing. Public smoke tests use the
-Pages revision manifest. See the [calculation and limits](cache-age.md).
+rejected paste, ignored file drops, clear and the mounted status region.
+Production browser tests cover five locales, both themes, keyboard, narrow
+viewports, clearing on reload and navigation, and exact-distribution asset
+and storage auditing. Public smoke tests use the Pages revision manifest.
+See the [calculation and limits](cache-age.md).
 
 ## Cache-Status coverage (2026-11-22 JST)
 

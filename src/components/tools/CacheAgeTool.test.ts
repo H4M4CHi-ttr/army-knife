@@ -47,6 +47,30 @@ describe("Cache Age Vapor view", () => {
     expect(wrapper.get('[role="alert"]').text()).toContain("request ≤ response ≤ evaluation");
   });
 
+  it("announces the result in a mounted live region", async () => {
+    const live = wrapper.get('[data-testid="cache-age-announcement"]').element;
+    expect(live.textContent).toBe("");
+    await button("sample").trigger("click");
+    expect(wrapper.get('[data-testid="cache-age-announcement"]').element).toBe(live);
+    expect(live.textContent).toBe("Age at evaluation 24.625 s");
+    await button("clear").trigger("click");
+    expect(live.textContent).toBe("");
+  });
+
+  it("ignores dropped files in text-only inputs", async () => {
+    await button("sample").trigger("click");
+    const editor = input("request").element as HTMLTextAreaElement;
+    const file = new File(["2026-11-23T00:00:12Z"], "synthetic.txt");
+    const event = new Event("drop", { bubbles: true, cancelable: true });
+    Object.defineProperty(event, "dataTransfer", { value: { files: [file], getData: () => "" } });
+    editor.dispatchEvent(event);
+    await flushPromises();
+    expect(event.defaultPrevented).toBe(true);
+    expect(editor.disabled).toBe(false);
+    expect(editor.value).toBe("2026-11-23T00:00:11.250Z");
+    expect(result().get('[data-testid="cache-age-current"]').text()).toBe("24.625 s");
+  });
+
   it("discards stale output if a paste is rejected and recomputes after a valid edit", async () => {
     await button("sample").trigger("click");
     const editor = input("request").element as HTMLTextAreaElement;

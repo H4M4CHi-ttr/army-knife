@@ -35,7 +35,7 @@ const en = {
   "errors.CACHE_AGE_DIGITS": "Age must contain no more than 40 digits.",
   "errors.CACHE_AGE_TIME_MISSING": "Enter all three recorded times.",
   "errors.CACHE_AGE_TIME": "Enter valid UTC times in the shown format, with at most three fractional digits and no leap second.",
-  "errors.CACHE_AGE_TIME_ORDER": "Use chronological order: request ≤ response ≤ evaluation.",
+  "errors.CACHE_AGE_TIME_ORDER": "Enter the times in request ≤ response ≤ evaluation order.",
 };
 
 const ja: Record<keyof typeof en, string> = {

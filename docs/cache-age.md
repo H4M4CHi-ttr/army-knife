@@ -36,7 +36,7 @@ estimate. The tool uses the explicitly supplied evaluation time.
 
 - Up to 512 UTF-8 bytes of Date/Age lines. The text editor uses line breaks
   normalized by the browser, and the parser accepts LF or CRLF with an optional
-  final line ending. Header names are case-insensitive. Other headers, status
+  final line ending. The editor ignores file drops. Header names are case-insensitive. Other headers, status
   lines, folded lines, duplicate fields and comma-joined Age values are rejected.
 - Date is required for the conservative calculation. It accepts canonical
   IMF-fixdate in GMT (years 1900–9999) with a matching weekday. Legacy date forms

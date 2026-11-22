@@ -38,11 +38,17 @@ function replace(input: CacheAgeInput) {
   source.value = { input, rejected: new Set() };
 }
 
+function ignoreFileDrop(event: DragEvent) {
+  if (!event.dataTransfer?.files.length) return;
+  event.preventDefault();
+  event.stopPropagation();
+}
+
 const stages = ["apparentAge", "responseDelay", "correctedAgeValue", "correctedInitialAge", "residentTime"] as const;
 </script>
 
 <template>
-  <div class="tool-panel">
+  <div class="tool-panel" @drop.capture="ignoreFileDrop">
     <div class="tool-toolbar">
       <div class="toolbar-label">{{ t("labels.input") }}</div>
       <div class="control-row">
@@ -88,7 +94,8 @@ const stages = ["apparentAge", "responseDelay", "correctedAgeValue", "correctedI
   <p v-else-if="error" class="error-panel" role="alert">{{ t("errors." + error) }}</p>
   <p v-else-if="incomplete" class="hint" data-testid="cache-age-incomplete">{{ t("cacheAge.incomplete") }}</p>
 
-  <section v-if="result" class="result-panel" aria-live="polite" data-testid="cache-age-result">
+  <p class="sr-only" role="status" aria-atomic="true" data-testid="cache-age-announcement">{{ result ? t("cacheAge.currentAge") + " " + result.currentAge + " s" : "" }}</p>
+  <section v-if="result" class="result-panel" data-testid="cache-age-result">
     <div class="result-header">
       <h2>{{ t("cacheAge.currentAge") }}</h2>
       <strong class="cache-age-number" data-testid="cache-age-current"><code>{{ result.currentAge }} s</code></strong>
