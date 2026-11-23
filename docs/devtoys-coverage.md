@@ -1,5 +1,13 @@
 # DevToys overlap policy
 
+## Git blob ID
+
+The Git object ID calculator defaults **on**. The [bundled DevToys list](https://devtoys.app/)
+includes a generic hash generator. Git blob IDs include a type and byte-length header
+before the raw file bytes, and this tool shows the two repository formats together.
+The calculation is scoped to blobs, comparable to
+[`git hash-object --no-filters`](https://git-scm.com/docs/git-hash-object).
+
 ## HTTP Cache Age (2026-11-23 JST)
 
 The recorded response age calculator defaults **on**. The [official bundled

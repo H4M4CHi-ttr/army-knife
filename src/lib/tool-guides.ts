@@ -21,6 +21,7 @@ import { httpRangeGuide } from "./http-range-guide.ts";
 import { patchGuide } from "./git-patch-guide.ts";
 import { cacheStatusGuide } from "./cache-status-guide.ts";
 import { cacheAgeGuide } from "./cache-age-guide.ts";
+import { gitBlobGuide } from "./git-blob-guide.ts";
 import { serverTimingGuide } from "./server-timing-guide.ts";
 import { dispositionGuide } from "./content-disposition-guide.ts";
 import { pkceGuide } from "./pkce-guide.ts";
@@ -198,6 +199,7 @@ export const toolGuides = {
   "content-disposition": dispositionGuide,
   "cache-status": cacheStatusGuide,
   "cache-age": cacheAgeGuide,
+  "git-blob": gitBlobGuide,
   "server-timing": serverTimingGuide,
   "cache-control": cacheControlGuide,
   cors: corsGuide,

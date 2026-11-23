@@ -46,6 +46,7 @@ import { backlogMessages } from "./backlog.ts";
 
 import { pkceMessages } from "./pkce.ts";
 import { cacheStatusMessages } from "./cache-status.ts";
+import { gitBlobMessages } from "./git-blob.ts";
 import { cacheAgeMessages } from "./cache-age.ts";
 import { serverTimingMessages } from "./server-timing.ts";
 import { dispositionMessages } from "./content-disposition.ts";
@@ -78,6 +79,7 @@ export const messages = {
     ...patchMessages["en"],
     ...dispositionMessages.en,
     ...cacheStatusMessages.en,
+    ...gitBlobMessages.en,
     ...cacheAgeMessages.en,
     ...serverTimingMessages.en,
     ...cacheControlMessages.en,
@@ -128,6 +130,7 @@ export const messages = {
     ...patchMessages["ja"],
     ...dispositionMessages.ja,
     ...cacheStatusMessages.ja,
+    ...gitBlobMessages.ja,
     ...cacheAgeMessages.ja,
     ...serverTimingMessages.ja,
     ...cacheControlMessages.ja,
@@ -178,6 +181,7 @@ export const messages = {
     ...patchMessages["zh-CN"],
     ...dispositionMessages["zh-CN"],
     ...cacheStatusMessages["zh-CN"],
+    ...gitBlobMessages["zh-CN"],
     ...cacheAgeMessages["zh-CN"],
     ...serverTimingMessages["zh-CN"],
     ...cacheControlMessages["zh-CN"],
@@ -228,6 +232,7 @@ export const messages = {
     ...patchMessages["zh-TW"],
     ...dispositionMessages["zh-TW"],
     ...cacheStatusMessages["zh-TW"],
+    ...gitBlobMessages["zh-TW"],
     ...cacheAgeMessages["zh-TW"],
     ...serverTimingMessages["zh-TW"],
     ...cacheControlMessages["zh-TW"],
@@ -278,6 +283,7 @@ export const messages = {
     ...patchMessages["ko"],
     ...dispositionMessages.ko,
     ...cacheStatusMessages.ko,
+    ...gitBlobMessages.ko,
     ...cacheAgeMessages.ko,
     ...serverTimingMessages.ko,
     ...cacheControlMessages.ko,
