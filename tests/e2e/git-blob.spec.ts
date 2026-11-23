@@ -8,7 +8,11 @@ test("Git blob route hashes binary content and removes stale IDs after an oversi
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Git blob ID calculator");
   const file = page.locator("#git-blob-file");
   const sha1 = page.getByTestId("git-blob-sha1");
-  await file.setInputFiles({ name: "fixture.bin", mimeType: "application/octet-stream", buffer: binary });
+  const open = page.locator("#git-blob-input");
+  await open.focus();
+  const chooser = page.waitForEvent("filechooser");
+  await open.press("Enter");
+  await (await chooser).setFiles({ name: "fixture.bin", mimeType: "application/octet-stream", buffer: binary });
   await expect(sha1).toHaveText(expected);
   await expect(page.getByTestId("git-blob-sha256")).toHaveText(/^[0-9a-f]{64}$/);
 

@@ -195,7 +195,7 @@ function sample() {
     </div>
     <div class="file-inspector-control">
       <label class="field-label" :for="kind + '-file'">{{ t("inspector.file") }}</label>
-      <Button variant="outline" size="sm" @click="picker?.click()">{{ t("actions.import") }}</Button>
+      <Button :id="kind + '-input'" variant="outline" size="sm" @click="picker?.click()">{{ t("actions.import") }}</Button>
       <span class="hint" data-testid="selected-file">{{ file ? file.name + " (" + file.size.toLocaleString(locale) + " B)" : t("inspector.fileNone") }}</span>
       <input :id="kind + '-file'" ref="picker" type="file" accept="*/*" hidden :aria-label="t('inspector.file')" @change="onFile" />
     </div>
