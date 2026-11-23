@@ -13,8 +13,11 @@ import {
   type EncodingReport, type MagicReport, type SriAlgorithm, type SriReport,
 } from "@/lib/tools/file-inspectors";
 
-type Kind = "sri" | "encoding" | "magic";
+import type { GitBlobReport } from "@/lib/tools/git-blob";
+
+type Kind = "git-blob" | "sri" | "encoding" | "magic";
 type BinaryResult =
+  | { kind: "git-blob"; data: GitBlobReport }
   | { kind: "sri"; data: SriReport }
   | { kind: "encoding"; data: EncodingReport }
   | { kind: "magic"; data: MagicReport };
@@ -77,6 +80,8 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<Bina
     const buffer = chosen ? await chosen.arrayBuffer() : Uint8Array.from(parseHexBytes(hex.value)).buffer;
     if (signal.aborted) throw new ToolError("CANCELLED");
     const options: Request = { action: props.kind, bytes: buffer, filename: chosen?.name ?? "", mime: chosen?.type ?? "", algorithm: algorithm.value };
+    if (props.kind === "git-blob")
+      return { kind: "git-blob", data: await inWorker<GitBlobReport>(options, signal) };
     if (props.kind === "sri")
       return { kind: "sri", data: await inWorker<SriReport>(options, signal) };
     if (props.kind === "encoding")
@@ -84,6 +89,7 @@ const { result, error, control, apply, cancel, setAuto } = useToolExecution<Bina
     return { kind: "magic", data: await inWorker<MagicReport>(options, signal) };
   },
 });
+const blob = computed(() => result.value?.kind === "git-blob" ? result.value.data : null);
 const sri = computed(() => result.value?.kind === "sri" ? result.value.data : null);
 const encoding = computed(() => result.value?.kind === "encoding" ? result.value.data : null);
 const magic = computed(() => result.value?.kind === "magic" ? result.value.data : null);
@@ -94,6 +100,7 @@ function eolRatio(count: number, report: EncodingReport): string {
 }
 const copy = computed(() => sri.value
   ? sri.value.integrity + "\n" + sri.value.html
+  : blob.value ? "SHA-1 " + blob.value.sha1 + "\nSHA-256 " + blob.value.sha256
   : result.value ? JSON.stringify(result.value.data, null, 2) : "");
 
 function invalidateConversion() {
@@ -165,7 +172,9 @@ async function downloadConverted() {
 function sample() {
   clear();
   if (props.kind === "sri") hex.value = "63 6F 6E 73 6F 6C 65 2E 6C 6F 67 28 31 29 3B 0A";
-  else {
+  else if (props.kind === "git-blob") {
+    file.value = new File([], "empty.bin");
+  } else {
     // Synthetic bytes; the same bytes go through the exact binary Worker route.
     const bytes = props.kind === "magic"
       ? new Uint8Array([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a])
@@ -186,7 +195,7 @@ function sample() {
     </div>
     <div class="file-inspector-control">
       <label class="field-label" :for="kind + '-file'">{{ t("inspector.file") }}</label>
-      <Button variant="outline" size="sm" @click="picker?.click()">{{ t("actions.import") }}</Button>
+      <Button :id="kind + '-input'" variant="outline" size="sm" @click="picker?.click()">{{ t("actions.import") }}</Button>
       <span class="hint" data-testid="selected-file">{{ file ? file.name + " (" + file.size.toLocaleString(locale) + " B)" : t("inspector.fileNone") }}</span>
       <input :id="kind + '-file'" ref="picker" type="file" accept="*/*" hidden :aria-label="t('inspector.file')" @change="onFile" />
     </div>
@@ -215,7 +224,14 @@ function sample() {
       <h2><span class="step-number">02</span>{{ t("labels.result") }}</h2>
       <OutputActions :text="copy" :filename="'army-knife-' + kind + '.txt'" />
     </div>
-    <template v-if="sri">
+    <template v-if="blob">
+      <p class="hint">{{ t("gitBlob.scope") }}</p>
+      <h3 class="field-label">SHA-1</h3>
+      <pre class="code-output" data-testid="git-blob-sha1">{{ blob.sha1 }}</pre>
+      <h3 class="field-label">SHA-256</h3>
+      <pre class="code-output" data-testid="git-blob-sha256">{{ blob.sha256 }}</pre>
+    </template>
+    <template v-else-if="sri">
       <div class="metric-grid"><div class="metric">
         <span class="metric-label">{{ t("inspector.size") }}</span><strong class="metric-value">{{ sri.bytes.toLocaleString(locale) }}</strong>
       </div><div class="metric">
@@ -273,7 +289,7 @@ function sample() {
       <h3 class="field-label">{{ t("inspector.warnings") }}</h3>
       <ul><li v-for="warning in warnings" :key="warning">{{ t("inspector.warning." + warning) }}</li></ul>
     </div>
-    <p v-else class="hint">{{ t("inspector.noWarnings") }}</p>
+    <p v-else-if="!blob" class="hint">{{ t("inspector.noWarnings") }}</p>
   </section>
   <EmptyResult v-else />
 </template>

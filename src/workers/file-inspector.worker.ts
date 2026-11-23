@@ -1,8 +1,10 @@
 import { convertEncoding, generateSri, inspectEncoding, inspectMagic, type SriAlgorithm } from "../lib/tools/file-inspectors";
 import { ToolError } from "../lib/tools/errors";
 
+import { calculateGitBlob } from "../lib/tools/git-blob";
+
 interface Request {
-  action: "encoding" | "magic" | "sri" | "convert";
+  action: "encoding" | "magic" | "sri" | "git-blob" | "convert";
   bytes: ArrayBuffer;
   filename?: string;
   mime?: string;
@@ -22,6 +24,8 @@ self.onmessage = async (event: MessageEvent<Request>) => {
       const resourceKind = /\.css$/i.test(filename) ? "stylesheet" :
         /\.(?:js|mjs|cjs)$/i.test(filename) ? "script" : "unknown";
       self.postMessage({ ok: true, result: await generateSri(view, algorithm, resourceKind) });
+    } else if (action === "git-blob") {
+      self.postMessage({ ok: true, result: await calculateGitBlob(view) });
     } else if (action === "convert") {
       const converted = convertEncoding(view, lineEnding);
       self.postMessage({ ok: true, result: converted.buffer });

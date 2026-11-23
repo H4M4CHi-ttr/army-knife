@@ -19,6 +19,7 @@ export type ToolId =
   | "jwk"
   | "idn"
   | "http-range"
+  | "git-blob"
   | "git-patch"
   | "content-disposition"
   | "cache-status"
@@ -155,6 +156,8 @@ export const tools: readonly ToolDefinition[] = [
   { id: "idn", category: "network", wasm: false, devtoys: false, keywords: "idn punycode domain hostname unicode ascii xn-- internationalized homoglyph ドメイン 国際化 域名 網域 도메인", color: "purple" },
   { id: "http-range", category: "network", wasm: false, devtoys: false,
     keywords: "http range bytes content-range partial download resume suffix overlap バイト 範囲 再開 下载 位元組 범위 다운로드", color: "blue" },
+  { id: "git-blob", category: "text", wasm: false, devtoys: false,
+    keywords: "git blob object id oid hash-object sha1 sha256 raw binary ファイル オブジェクト 对象 物件 객체", color: "orange" },
   { id: "git-patch", category: "text", wasm: false, devtoys: false,
     keywords: "git patch unified diff hunk rename added deleted inspect 差分 パッチ 変更 追加 削除 补丁 修補 패치 변경", color: "orange" },
   {

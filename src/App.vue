@@ -928,7 +928,7 @@ onBeforeUnmount(() => {
               :kind="selectedTool.id" :key="selectedTool.id + ':' + preferences.locale"
             />
             <FileInspectorTool
-              v-else-if="selectedTool.id === 'sri' || selectedTool.id === 'encoding' || selectedTool.id === 'magic'"
+              v-else-if="selectedTool.id === 'git-blob' || selectedTool.id === 'sri' || selectedTool.id === 'encoding' || selectedTool.id === 'magic'"
               :kind="selectedTool.id" :key="`${selectedTool.id}:${preferences.locale}`"
             />
             <TextInspectorTool
