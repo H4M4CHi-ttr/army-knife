@@ -96,7 +96,8 @@ test("imports an ICS file, displays inert values and exports only on request", a
 
 test("defers heavy parsing, cancels the countdown, and inspects the latest edit on manual apply", async ({ page }) => {
   await page.goto("./en/tools/icalendar/");
-  await page.clock.install();
+  await page.clock.install({ time: new Date("2026-11-25T00:00:00Z") });
+  await page.clock.pauseAt(new Date("2026-11-25T00:01:00Z"));
   const input = page.locator("#icalendar-input");
   const result = page.getByTestId("icalendar-result");
   const status = page.getByTestId("apply-control");
