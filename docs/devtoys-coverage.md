@@ -8,6 +8,13 @@ before the raw file bytes, and this tool shows the two repository formats togeth
 The calculation is scoped to blobs, comparable to
 [`git hash-object --no-filters`](https://git-scm.com/docs/git-hash-object).
 
+## iCalendar inspector (2026-11-25 JST)
+
+The iCalendar inspector defaults **on**. The [official bundled DevToys
+catalog](https://devtoys.app/) has no dedicated iCalendar inspection workflow.
+Generic timestamp conversion does not display recurring event definitions,
+exceptions or VTIMEZONE references. [Supported fields and limits](icalendar.md).
+
 ## HTTP Cache Age (2026-11-23 JST)
 
 The recorded response age calculator defaults **on**. The [official bundled

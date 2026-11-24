@@ -45,6 +45,7 @@ import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, t
 
 const CidrAggregateTool = defineAsyncComponent(() => import("@/components/tools/CidrAggregateTool.vue"));
 const GitBranchTool = defineAsyncComponent(() => import("@/components/tools/GitBranchTool.vue"));
+const ICalendarTool = defineAsyncComponent(() => import("@/components/tools/ICalendarTool.vue"));
 const RedisSlotsTool = defineAsyncComponent(() => import("@/components/tools/RedisSlotsTool.vue"));
 const WebSocketAcceptTool = defineAsyncComponent(() => import("@/components/tools/WebSocketAcceptTool.vue"));
 const ContentRangeTool = defineAsyncComponent(() => import("@/components/tools/ContentRangeTool.vue"));
@@ -877,6 +878,7 @@ onBeforeUnmount(() => {
             <JsonMergePatchTool v-else-if="selectedTool.id === 'json-merge-patch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CidrAggregateTool v-else-if="selectedTool.id === 'cidr-aggregate'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GitBranchTool v-else-if="selectedTool.id === 'git-branch'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <ICalendarTool v-else-if="selectedTool.id === 'icalendar'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <RedisSlotsTool v-else-if="selectedTool.id === 'redis-slots'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <WebSocketAcceptTool v-else-if="selectedTool.id === 'websocket-accept'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ContentRangeTool v-else-if="selectedTool.id === 'content-range'" :key="`${selectedTool.id}:${preferences.locale}`" />

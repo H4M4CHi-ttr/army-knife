@@ -1,4 +1,5 @@
 export type ToolId =
+  | "icalendar"
   | "cidr-aggregate"
   | "git-branch"
   | "redis-slots"
@@ -96,6 +97,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "icalendar", category: "data", wasm: false, devtoys: false,
+    keywords: "icalendar ics vevent vtimezone calendar schedule rrule recurrence date timezone カレンダー 予定 繰り返し 日历 日曆 行事曆 일정 달력 반복", color: "purple" },
   { id: "cidr-aggregate", category: "network", wasm: false, devtoys: false,
     keywords: "cidr aggregation collapse supernet prefix union deduplicate containment 集約 重複 包含 聚合 彙整 집약", color: "blue" },
   { id: "git-branch", category: "text", wasm: false, devtoys: false,

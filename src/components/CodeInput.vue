@@ -22,6 +22,7 @@ const props = withDefaults(
     inputHint?: string;
     rows?: number;
     file?: boolean;
+    accept?: string;
     /** Preserve an initial UTF-8 BOM when exact file bytes matter. */
     preserveBom?: boolean;
     /** Opt in to raw CR paste and a read-only preview until explicit replacement. */
@@ -276,7 +277,7 @@ function downloadInput() {
       :id="inputId + '-file'"
       ref="picker"
       type="file"
-      accept=".csv,.tsv,.txt,.log,.json,.har,.env,text/*,application/json"
+      :accept="accept ?? '.csv,.tsv,.txt,.log,.json,.har,.env,text/*,application/json'"
       hidden
       :aria-label="label + ': ' + t('actions.import')"
       @change="onFile"
