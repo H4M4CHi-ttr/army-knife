@@ -516,3 +516,14 @@ malformed inputs, bounds, delayed/manual/cancel and navigation/reload clearing.
 Its exact-dist-asset audit checks external requests, query/body/header leakage,
 WebSockets and browser errors. Synthetic domains are rendered only as text.
 This verifies the offline inspector, not domain safety or a DNS service.
+
+## iCalendar coverage (2026-11-25 JST)
+
+`src/lib/tools/icalendar.test.ts` covers CRLF folding, quoted parameters, the
+four date kinds, recurrence definitions and overrides, calendar-local zone
+references, malformed structures and resource bounds. `tests/e2e/icalendar.spec.ts`
+runs all four browser projects and checks five locales, both themes, keyboard
+operation, local ICS import, explicit JSON download, deferred manual apply and
+countdown cancellation, active worker termination, input clearing, and the
+built-asset network audit. The published smoke test exercises the tool against the verified Pages asset
+manifest. All fixtures are synthetic.

@@ -1,3 +1,4 @@
+import type { ICalendarReport } from "./icalendar";
 import { ToolError } from "./errors";
 import type { CaseStyle, LiteralFormat, LiteralDirection, TextAnalysis } from "./text-advanced";
 import type { ConflictEntry, ConflictDiagnostic } from "./inspectors";
@@ -5,15 +6,20 @@ import type { ConflictEntry, ConflictDiagnostic } from "./inspectors";
 export type InspectorWorkerRequest =
   | { kind: "text-stats"; input: string; locale: string; style: CaseStyle }
   | { kind: "string-literals"; input: string; format: LiteralFormat; direction: LiteralDirection }
-  | { kind: "git-conflicts"; input: string };
+  | { kind: "git-conflicts"; input: string }
+  | { kind: "icalendar"; input: string };
 export type InspectorWorkerResult =
   | { kind: "text-stats"; data: TextAnalysis }
   | { kind: "string-literals"; data: string }
+  | { kind: "icalendar"; data: ICalendarReport }
   | { kind: "git-conflicts"; data: { conflicts: ConflictEntry[]; diagnostics: ConflictDiagnostic[]; lines: number } };
 
 interface WorkerReply { ok: boolean; result?: InspectorWorkerResult; code?: string }
 
 /** Heavy inputs never silently fall back to the UI thread. */
+export function runInspectorWorker<K extends InspectorWorkerRequest["kind"]>(
+  request: Extract<InspectorWorkerRequest, { kind: K }> & { kind: K }, signal: AbortSignal,
+): Promise<Extract<InspectorWorkerResult, { kind: K }>>;
 export function runInspectorWorker(
   request: InspectorWorkerRequest, signal: AbortSignal,
 ): Promise<InspectorWorkerResult> {

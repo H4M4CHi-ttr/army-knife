@@ -1,4 +1,5 @@
 import { analyzeText, transformLiteral } from "../lib/tools/text-advanced";
+import { inspectICalendar } from "../lib/tools/icalendar";
 import { inspectConflicts } from "../lib/tools/inspectors";
 import { ToolError } from "../lib/tools/errors";
 import type { InspectorWorkerRequest, InspectorWorkerResult } from "../lib/tools/inspector-worker";
@@ -14,6 +15,9 @@ self.onmessage = (event: MessageEvent<InspectorWorkerRequest>) => {
         break;
       case "string-literals":
         result = { kind: request.kind, data: transformLiteral(request.input, request.format, request.direction) };
+        break;
+      case "icalendar":
+        result = { kind: request.kind, data: inspectICalendar(request.input) };
         break;
       case "git-conflicts":
         result = { kind: request.kind, data: inspectConflicts(request.input) };

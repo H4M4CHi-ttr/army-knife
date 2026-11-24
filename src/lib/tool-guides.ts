@@ -1,5 +1,6 @@
 import { cidrAggregateGuide } from "./cidr-aggregate-guide.ts";
 import { gitBranchGuide } from "./git-branch-guide.ts";
+import { iCalendarGuide } from "./icalendar-guide.ts";
 import { redisSlotsGuide } from "./redis-slots-guide.ts";
 import { websocketAcceptGuide } from "./websocket-accept-guide.ts";
 import { pgTextArrayGuide } from "./pg-text-array-guide.ts";
@@ -177,6 +178,7 @@ function localized(
 export const toolGuides = {
   "cidr-aggregate": cidrAggregateGuide,
   "git-branch": gitBranchGuide,
+  icalendar: iCalendarGuide,
   "redis-slots": redisSlotsGuide,
   "websocket-accept": websocketAcceptGuide,
   "http-accept": acceptGuide,
