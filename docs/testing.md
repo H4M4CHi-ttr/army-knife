@@ -524,6 +524,6 @@ four date kinds, recurrence definitions and overrides, calendar-local zone
 references, malformed structures and resource bounds. `tests/e2e/icalendar.spec.ts`
 runs all four browser projects and checks five locales, both themes, keyboard
 operation, local ICS import, explicit JSON download, deferred manual apply and
-countdown cancellation, input clearing, and the built-asset network audit.
-The published smoke test exercises the tool against the verified Pages asset
+countdown cancellation, active worker termination, input clearing, and the
+built-asset network audit. The published smoke test exercises the tool against the verified Pages asset
 manifest. All fixtures are synthetic.

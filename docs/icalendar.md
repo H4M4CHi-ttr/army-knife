@@ -47,3 +47,10 @@ existing 800 ms delay or manual apply, with a cancelable worker and five-second
 timeout. Inputs and reports are memory-only. The tool does not access calendar
 services, request external references, import into a calendar or send invitations.
 The tool and worker use the repository MIT license and add no dependencies.
+The production route adds approximately 16 KiB of tool JavaScript and CSS
+(6 KiB gzip), plus the existing shared inspector worker used for larger inputs.
+
+[Desktop light](screenshots/icalendar-en-light-desktop.png) ·
+[Small light](screenshots/icalendar-en-light-small.png) ·
+[Desktop dark](screenshots/icalendar-ja-dark-desktop.png) ·
+[Small dark](screenshots/icalendar-ja-dark-small.png)

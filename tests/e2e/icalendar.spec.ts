@@ -123,3 +123,42 @@ test("defers heavy parsing, cancels the countdown, and inspects the latest edit 
   await expect(result).toHaveCount(0);
   await expect(page.getByRole("alert")).toContainText("structure exceeds");
 });
+
+test("terminates an active inspector worker and never publishes its canceled result", async ({ page }) => {
+  await page.addInitScript(() => {
+    const nativePost = Worker.prototype.postMessage;
+    const nativeTerminate = Worker.prototype.terminate;
+    const heldWorkers = new WeakSet<Worker>();
+    Worker.prototype.postMessage = function (...args: unknown[]) {
+      if ((args[0] as { kind?: string } | undefined)?.kind === "icalendar" &&
+          document.documentElement.dataset.icalendarWorker === undefined) {
+        heldWorkers.add(this);
+        document.documentElement.dataset.icalendarWorker = "running";
+        return;
+      }
+      Reflect.apply(nativePost, this, args);
+    };
+    Worker.prototype.terminate = function () {
+      nativeTerminate.call(this);
+      if (heldWorkers.has(this)) document.documentElement.dataset.icalendarWorker = "terminated";
+    };
+  });
+  await page.goto("./en/tools/icalendar/");
+  const root = page.locator("html");
+  const input = page.locator("#icalendar-input");
+  const status = page.getByTestId("apply-control");
+  const result = page.getByTestId("icalendar-result");
+  const large = ICALENDAR_SAMPLE.replace("END:VCALENDAR", "X-TEST:" + "a".repeat(4200) + "\nEND:VCALENDAR");
+  await input.fill(large.replace("Moved planning", marker));
+  await page.getByTestId("apply-now").click();
+  await expect(root).toHaveAttribute("data-icalendar-worker", "running");
+  await expect(status).toHaveAttribute("data-status", "running");
+  await status.getByRole("button", { name: /cancel/i }).click();
+  await expect(root).toHaveAttribute("data-icalendar-worker", "terminated");
+  await expect(status).toHaveAttribute("data-status", "cancelled");
+  await expect(result).toHaveCount(0);
+  await input.fill(large);
+  await page.getByTestId("apply-now").click();
+  await expect(result).toContainText("Moved planning");
+  await expect(result).not.toContainText(marker);
+});
