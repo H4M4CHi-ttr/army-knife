@@ -57,6 +57,8 @@ JavaScript のバージョンと依存グラフは [package.json](package.json) 
 | [Class Variance Authority](https://github.com/joe-bell/cva)      | 0.7.1              | Apache-2.0                                        |
 | [clsx](https://github.com/lukeed/clsx)                           | 2.1.1              | MIT                                               |
 | [tailwind-merge](https://github.com/dcastil/tailwind-merge)      | 3.7.0              | MIT                                               |
+| [parse5](https://github.com/inikulin/parse5)                     | 8.1.1              | MIT                                               |
+| [entities](https://github.com/fb55/entities)                     | 9.0.0（間接依存）   | BSD-2-Clause                                      |
 | [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss)      | 4.3.3              | MIT                                               |
 
 Lucide の配布ライセンスには **Copyright (c) 2026 Lucide Icons and Contributors** と、Feather 由来アイコンに関する追加の権利表示が含まれています。アプリの MIT 表記だけで置き換えないでください。

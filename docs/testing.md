@@ -1,5 +1,17 @@
 # Testing and deployment
 
+## HTML hreflang pair coverage (2026-11-26 JST)
+
+Pure tests cover actual head links, HTML recovery and entity decoding, fallback,
+both directions of language matching, third-page scope and exact byte/count
+limits. The real Vapor route covers immediate updates, stale-result invalidation,
+raw CRLF paste rejection and pending cancellation. The production browsers
+cover the five languages, themes, keyboard activation, 390 px layouts, manual
+Worker application and memory-only lifecycle. Passive resource tags are tested
+through both parsing paths with an exact asset allowlist and CSP violation
+monitoring. The public smoke test checks the Pages revision and sample.
+See the [scope and comparison rules](hreflang.md).
+
 ## HTTP Cache Age coverage (2026-11-23 JST)
 
 Pure tests pin the conservative maximum, ties, future Date, missing Age, invalid

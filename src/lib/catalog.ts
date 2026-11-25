@@ -1,4 +1,5 @@
 export type ToolId =
+  | "hreflang"
   | "icalendar"
   | "cidr-aggregate"
   | "git-branch"
@@ -97,6 +98,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "hreflang", category: "network", wasm: false, devtoys: false,
+    keywords: "hreflang html head alternate seo localized pair reciprocal language 多言語 言語 相互 语言 語言 언어 상호", color: "blue" },
   { id: "icalendar", category: "data", wasm: false, devtoys: false,
     keywords: "icalendar ics vevent vtimezone calendar schedule rrule recurrence date timezone カレンダー 予定 繰り返し 日历 日曆 行事曆 일정 달력 반복", color: "purple" },
   { id: "cidr-aggregate", category: "network", wasm: false, devtoys: false,
