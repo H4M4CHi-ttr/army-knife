@@ -1,3 +1,4 @@
+import type { HreflangPairInput, HreflangPairReport } from "./hreflang";
 import type { ICalendarReport } from "./icalendar";
 import { ToolError } from "./errors";
 import type { CaseStyle, LiteralFormat, LiteralDirection, TextAnalysis } from "./text-advanced";
@@ -7,11 +8,13 @@ export type InspectorWorkerRequest =
   | { kind: "text-stats"; input: string; locale: string; style: CaseStyle }
   | { kind: "string-literals"; input: string; format: LiteralFormat; direction: LiteralDirection }
   | { kind: "git-conflicts"; input: string }
-  | { kind: "icalendar"; input: string };
+  | { kind: "icalendar"; input: string }
+  | { kind: "hreflang"; input: HreflangPairInput };
 export type InspectorWorkerResult =
   | { kind: "text-stats"; data: TextAnalysis }
   | { kind: "string-literals"; data: string }
   | { kind: "icalendar"; data: ICalendarReport }
+  | { kind: "hreflang"; data: HreflangPairReport }
   | { kind: "git-conflicts"; data: { conflicts: ConflictEntry[]; diagnostics: ConflictDiagnostic[]; lines: number } };
 
 interface WorkerReply { ok: boolean; result?: InspectorWorkerResult; code?: string }

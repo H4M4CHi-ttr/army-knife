@@ -1,5 +1,6 @@
 import { cidrAggregateMessages } from "./cidr-aggregate.ts";
 import { gitBranchMessages } from "./git-branch.ts";
+import { hreflangMessages } from "./hreflang.ts";
 import { iCalendarMessages } from "./icalendar.ts";
 import { redisSlotsMessages } from "./redis-slots.ts";
 import { websocketAcceptMessages } from "./websocket-accept.ts";
@@ -59,6 +60,7 @@ export const messages = {
   en: {
     ...cidrAggregateMessages["en"],
     ...gitBranchMessages["en"],
+    ...hreflangMessages["en"],
     ...iCalendarMessages["en"],
     ...redisSlotsMessages["en"],
     ...websocketAcceptMessages.en,
@@ -111,6 +113,7 @@ export const messages = {
   ja: {
     ...cidrAggregateMessages["ja"],
     ...gitBranchMessages["ja"],
+    ...hreflangMessages["ja"],
     ...iCalendarMessages["ja"],
     ...redisSlotsMessages["ja"],
     ...websocketAcceptMessages.ja,
@@ -163,6 +166,7 @@ export const messages = {
   "zh-CN": {
     ...cidrAggregateMessages["zh-CN"],
     ...gitBranchMessages["zh-CN"],
+    ...hreflangMessages["zh-CN"],
     ...iCalendarMessages["zh-CN"],
     ...redisSlotsMessages["zh-CN"],
     ...websocketAcceptMessages["zh-CN"],
@@ -215,6 +219,7 @@ export const messages = {
   "zh-TW": {
     ...cidrAggregateMessages["zh-TW"],
     ...gitBranchMessages["zh-TW"],
+    ...hreflangMessages["zh-TW"],
     ...iCalendarMessages["zh-TW"],
     ...redisSlotsMessages["zh-TW"],
     ...websocketAcceptMessages["zh-TW"],
@@ -267,6 +272,7 @@ export const messages = {
   ko: {
     ...cidrAggregateMessages["ko"],
     ...gitBranchMessages["ko"],
+    ...hreflangMessages["ko"],
     ...iCalendarMessages["ko"],
     ...redisSlotsMessages["ko"],
     ...websocketAcceptMessages.ko,

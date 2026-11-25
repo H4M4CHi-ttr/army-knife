@@ -6,6 +6,8 @@ import { i18n } from "./i18n";
 import { setFontLocale } from "./lib/fonts";
 import { defaultPreferences, settings, STORAGE_KEY } from "./lib/preferences";
 import { tools } from "./lib/catalog";
+import { HREFLANG_LIMITS } from "./lib/tools/hreflang";
+import { HREFLANG_SAMPLE } from "./lib/tools/hreflang-sample";
 import { legacyToolRedirect, localeHomePath, resolvePageRoute, toolPath } from "./lib/routes";
 import * as engine from "./lib/wasm/client";
 
@@ -125,6 +127,51 @@ async function openSettings(wrapper: VueWrapper): Promise<DOMWrapper<Element>> {
 }
 
 describe("App integration with real local tools", () => {
+  it("compares pasted hreflang heads in the real Vapor tool and removes invalidated results", async () => {
+    const wrapper = await mountPage(toolPath("en", "hreflang"));
+    await expectElement(wrapper, "#hreflang-a-head");
+    const result = '[data-testid="hreflang-result"]';
+    const status = '[data-testid="apply-control"]';
+    expect(wrapper.find(result).exists()).toBe(false);
+    expect(wrapper.get('[data-testid="hreflang-incomplete"]').text()).toContain("both URLs");
+
+    await wrapper.get('[data-testid="hreflang-sample"]').trigger("click");
+    const head = wrapper.get<HTMLTextAreaElement>("#hreflang-a-head");
+    const url = wrapper.get<HTMLTextAreaElement>("#hreflang-a-url");
+    expect(wrapper.get(result).text()).toContain("The submitted pair matches");
+    expect(wrapper.get('[data-testid="hreflang-announcement"]').text()).toBe("The submitted pair matches");
+    expect(wrapper.findAll('[data-testid="hreflang-row"]')).toHaveLength(8);
+    await url.setValue("https://example.test/ja");
+    expect(wrapper.get(result).text()).toContain("Missing self-reference");
+    await url.setValue(HREFLANG_SAMPLE.a.url);
+    expect(wrapper.get(result).text()).toContain("The submitted pair matches");
+
+    head.element.setSelectionRange(0, head.element.value.length);
+    const paste = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(paste, "clipboardData", {
+      value: { getData: () => "é".repeat(HREFLANG_LIMITS.headBytes / 2) + "\r\n" },
+    });
+    head.element.dispatchEvent(paste);
+    await nextTick();
+    expect(paste.defaultPrevented).toBe(true);
+    expect(wrapper.find(result).exists()).toBe(false);
+    expect(wrapper.text()).toContain("The edit was rejected");
+    await head.setValue(HREFLANG_SAMPLE.a.head);
+    expect(wrapper.get(result).text()).toContain("The submitted pair matches");
+
+    controlExecutionClock();
+    await head.setValue("<!--" + "a".repeat(HREFLANG_LIMITS.instantCharacters) + "-->" + HREFLANG_SAMPLE.a.head);
+    expect(wrapper.get(status).attributes("data-status")).toBe("pending");
+    expect(wrapper.find(result).exists()).toBe(false);
+    await wrapper.get('[data-testid="hreflang-cancel"]').trigger("click");
+    await advanceExecutionClock(800);
+    expect(wrapper.get(status).attributes("data-status")).toBe("cancelled");
+    expect(wrapper.find(result).exists()).toBe(false);
+    await wrapper.get('[data-testid="hreflang-clear"]').trigger("click");
+    expect(wrapper.get<HTMLTextAreaElement>("#hreflang-a-head").element.value).toBe("");
+    expect(wrapper.get('[data-testid="hreflang-announcement"]').text()).toBe("");
+  });
+
   it("uses the public URL language ahead of saved preferences and preserves static guide content", async () => {
     settings.preferences.locale = "ja";
     const guide = document.createElement("article");

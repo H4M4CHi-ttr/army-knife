@@ -23,6 +23,9 @@ importers:
       clsx:
         specifier: 2.1.1
         version: 2.1.1
+      parse5:
+        specifier: 8.1.1
+        version: 8.1.1
       reka-ui:
         specifier: 2.11.0
         version: 2.11.0(vue@3.6.0-rc.11(typescript@6.0.3))
@@ -1148,6 +1151,10 @@ packages:
     resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
     engines: {node: '>=0.12'}
 
+  entities@9.0.0:
+    resolution: {integrity: sha512-oJFNDJg3kTPwAD1cNn2+WmUq4wFoo09npc3Ydf1D7ED4smRiWrsKnaLxykrTWgyGEcusc87P5dxlAleol9kpkg==}
+    engines: {node: '>=20.19.0'}
+
   es-module-lexer@2.3.2:
     resolution: {integrity: sha512-poHGpORABojJJucnV9KbOavETW8lBVnphkW77ER5/BQ5Fz7oXSoCNek7IH3vR5nRjdsEz926ibFYX8KtLQmdyw==}
 
@@ -1456,6 +1463,9 @@ packages:
         optional: true
       vite-plus:
         optional: true
+
+  parse5@8.1.1:
+    resolution: {integrity: sha512-EcR/6WDcU7b2N3vQSxKALCk9lXGtUMQxXio008OEMBE0kavu/7JLfBEeFPzi43nMqVDSbEn3QCK+BMCc9zO//w==}
 
   path-browserify@1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
@@ -2515,6 +2525,8 @@ snapshots:
 
   entities@7.0.1: {}
 
+  entities@9.0.0: {}
+
   es-module-lexer@2.3.2: {}
 
   estree-walker@2.0.2: {}
@@ -2795,6 +2807,10 @@ snapshots:
       '@oxlint/binding-win32-x64-msvc': 1.87.0
       oxlint-tsgolint: 7.0.2003
       vite-plus: 1.1.0(@types/node@24.19.2)(@vitest/ui@5.0.3(vitest@5.0.3))(@volar/typescript@2.4.28(typescript@6.0.3))(@vue/language-core@3.3.12)(happy-dom@20.14.6)(jiti@2.7.0)(playwright@1.64.0)(stylus@0.57.0)(typescript@6.0.3)(vue-tsc@3.3.12(typescript@6.0.3))
+
+  parse5@8.1.1:
+    dependencies:
+      entities: 9.0.0
 
   path-browserify@1.0.1: {}
 

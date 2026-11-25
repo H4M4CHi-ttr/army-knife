@@ -1,5 +1,12 @@
 # DevToys overlap policy
 
+## HTML hreflang pair inspector (2026-11-26 JST)
+
+This tool defaults **on**. The [official bundled DevToys catalog](https://devtoys.app/)
+has no dedicated workflow for comparing hreflang self and return links in two
+HTML heads. Generic text comparison and URL utilities serve different workflows.
+The comparison covers the official bundle. [Parsing scope and limits](hreflang.md).
+
 ## Git blob ID
 
 The Git object ID calculator defaults **on**. The [bundled DevToys list](https://devtoys.app/)
