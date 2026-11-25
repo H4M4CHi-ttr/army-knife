@@ -13,7 +13,8 @@ source order and show their line numbers. The sample uses only `example.test`.
   supply a language-specific self or return link.
 - Repeated language/URL pairs, conflicting URLs for a language in one head,
   and differing destinations for the same language between heads are flagged.
-  Links that declare `media` are flagged and excluded from matching.
+  Links that declare `media`, an alternate stylesheet, or an RSS or Atom feed
+  are flagged and excluded from matching.
 - Unsubmitted destinations are displayed as unverified, even if the two maps
   agree about those URLs. A missing third-page declaration on one side alone
   is outside the pair checks.
@@ -35,8 +36,10 @@ The pinned parse5 library constructs plain JavaScript data in memory. Only
 direct HTML link children of the parsed head with an `alternate` relation and
 a `hreflang` attribute are read. Attribute entities are decoded. Comments, raw
 text, template descendants, body content and links recovered from after the
-closing head are excluded. HTML recovery errors other than an omitted doctype
-are flagged because declarations may be missing.
+closing head are excluded. Recovery errors in the head and relocated alternate
+hreflang links are flagged because declarations may be missing. Diagnostics
+outside that region and an omitted doctype do not affect the report. One
+leading byte order mark is ignored by the parser and counts toward the byte limit.
 
 Limits are 64 KiB of raw UTF-8 per HTML source, 2,048 raw UTF-8 bytes per page URL,
 and 64 declarations per head. Decoded declaration values are limited to 2,048

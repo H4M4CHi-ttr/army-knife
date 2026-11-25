@@ -59,6 +59,56 @@ describe("HTML hreflang pair", () => {
     expect(report.pages.a.peerLanguages).toEqual([]);
   });
 
+
+  it.each([
+    ["<head>", "</head><body class=a class=b>"],
+    ["<head>", "<body class=a class=b>"],
+    ["", "<main class=a class=b>"],
+    ["", "</head><main class=a class=b>"],
+    ["", '</head><link rel="stylesheet" href="https://example.test/style.css"><main class=a class=b>'],
+  ])("ignores unrelated errors outside explicit or implied head boundaries (%s %s)", (start, end) => {
+    const report = inspectHreflangPair(pair(`<!doctype html><html>${start}${b.head}${end}Synthetic text</html>`));
+    expect(report.hasIssues).toBe(false);
+    expect(report.pages.a).toMatchObject({ parseErrors: 0, firstParseErrorLine: null, selfLanguages: ["ja"], peerLanguages: ["en"] });
+  });
+
+  it("distinguishes relocated alternate declarations from relocated styles", () => {
+    const report = inspectHreflangPair(pair([
+      "<!doctype html><head>", b.head, "</head>",
+      '<style>body { margin: 0; }</style>',
+      link("fr", "https://example.test/fr/"),
+      "<body class=a class=b>Synthetic text</body>",
+    ].join("\n")));
+    expect(report.hasIssues).toBe(true);
+    expect(report.pages.a).toMatchObject({ parseErrors: 1, firstParseErrorLine: 8, selfLanguages: ["ja"], peerLanguages: ["en"] });
+    expect(report.pages.a.links.map(row => row.language)).toEqual(["ja", "en", "x-default", "ko"]);
+  });
+
+  it("strips one leading paste BOM for parsing and still charges its UTF-8 bytes", () => {
+    const report = inspectHreflangPair(pair("\uFEFF" + b.head));
+    expect(report.hasIssues).toBe(false);
+    expect(report.pages.a.links[0].line).toBe(1);
+    const head = "<!--" + "a".repeat(HREFLANG_LIMITS.headBytes - 7) + "-->";
+    expect(inspectHreflangPair(pair(head)).pages.a.parseErrors).toBe(0);
+    expect(() => inspectHreflangPair(pair("\uFEFF" + head))).toThrow(issue("INPUT_TOO_LARGE"));
+  });
+
+  it("excludes stylesheet and feed alternates from evidence while allowing typed HTML alternatives", () => {
+    const report = inspectHreflangPair(pair([
+      link("ja", a.url).replace('rel="alternate"', 'rel="alternate StyleSheet"'),
+      link("ja", a.url).replace('<link ', '<link type=" Application/Rss+Xml; charset=UTF-8 " '),
+      link("en", b.url).replace('<link ', '<link type="application/atom+xml" '),
+    ].join("\n")));
+    expect(report.hasIssues).toBe(true);
+    expect(report.pages.a.selfLanguages).toEqual([]);
+    expect(report.pages.a.peerLanguages).toEqual([]);
+    expect(report.pages.a.links.map(row => row.issues)).toEqual([["representation"], ["representation"], ["representation"]]);
+
+    const typed = [link("ja", a.url).replace('<link ', '<link type="text/html; charset=utf-8" '),
+      link("en", b.url).replace('<link ', '<link type="application/xhtml+xml" ')].join("\n");
+    expect(inspectHreflangPair(pair(typed)).hasIssues).toBe(false);
+  });
+
   it("keeps an HTML recovery warning even when the recorded pair behaves reciprocally", () => {
     const report = inspectHreflangPair(pair(b.head + '\n<link href="unfinished'));
     expect(report.hasIssues).toBe(true);

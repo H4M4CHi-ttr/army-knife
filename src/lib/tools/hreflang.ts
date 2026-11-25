@@ -1,4 +1,6 @@
-import { defaultTreeAdapter, html, parse, type DefaultTreeAdapterTypes } from "parse5";
+import {
+  defaultTreeAdapter, ErrorCodes, html, parse, type DefaultTreeAdapterTypes, type ParserError,
+} from "parse5";
 import { assertInputSize, ToolError } from "./errors";
 
 export const HREFLANG_LIMITS = {
@@ -13,7 +15,7 @@ export const HREFLANG_PAGES = ["a", "b"] as const;
 type PageId = typeof HREFLANG_PAGES[number];
 export type HreflangPairInput = Record<PageId, { url: string; head: string }>;
 
-type LinkIssue = "language" | "relative" | "url" | "media" | "duplicate" | "conflict" | "disagreement";
+type LinkIssue = "language" | "relative" | "url" | "media" | "representation" | "duplicate" | "conflict" | "disagreement";
 interface HreflangLink {
   line: number;
   language: string;
@@ -64,18 +66,17 @@ interface Mapping {
 }
 
 function inspectHead(source: string, url: string, otherUrl: string) {
-  let parseErrors = 0;
-  let firstParseErrorLine: number | null = null;
-  let firstAbandonedHeadOffset = Infinity;
-  const document = parse(source, {
+  const parserErrors: ParserError[] = [];
+  let relocatedStart = Infinity;
+  const document = parse(source.startsWith("\uFEFF") ? source.slice(1) : source, {
     scriptingEnabled: true,
     sourceCodeLocationInfo: true,
     onParseError(error) {
-      if (error.code === "missing-doctype") return;
-      parseErrors++;
-      firstParseErrorLine ??= error.startLine;
-      if (error.code === "abandoned-head-element-child")
-        firstAbandonedHeadOffset = Math.min(firstAbandonedHeadOffset, error.startOffset);
+      if (error.code === ErrorCodes.abandonedHeadElementChild) {
+        relocatedStart = Math.min(relocatedStart, error.startOffset);
+      } else if (error.code !== ErrorCodes.missingDoctype) {
+        parserErrors.push(error);
+      }
     },
   });
   const documentElement = document.childNodes.find(
@@ -84,15 +85,47 @@ function inspectHead(source: string, url: string, otherUrl: string) {
   const head = documentElement?.childNodes.find(
     (node): node is DefaultTreeAdapterTypes.Element => defaultTreeAdapter.isElementNode(node) && node.tagName === "head",
   );
-  const cutoff = Math.min(firstAbandonedHeadOffset, head?.sourceCodeLocation?.endTag?.startOffset ?? Infinity);
+  const closingTag = head?.sourceCodeLocation?.endTag;
+  const headContentEnd = Math.min(closingTag?.startOffset ?? Infinity, relocatedStart);
+  let headMarkupEnd = Math.min(closingTag?.endOffset ?? Infinity, relocatedStart);
+  if (documentElement && head) {
+    // When HTML omits </head>, use the first authored node outside the head.
+    // The parser may also imply <body>, in which case only its descendants
+    // have source positions. Other inferred nodes can be traversed likewise.
+    const afterHead = documentElement.childNodes.slice(documentElement.childNodes.indexOf(head) + 1);
+    while (afterHead.length) {
+      const node = afterHead.pop()!;
+      if (node.sourceCodeLocation) {
+        headMarkupEnd = Math.min(headMarkupEnd, node.sourceCodeLocation.startOffset);
+      } else if (defaultTreeAdapter.isElementNode(node)) {
+        for (const child of node.childNodes) afterHead.push(child);
+      }
+    }
+  }
+
+  let parseErrors = 0;
+  let firstParseErrorLine: number | null = null;
+  function noteParseError(line: number) {
+    parseErrors++;
+    firstParseErrorLine = firstParseErrorLine === null ? line : Math.min(firstParseErrorLine, line);
+  }
+  for (const error of parserErrors) {
+    if (error.startOffset < headMarkupEnd) noteParseError(error.startLine);
+  }
+
   const links: HreflangLink[] = [];
   const mappings = new Map<string, Mapping[]>();
   for (const node of head?.childNodes ?? []) {
     if (!defaultTreeAdapter.isElementNode(node) || node.namespaceURI !== html.NS.HTML ||
-      node.tagName !== "link" || !node.sourceCodeLocation || node.sourceCodeLocation.startOffset >= cutoff) continue;
+      node.tagName !== "link" || !node.sourceCodeLocation) continue;
     const attributes = new Map(node.attrs.map(attribute => [attribute.name, attribute.value]));
     const rawLanguage = attributes.get("hreflang");
-    if (rawLanguage === undefined || !attributes.get("rel")?.toLowerCase().split(asciiSpace).includes("alternate")) continue;
+    const relations = attributes.get("rel")?.toLowerCase().split(asciiSpace) ?? [];
+    if (rawLanguage === undefined || !relations.includes("alternate")) continue;
+    if (node.sourceCodeLocation.startOffset >= headContentEnd) {
+      noteParseError(node.sourceCodeLocation.startLine);
+      continue;
+    }
     if (links.length === HREFLANG_LIMITS.linksPerHead) throw new ToolError("HREFLANG_LINK_LIMIT");
     const href = attributes.get("href") ?? "";
     if (encoder.encode(rawLanguage).byteLength > HREFLANG_LIMITS.languageBytes ||
@@ -103,6 +136,9 @@ function inspectHead(source: string, url: string, otherUrl: string) {
     if (!asciiLanguage.test(rawLanguage)) issues.push("language");
     if (!target) issues.push(href.trim() && !absoluteScheme.test(trimHtmlSpace(href)) ? "relative" : "url");
     if (attributes.has("media")) issues.push("media");
+    const mime = attributes.get("type")?.split(";", 1)[0].trim().toLowerCase();
+    if (relations.includes("stylesheet") || mime === "application/rss+xml" || mime === "application/atom+xml")
+      issues.push("representation");
     const destination = target === null ? null : target === url ? "self" : target === otherUrl ? "peer" : "unchecked";
     const link: HreflangLink = { line: node.sourceCodeLocation.startLine, language: rawLanguage, href, destination, issues };
     links.push(link);
