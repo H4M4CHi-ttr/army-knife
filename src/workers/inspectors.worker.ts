@@ -16,6 +16,11 @@ self.onmessage = async (event: MessageEvent<InspectorWorkerRequest>) => {
       case "string-literals":
         result = { kind: request.kind, data: transformLiteral(request.input, request.format, request.direction) };
         break;
+      case "csv-key-diff": {
+        const { compareCsvKeys } = await import("../lib/tools/csv-key-diff");
+        result = { kind: request.kind, data: compareCsvKeys(request.input) };
+        break;
+      }
       case "hreflang": {
         const { inspectHreflangPair } = await import("../lib/tools/hreflang");
         result = { kind: request.kind, data: inspectHreflangPair(request.input) };

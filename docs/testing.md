@@ -1,5 +1,16 @@
 # Testing and deployment
 
+## CSV/TSV key diff coverage (2026-11-27 JST)
+
+The pure tests check exact key tuples, reordered input, mixed CSV/TSV, schema
+changes, invalid or ambiguous records, resource limits, spreadsheet CSV
+escaping and completeness beyond the preview. The real Vapor route covers
+key selection, stale results, pending cancellation and recovery. Production
+browser tests exercise the five locales, the four Chromium/Firefox projects,
+local file import, explicit download and the exact-distribution asset audit.
+The Pages smoke tests check the revision and run the sample comparison.
+See the [comparison rules and bounds](csv-key-diff.md).
+
 ## HTML hreflang pair coverage (2026-11-26 JST)
 
 Pure tests cover actual head links, HTML recovery and entity decoding, fallback,

@@ -1,3 +1,4 @@
+import type { CsvDiffInput, CsvDiffReport } from "./csv-key-diff";
 import type { HreflangPairInput, HreflangPairReport } from "./hreflang";
 import type { ICalendarReport } from "./icalendar";
 import { ToolError } from "./errors";
@@ -9,12 +10,14 @@ export type InspectorWorkerRequest =
   | { kind: "string-literals"; input: string; format: LiteralFormat; direction: LiteralDirection }
   | { kind: "git-conflicts"; input: string }
   | { kind: "icalendar"; input: string }
-  | { kind: "hreflang"; input: HreflangPairInput };
+  | { kind: "hreflang"; input: HreflangPairInput }
+  | { kind: "csv-key-diff"; input: CsvDiffInput };
 export type InspectorWorkerResult =
   | { kind: "text-stats"; data: TextAnalysis }
   | { kind: "string-literals"; data: string }
   | { kind: "icalendar"; data: ICalendarReport }
   | { kind: "hreflang"; data: HreflangPairReport }
+  | { kind: "csv-key-diff"; data: CsvDiffReport }
   | { kind: "git-conflicts"; data: { conflicts: ConflictEntry[]; diagnostics: ConflictDiagnostic[]; lines: number } };
 
 interface WorkerReply { ok: boolean; result?: InspectorWorkerResult; code?: string }

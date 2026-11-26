@@ -127,6 +127,42 @@ async function openSettings(wrapper: VueWrapper): Promise<DOMWrapper<Element>> {
 }
 
 describe("App integration with real local tools", () => {
+  it("compares selected CSV keys in the real Vapor route and removes stale results", async () => {
+    const wrapper = await mountPage(toolPath("en", "csv-key-diff"));
+    const before = "#csv-key-diff-before";
+    const after = "#csv-key-diff-after";
+    const result = '[data-testid="csv-key-diff-result"]';
+    const download = '[data-testid="csv-key-diff-download"]';
+    const status = '[data-testid="apply-control"]';
+    await expectElement(wrapper, before);
+    await wrapper.get(before).setValue("id,site,value\n001,us,old\n001,eu,same");
+    await wrapper.get(after).setValue("site,id,value\neu,001,same\nus,001,new");
+    expect(wrapper.find(result).exists()).toBe(false);
+    const [id, site] = wrapper.findAll<HTMLInputElement>('[data-testid="csv-key-diff-key"]');
+    await id.setValue(true);
+    expect(wrapper.get('[role="alert"]').text()).toContain("duplicate key values");
+    await site.setValue(true);
+    expect(wrapper.get(result).text()).toContain("1 updated");
+    expect(wrapper.find(download).exists()).toBe(true);
+
+    await wrapper.get(after).setValue("area,id,value\nus,001,new");
+    expect(wrapper.find(download).exists()).toBe(false);
+    expect(wrapper.get('[role="alert"]').text()).toContain("must exist in both tables");
+    await wrapper.get('[data-testid="csv-key-diff-sample"]').trigger("click");
+    expect(wrapper.get(result).text()).toContain("1 added · 1 removed · 1 updated");
+    controlExecutionClock();
+    await wrapper.get(after).setValue("id,value\n001," + "x".repeat(4096));
+    expect(wrapper.find(download).exists()).toBe(false);
+    expect(wrapper.get(status).attributes("data-status")).toBe("pending");
+    await wrapper.get('[data-testid="csv-key-diff-cancel"]').trigger("click");
+    await advanceExecutionClock(800);
+    expect(wrapper.get(status).attributes("data-status")).toBe("cancelled");
+    expect(wrapper.find(result).exists()).toBe(false);
+    await wrapper.get('[data-testid="csv-key-diff-clear"]').trigger("click");
+    expect(wrapper.get<HTMLTextAreaElement>(before).element.value).toBe("");
+    expect(wrapper.get<HTMLTextAreaElement>(after).element.value).toBe("");
+  });
+
   it("compares pasted hreflang heads in the real Vapor tool and removes invalidated results", async () => {
     const wrapper = await mountPage(toolPath("en", "hreflang"));
     await expectElement(wrapper, "#hreflang-a-head");

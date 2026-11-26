@@ -33,6 +33,7 @@ import {
 import type { ToolId } from "@/lib/catalog";
 defineProps<{ id: ToolId }>();
 const icons = {
+  "csv-key-diff": TableProperties,
   hreflang: Languages,
   icalendar: CalendarClock,
   "cidr-aggregate": Network,
