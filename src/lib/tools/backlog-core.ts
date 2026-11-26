@@ -1,3 +1,4 @@
+import { scanDelimited } from "./delimited";
 import { assertInputSize, ToolError } from "./errors";
 import { parseJsonSafely, type JsonValue } from "./json";
 import { recordedInstant } from "./backlog-dates";
@@ -163,32 +164,10 @@ export function convertJsonPointer(input: string, mode: "flatten" | "restore" = 
 export function parseCsv(input: string): string[][] {
   guard(input);
   const records: string[][] = [];
-  let record: string[] = [], field = "", quoted = false, afterQuote = false;
-  for (let i = 0; i < input.length; i++) {
-    const c = input[i];
-    if (quoted) {
-      if (c === '"') {
-        if (input[i + 1] === '"') { field += '"'; i++; }
-        else { quoted = false; afterQuote = true; }
-      } else field += c;
-      continue;
-    }
-    if (afterQuote && c !== "," && c !== "\r" && c !== "\n") return fail();
-    if (c === '"' && !field && !afterQuote) { quoted = true; continue; }
-    if (c === '"') return fail();
-    if (c === ",") { record.push(field); field = ""; afterQuote = false; }
-    else if (c === "\r" || c === "\n") {
-      if (c === "\r" && input[i + 1] === "\n") i++;
-      record.push(field); records.push(record);
-      checkedRows(records.length);
-      record = []; field = ""; afterQuote = false;
-    } else field += c;
+  for (const record of scanDelimited(input, ",")) {
+    records.push(record);
+    checkedRows(records.length);
   }
-  if (quoted) return fail();
-  if (field !== "" || afterQuote || record.length || !/[\r\n]$/.test(input)) {
-    record.push(field); records.push(record);
-  }
-  checkedRows(records.length);
   return records;
 }
 /** #38: no execution; quote each literal and identifier in the selected dialect. */

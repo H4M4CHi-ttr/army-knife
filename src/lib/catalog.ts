@@ -1,4 +1,5 @@
 export type ToolId =
+  | "csv-key-diff"
   | "hreflang"
   | "icalendar"
   | "cidr-aggregate"
@@ -98,6 +99,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "csv-key-diff", category: "data", wasm: false, devtoys: false,
+    keywords: "csv tsv diff compare table database primary composite key export 主キー 複合キー 行差分 主键 主鍵 기본 키", color: "orange" },
   { id: "hreflang", category: "network", wasm: false, devtoys: false,
     keywords: "hreflang html head alternate seo localized pair reciprocal language 多言語 言語 相互 语言 語言 언어 상호", color: "blue" },
   { id: "icalendar", category: "data", wasm: false, devtoys: false,

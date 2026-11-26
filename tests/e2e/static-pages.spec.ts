@@ -39,6 +39,7 @@ async function preferences(page: Page, enabledTools: readonly ToolId[], locale: 
 }
 
 function inputSelector(id: ToolId): string {
+  if (id === "csv-key-diff") return "#csv-key-diff-before";
   if (id === "hreflang") return "#hreflang-a-url";
   if (id === "pg-lsn") return "#pg-lsn-first";
   if (id === "json-merge-patch") return "#merge-patch-target";

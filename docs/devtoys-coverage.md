@@ -1,5 +1,13 @@
 # DevToys overlap policy
 
+## CSV/TSV key diff (2026-11-27 JST)
+
+This tool defaults **on**. The [official bundled DevToys catalog](https://devtoys.app/)
+lists a text comparer and a JSON array to table/CSV converter. Comparison by
+single or composite table keys, across reordered exports with schema changes,
+is a separate workflow. Army Knife's CSV profiler summarizes one table and
+its CSV-to-SQL converter generates statements. [Table diff scope and limits](csv-key-diff.md).
+
 ## HTML hreflang pair inspector (2026-11-26 JST)
 
 This tool defaults **on**. The [official bundled DevToys catalog](https://devtoys.app/)
