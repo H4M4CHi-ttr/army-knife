@@ -21,6 +21,11 @@ self.onmessage = async (event: MessageEvent<InspectorWorkerRequest>) => {
         result = { kind: request.kind, data: compareCsvKeys(request.input) };
         break;
       }
+      case "gitignore": {
+        const { inspectGitignore } = await import("../lib/tools/gitignore");
+        result = { kind: request.kind, data: inspectGitignore(request.input) };
+        break;
+      }
       case "hreflang": {
         const { inspectHreflangPair } = await import("../lib/tools/hreflang");
         result = { kind: request.kind, data: inspectHreflangPair(request.input) };

@@ -1,4 +1,5 @@
 import { csvKeyDiffMessages } from "./csv-key-diff.ts";
+import { gitignoreMessages } from "./gitignore.ts";
 import { cidrAggregateMessages } from "./cidr-aggregate.ts";
 import { gitBranchMessages } from "./git-branch.ts";
 import { hreflangMessages } from "./hreflang.ts";
@@ -62,6 +63,7 @@ export const messages = {
     ...cidrAggregateMessages["en"],
     ...gitBranchMessages["en"],
     ...csvKeyDiffMessages["en"],
+    ...gitignoreMessages["en"],
     ...hreflangMessages["en"],
     ...iCalendarMessages["en"],
     ...redisSlotsMessages["en"],
@@ -116,6 +118,7 @@ export const messages = {
     ...cidrAggregateMessages["ja"],
     ...gitBranchMessages["ja"],
     ...csvKeyDiffMessages["ja"],
+    ...gitignoreMessages["ja"],
     ...hreflangMessages["ja"],
     ...iCalendarMessages["ja"],
     ...redisSlotsMessages["ja"],
@@ -170,6 +173,7 @@ export const messages = {
     ...cidrAggregateMessages["zh-CN"],
     ...gitBranchMessages["zh-CN"],
     ...csvKeyDiffMessages["zh-CN"],
+    ...gitignoreMessages["zh-CN"],
     ...hreflangMessages["zh-CN"],
     ...iCalendarMessages["zh-CN"],
     ...redisSlotsMessages["zh-CN"],
@@ -224,6 +228,7 @@ export const messages = {
     ...cidrAggregateMessages["zh-TW"],
     ...gitBranchMessages["zh-TW"],
     ...csvKeyDiffMessages["zh-TW"],
+    ...gitignoreMessages["zh-TW"],
     ...hreflangMessages["zh-TW"],
     ...iCalendarMessages["zh-TW"],
     ...redisSlotsMessages["zh-TW"],
@@ -278,6 +283,7 @@ export const messages = {
     ...cidrAggregateMessages["ko"],
     ...gitBranchMessages["ko"],
     ...csvKeyDiffMessages["ko"],
+    ...gitignoreMessages["ko"],
     ...hreflangMessages["ko"],
     ...iCalendarMessages["ko"],
     ...redisSlotsMessages["ko"],

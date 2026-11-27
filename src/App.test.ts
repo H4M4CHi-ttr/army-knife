@@ -127,6 +127,59 @@ async function openSettings(wrapper: VueWrapper): Promise<DOMWrapper<Element>> {
 }
 
 describe("App integration with real local tools", () => {
+  it("tests rule order, Windows CRLF pastes and pending cancellation in the real gitignore route", async () => {
+    const wrapper = await mountPage(toolPath("en", "gitignore"));
+    const rules = "#gitignore-rules";
+    const paths = "#gitignore-paths";
+    const summary = '[data-testid="gitignore-result"]';
+    const status = '[data-testid="apply-control"]';
+    await expectElement(wrapper, rules);
+    await wrapper.get(paths).setValue("build\\keep.txt\nnotes.txt");
+    expect(wrapper.get(summary).text()).toContain("0 ignored · 2 included");
+    await wrapper.get<HTMLInputElement>('[data-testid="gitignore-windows"]').setValue(true);
+
+    const paste = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(paste, "clipboardData", { value: { getData: () => "build/\r\n!build/keep.txt\r\n" } });
+    wrapper.get(rules).element.dispatchEvent(paste);
+    await nextTick();
+    const input = wrapper.get<HTMLTextAreaElement>(rules).element;
+    expect(input.value).toBe("build/\n!build/keep.txt\n");
+    expect(input.readOnly).toBe(false);
+    expect(wrapper.get(summary).text()).toContain("1 ignored · 1 included");
+    expect(wrapper.get(summary).text()).toContain("Inherited from ignored directory");
+    expect(wrapper.get(summary).text()).toContain("Rule on line 1");
+    await wrapper.get(rules).setValue("build/\n!build/\n!build/keep.txt");
+    expect(wrapper.get(summary).text()).toContain("0 ignored · 2 included");
+
+    const oversized = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(oversized, "clipboardData", { value: { getData: () => "é".repeat(32768) + "\r\n" } });
+    input.dispatchEvent(oversized);
+    await nextTick();
+    expect(wrapper.find(summary).exists()).toBe(false);
+    expect(wrapper.find('[role="alert"]').exists()).toBe(true);
+
+    const malformed = new Event("paste", { bubbles: true, cancelable: true });
+    Object.defineProperty(malformed, "clipboardData", { value: { getData: () => "build/\r\r\n!build/keep.txt" } });
+    input.dispatchEvent(malformed);
+    await nextTick();
+    expect(wrapper.find(summary).exists()).toBe(false);
+    expect(wrapper.get('[role="alert"]').text()).toContain("Use valid Unicode text with LF or CRLF");
+
+    controlExecutionClock();
+    await wrapper.get('[data-testid="gitignore-sample"]').trigger("click");
+    expect(wrapper.get(summary).text()).toContain("3 ignored · 2 included");
+    await wrapper.get(rules).setValue("#" + "x".repeat(510) + "\n" + "#x\n".repeat(550));
+    expect(wrapper.find(summary).exists()).toBe(false);
+    expect(wrapper.get(status).attributes("data-status")).toBe("pending");
+    await wrapper.get('[data-testid="gitignore-cancel"]').trigger("click");
+    await advanceExecutionClock(800);
+    expect(wrapper.get(status).attributes("data-status")).toBe("cancelled");
+    await wrapper.get('[data-testid="gitignore-clear"]').trigger("click");
+    expect(wrapper.get<HTMLTextAreaElement>(rules).element.value).toBe("");
+    expect(wrapper.get<HTMLTextAreaElement>(paths).element.value).toBe("");
+    expect(wrapper.get<HTMLInputElement>('[data-testid="gitignore-windows"]').element.checked).toBe(false);
+  });
+
   it("compares selected CSV keys in the real Vapor route and removes stale results", async () => {
     const wrapper = await mountPage(toolPath("en", "csv-key-diff"));
     const before = "#csv-key-diff-before";

@@ -1,4 +1,5 @@
 import { csvKeyDiffGuide } from "./csv-key-diff-guide.ts";
+import { gitignoreGuide } from "./gitignore-guide.ts";
 import { cidrAggregateGuide } from "./cidr-aggregate-guide.ts";
 import { gitBranchGuide } from "./git-branch-guide.ts";
 import { hreflangGuide } from "./hreflang-guide.ts";
@@ -181,6 +182,7 @@ export const toolGuides = {
   "cidr-aggregate": cidrAggregateGuide,
   "git-branch": gitBranchGuide,
   "csv-key-diff": csvKeyDiffGuide,
+  gitignore: gitignoreGuide,
   hreflang: hreflangGuide,
   icalendar: iCalendarGuide,
   "redis-slots": redisSlotsGuide,

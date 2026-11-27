@@ -46,6 +46,7 @@ import { legacyHashTool, legacyToolRedirect, localeHomePath, resolvePageRoute, t
 const CidrAggregateTool = defineAsyncComponent(() => import("@/components/tools/CidrAggregateTool.vue"));
 const GitBranchTool = defineAsyncComponent(() => import("@/components/tools/GitBranchTool.vue"));
 const CsvKeyDiffTool = defineAsyncComponent(() => import("@/components/tools/CsvKeyDiffTool.vue"));
+const GitignoreTool = defineAsyncComponent(() => import("@/components/tools/GitignoreTool.vue"));
 const HreflangTool = defineAsyncComponent(() => import("@/components/tools/HreflangTool.vue"));
 const ICalendarTool = defineAsyncComponent(() => import("@/components/tools/ICalendarTool.vue"));
 const RedisSlotsTool = defineAsyncComponent(() => import("@/components/tools/RedisSlotsTool.vue"));
@@ -881,6 +882,7 @@ onBeforeUnmount(() => {
             <CidrAggregateTool v-else-if="selectedTool.id === 'cidr-aggregate'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <GitBranchTool v-else-if="selectedTool.id === 'git-branch'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <CsvKeyDiffTool v-else-if="selectedTool.id === 'csv-key-diff'" :key="`${selectedTool.id}:${preferences.locale}`" />
+            <GitignoreTool v-else-if="selectedTool.id === 'gitignore'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <HreflangTool v-else-if="selectedTool.id === 'hreflang'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <ICalendarTool v-else-if="selectedTool.id === 'icalendar'" :key="`${selectedTool.id}:${preferences.locale}`" />
             <RedisSlotsTool v-else-if="selectedTool.id === 'redis-slots'" :key="`${selectedTool.id}:${preferences.locale}`" />
