@@ -1,4 +1,5 @@
 import type { CsvDiffInput, CsvDiffReport } from "./csv-key-diff";
+import type { GitignoreInput, GitignoreReport } from "./gitignore";
 import type { HreflangPairInput, HreflangPairReport } from "./hreflang";
 import type { ICalendarReport } from "./icalendar";
 import { ToolError } from "./errors";
@@ -11,13 +12,15 @@ export type InspectorWorkerRequest =
   | { kind: "git-conflicts"; input: string }
   | { kind: "icalendar"; input: string }
   | { kind: "hreflang"; input: HreflangPairInput }
-  | { kind: "csv-key-diff"; input: CsvDiffInput };
+  | { kind: "csv-key-diff"; input: CsvDiffInput }
+  | { kind: "gitignore"; input: GitignoreInput };
 export type InspectorWorkerResult =
   | { kind: "text-stats"; data: TextAnalysis }
   | { kind: "string-literals"; data: string }
   | { kind: "icalendar"; data: ICalendarReport }
   | { kind: "hreflang"; data: HreflangPairReport }
   | { kind: "csv-key-diff"; data: CsvDiffReport }
+  | { kind: "gitignore"; data: GitignoreReport }
   | { kind: "git-conflicts"; data: { conflicts: ConflictEntry[]; diagnostics: ConflictDiagnostic[]; lines: number } };
 
 interface WorkerReply { ok: boolean; result?: InspectorWorkerResult; code?: string }

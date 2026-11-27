@@ -1,5 +1,13 @@
 # DevToys overlap policy
 
+## .gitignore rule tester (2026-11-28 JST)
+
+This tool defaults **on**. The [official bundled DevToys catalog](https://devtoys.app/)
+offers a regular-expression tester and text comparison. Testing Git's ordered
+ignore rules, directory inheritance and deciding lines is a separate workflow.
+Army Knife's Git branch, blob and patch tools cover other Git tasks.
+[Rules and limits](gitignore.md).
+
 ## CSV/TSV key diff (2026-11-27 JST)
 
 This tool defaults **on**. The [official bundled DevToys catalog](https://devtoys.app/)

@@ -1,5 +1,16 @@
 # Testing and deployment
 
+## .gitignore rule tester coverage (2026-11-28 JST)
+
+Pure tests compare decisions, winning patterns and their line numbers with
+native Git and cover path types, ancestor exclusions, encodings and bounds.
+The real Vapor route verifies CRLF paste editing, stale-result invalidation and
+pending cancellation. The four Chromium/Firefox projects cover five languages,
+both themes, 390 px layouts, keyboard operation, Worker cancellation,
+complete JSON download and exact-distribution request and storage audits.
+The Pages smoke test checks the deployed revision and the sample.
+See the [matching rules and limits](gitignore.md).
+
 ## CSV/TSV key diff coverage (2026-11-27 JST)
 
 The pure tests check exact key tuples, reordered input, mixed CSV/TSV, schema

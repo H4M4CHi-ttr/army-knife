@@ -1,4 +1,5 @@
 export type ToolId =
+  | "gitignore"
   | "csv-key-diff"
   | "hreflang"
   | "icalendar"
@@ -99,6 +100,8 @@ export interface ToolDefinition {
 }
 
 export const tools: readonly ToolDefinition[] = [
+  { id: "gitignore", category: "text", wasm: false, devtoys: false,
+    keywords: "gitignore git ignore check-ignore glob wildcard pattern negation matched path 除外 パターン 無視 忽略 排除 萬用字元 무시 패턴", color: "orange" },
   { id: "csv-key-diff", category: "data", wasm: false, devtoys: false,
     keywords: "csv tsv diff compare table database primary composite key export 主キー 複合キー 行差分 主键 主鍵 기본 키", color: "orange" },
   { id: "hreflang", category: "network", wasm: false, devtoys: false,
